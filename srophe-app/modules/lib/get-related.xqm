@@ -4,6 +4,7 @@ module namespace rel="http://syriaca.org/related";
 import module namespace page="http://syriaca.org/page" at "paging.xqm";
 import module namespace global="http://syriaca.org/global" at "global.xqm";
 import module namespace data="http://syriaca.org/data" at "data.xqm";
+import module namespace tei2html="http://syriaca.org/tei2html" at "content-negotiation/tei2html.xqm";
 import module namespace functx="http://www.functx.com";
 declare namespace tei="http://www.tei-c.org/ns/1.0";
 declare namespace html="http://www.w3.org/1999/xhtml";
@@ -26,7 +27,7 @@ declare function rel:get-uris($uris as xs:string*, $idno) as xs:string*{
 :)
 declare function rel:display($uri as xs:string*) as element(a)*{
     let $rec :=  data:get-rec($uri)  
-    return global:display-recs-short-view($rec, '')
+    return tei2html:summary-view($rec, '', $uri)
 };
 
 (:~
@@ -40,7 +41,7 @@ declare function rel:get-names($uris as xs:string?) {
     let $name := 
                 if(not(exists(data:get-rec($uri)))) then $uri
                 else if(contains($uris,'/spear/')) then
-                    let $string := normalize-space(string-join($rec/child::*/child::*[not(self::tei:bibl)]/descendant::text(),' '))
+                    let $string := normalize-space(string-join($rec/descendant-or-self::tei:div[@uri=$uri]/descendant::*[not(self::tei:bibl)]/descendant::text(),' '))
                     let $last-words := tokenize($string, '\W+')[position() = 5]
                     return $string (:concat(substring-before($string, $last-words),'...'):)
                 else substring-before($rec[1]/descendant::tei:titleStmt[1]/tei:title[1]/text()[1],' — ')
@@ -104,7 +105,7 @@ declare function rel:get-subject-type($rel as xs:string*) as xs:string*{
             'records'
         else if(contains($rel,'subject')) then 
             'keywords'
-        else (tokenize(string($rel[1]),'/')[4],'s')
+        else concat(tokenize(string($rel[1]),'/')[4],'s')
     else
         if(contains($rel,'subject')) then 
             'keywords'
@@ -117,12 +118,12 @@ declare function rel:get-subject-type($rel as xs:string*) as xs:string*{
 :)
 declare function rel:get-cited($idno){
 let $data := 
-    for $r in collection('/db/apps/srophe-data/data')//tei:body[.//@target[. = replace($idno[1],'/tei','')]]
+    for $r in collection($global:data-root)//tei:body[.//@target[. = replace($idno[1],'/tei','')]]
     let $headword := replace($r/ancestor::tei:TEI/descendant::tei:title[1]/text()[1],' — ','')
     let $id := $r/ancestor::tei:TEI/descendant::tei:idno[@type='URI'][1]
     let $sort := global:build-sort-string($headword,'')
     where $sort != ''
-    order by $sort collation "?lang=en&lt;syr&amp;decomposition=full"
+    order by $sort
     return concat($id, 'headword:=', $headword)
 return  map { "cited" := $data}    
 };
@@ -146,12 +147,12 @@ declare function rel:cited($idno, $start, $perpage){
                         for $rec in subsequence($hits,$start,$perpage)
                         let $id := substring-before($rec,'headword:=')
                         return 
-                            global:display-recs-short-view(collection($global:data-root)//tei:idno[@type='URI'][. = $id]/ancestor::tei:TEI,'')                        
+                            tei2html:summary-view(collection($global:data-root)//tei:idno[@type='URI'][. = $id]/ancestor::tei:TEI, '', $id)                        
                     else 
                         for $rec in $hits
                         let $id := substring-before($rec,'headword:=')
                         return 
-                            global:display-recs-short-view(collection($global:data-root)//tei:idno[@type='URI'][. = $id]/ancestor::tei:TEI,'')
+                            tei2html:summary-view(collection($global:data-root)//tei:idno[@type='URI'][. = $id]/ancestor::tei:TEI, '', $id)
                 }
                 { 
                      if($count gt 5) then
@@ -236,9 +237,9 @@ declare function rel:build-relationships($node,$idno){
                      if(contains($idno,'/subject/') and $relationship = 'skos:broadMatch') then
                         concat('This keyword has broader match with', $count,' keyword',if($count gt 1) then 's' else())
                      else if($related/@mutual) then 
-                        ('This ', rel:get-subject-type($related[1]/@mutual), ' ', rel:decode-relationship($related[1]), ' ', $count, ' other ', rel:get-subject-type($related[1]/@mutual),'.')
+                        concat('This ', rel:get-subject-type($related[1]/@mutual), ' ', rel:decode-relationship($related[1]), ' ', $count, ' other ', rel:get-subject-type($related[1]/@mutual),'.')
                       else if($related/@active) then 
-                        ('This ', rel:get-subject-type($related[1]/@active), ' ',
+                        concat('This ', rel:get-subject-type($related[1]/@active), ' ',
                         rel:decode-relationship($related[1]), ' ',$count, ' ',rel:get-subject-type($related[1]/@passive),'.')
                       else rel:decode-relationship($related[1])
                     }
@@ -363,12 +364,22 @@ declare function rel:link($uris as xs:string*){
         )
 };
 
-declare function rel:build-relationship-sentence($relationship,$uri){
+declare function rel:relationship-sentence($relationship as node()*){
 (: Will have to add in some advanced prcessing that tests the current id (for aggrigate pages) and subs vocab for active/passive:)
 if($relationship/@mutual) then
-    (rel:link($relationship/@mutual), rel:decode-spear-relationship($relationship/@ref),'.')
+    normalize-space(string-join((rel:get-names($relationship/@mutual), rel:decode-spear-relationship($relationship/@ref),'.')))
 else if($relationship/@active) then 
-    (rel:link($relationship/@active), rel:decode-spear-relationship($relationship/@ref), rel:link($relationship/@passive),'.') 
+    normalize-space(string-join((rel:get-names($relationship/@active), 
+    rel:decode-spear-relationship($relationship/@ref), rel:get-names($relationship/@passive),'.'))) 
+else ()
+};
+
+declare function rel:relationship-sentence-links($relationship,$uri){
+(: Will have to add in some advanced prcessing that tests the current id (for aggrigate pages) and subs vocab for active/passive:)
+if($relationship/@mutual) then
+    (rel:get-names($relationship/@mutual),'[',rel:link($relationship/@mutual),']', rel:decode-spear-relationship($relationship/@ref),'.')
+else if($relationship/@active) then 
+    (rel:get-names($relationship/@active),'[',rel:link($relationship/@active),']', rel:decode-spear-relationship($relationship/@ref), rel:get-names($relationship/@passive),'[',rel:link($relationship/@passive),'].') 
 else ()
 };
 
@@ -384,7 +395,7 @@ declare function rel:build-short-relationships-list($node,$idno){
         let $uri := string($related/ancestor::tei:div[@uri][1]/@uri)
         return
             <span class="short-relationships">
-               {(:rel:build-short-relationships($related,$uri):)rel:build-relationship-sentence($related,$uri)} 
+               {rel:relationship-sentence-links($related,$uri)} 
                 &#160;<a href="factoid.html?id={$uri}">See factoid page <span class="glyphicon glyphicon-circle-arrow-right" aria-hidden="true"/></a>
             </span>
 };
@@ -395,7 +406,7 @@ declare function rel:build-short-relationships-list($node,$idno){
  : @param $idno record idno
 :)
 declare function rel:build-short-relationships($node,$uri){ 
-    <p>{rel:build-relationship-sentence($node,$uri)}</p>
+    <p>{rel:relationship-sentence-links($node,$uri)}</p>
 };
 
 (:~
@@ -416,8 +427,8 @@ let $related :=
             then xs:integer($h/descendant::tei:listRelation/tei:relation[@passive[matches(.,request:get-parameter('relId', ''))]]/tei:desc[1]/tei:label[@type='order'][1]/@n)
         else 0
     order by $part
-    return $h      
-let $total := count($related)
+    return $h
+let $total := count($related)    
 let $recType := 
     if($collection = ('sbd','authors','q')) then 'person'
     else if($collection = ('geo','place')) then 'place'
@@ -425,7 +436,7 @@ let $recType :=
     else if($collection = ('subjects','keywords')) then 'keyword'
     else 'record'
 let $title-string :=     
-    if($relType = 'dct:isPartOf') then 
+    if($relType = 'dcterms:isPartOf') then 
         concat($title,' contains ',$total,' works.')
     else if ($relType = 'skos:broadMatch') then
         if($recType = 'keyword') then 
@@ -449,7 +460,7 @@ return
                     return 
                              <div class="indent row">
                                 <div class="col-md-1"><span class="badge results">{$r/descendant::tei:relation[@passive[matches(.,$recid)]][1]/descendant::tei:label[@type='order'][1]/text()}</span></div>
-                                <div class="col-md-11">{global:display-recs-short-view($r,'',$recid)}</div>
+                                <div class="col-md-11">{tei2html:summary-view($r, (), ())}</div>
                              </div>
                 else if($total gt 5) then
                         <div>
@@ -458,11 +469,11 @@ return
                              let $part := 
                                    if ($r/descendant::tei:relation[@passive[matches(.,$recid)]]/tei:desc[1]/tei:label[@type='order'][1]/@n castable as  xs:integer)
                                    then xs:integer($r/child::*/tei:listRelation/tei:relation[@passive[matches(.,$recid)]]/tei:desc[1]/tei:label[@type='order'][1]/@n)
-                                   else ''
+                                   else ''                                  
                              return 
                              <div class="indent row">
                                 <div class="col-md-1"><span class="badge results">{$r/descendant::tei:relation[@passive[matches(.,$recid)]][1]/descendant::tei:label[@type='order'][1]/text()}</span></div>
-                                <div class="col-md-11">{global:display-recs-short-view($r,'',$recid)}</div>
+                                <div class="col-md-11">{tei2html:summary-view($r, (), ())}</div>
                              </div>
                          }
                            <div>
@@ -478,7 +489,7 @@ return
                     return 
                              <div class="indent row">
                                 <div class="col-md-1"><span class="badge results">{$r/descendant::tei:relation[@passive[matches(.,$recid)]][1]/descendant::tei:label[@type='order'][1]/text()}</span></div>
-                                <div class="col-md-11">{global:display-recs-short-view($r,'',$recid)}</div>
+                                <div class="col-md-11">{tei2html:summary-view($r, (), ())}</div>
                              </div>
             )}
         </div>

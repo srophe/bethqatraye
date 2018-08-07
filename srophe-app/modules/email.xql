@@ -9,15 +9,23 @@ declare namespace tei="http://www.tei-c.org/ns/1.0";
 declare namespace xlink = "http://www.w3.org/1999/xlink";
 declare namespace mail="http://exist-db.org/xquery/mail";
 declare namespace request="http://exist-db.org/xquery/request";
+import module namespace global="http://syriaca.org/global" at "lib/global.xqm";
 import module namespace recap = "http://www.exist-db.org/xquery/util/recapture" at "recaptcha.xqm";
 
 declare option exist:serialize "method=xml media-type=text/xml indent=yes";
 
 (:request:get-parameter("recaptcha_response_field",()):)
 declare function local:recaptcha(){
-let $recapture-private-key := string(environment-variable('secret'))
+let $recapture-private-key := "6Lc8sQ4TAAAAALsZFuT6UWGtHNygEDMGZgQAryxe" 
 return 
     recap:validate($recapture-private-key, request:get-parameter("g-recaptcha-response",()))
+};
+
+declare function local:get-emails(){
+let $email-config := doc($global:app-root || 'config.xml')
+for $e-address in $global:get-config//*:contact/text()
+return 
+    <to>{$e-address}</to>
 };
 
 declare function local:build-message(){
@@ -37,7 +45,7 @@ return
     {
     if($collection = 'places') then
         (<to>david.a.michelson@vanderbilt.edu</to>,
-        <to>thomas.a.carlson@okstate.edu</to>)
+        <to>syriac.gazetteer@gmail.com</to>)
     else if($collection = 'q') then
         (<to>david.a.michelson@vanderbilt.edu</to>,
         <to>jeannenicolesaint@gmail.com</to>)

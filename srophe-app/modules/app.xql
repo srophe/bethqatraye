@@ -8,7 +8,7 @@ import module namespace functx="http://www.functx.com";
 (: Srophe modules :)
 import module namespace data="http://syriaca.org/data" at "lib/data.xqm";
 import module namespace teiDocs="http://syriaca.org/teiDocs" at "teiDocs/teiDocs.xqm";
-import module namespace tei2html="http://syriaca.org/tei2html" at "lib/tei2html.xqm";
+import module namespace tei2html="http://syriaca.org/tei2html" at "content-negotiation/tei2html.xqm";
 import module namespace global="http://syriaca.org/global" at "lib/global.xqm";
 import module namespace rel="http://syriaca.org/related" at "lib/get-related.xqm";
 import module namespace maps="http://syriaca.org/maps" at "lib/maps.xqm";
@@ -91,6 +91,54 @@ return
         </div>
     else ()
 }; 
+
+(:~ 
+ : Data formats and sharing
+ : to replace app-link
+ :)
+declare %templates:wrap function app:other-data-formats($node as node(), $model as map(*), $formats as xs:string?){
+let $id := replace($model("data")/descendant::tei:idno[contains(., $global:base-uri)][1],'/tei','')
+return 
+    if($formats) then
+        <div class="container" style="width:100%;clear:both;margin-bottom:1em; text-align:right;">
+            {
+                for $f in tokenize($formats,',')
+                return 
+                    if($f = 'tei') then
+                        (<a href="{concat(replace($id,$global:base-uri,$global:nav-base),'.tei')}" class="btn btn-default btn-xs" id="teiBtn" data-toggle="tooltip" title="Click to view the TEI XML data for this record." >
+                             <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> TEI/XML
+                        </a>, '&#160;')
+                    else if($f = 'print') then                        
+                        (<a href="javascript:window.print();" type="button" class="btn btn-default btn-xs" id="teiBtn" data-toggle="tooltip" title="Click to send this page to the printer." >
+                             <span class="glyphicon glyphicon-print" aria-hidden="true"></span>
+                        </a>, '&#160;')  
+                   else if($f = 'rdf') then
+                        (<a href="{concat(replace($id,$global:base-uri,$global:nav-base),'.rdf')}" class="btn btn-default btn-xs" id="teiBtn" data-toggle="tooltip" title="Click to view the RDF-XML data for this record." >
+                             <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> RDF/XML
+                        </a>, '&#160;')
+                  else if($f = 'ttl') then
+                        (<a href="{concat(replace($id,$global:base-uri,$global:nav-base),'.ttl')}" class="btn btn-default btn-xs" id="teiBtn" data-toggle="tooltip" title="Click to view the RDF-Turtle data for this record." >
+                             <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> RDF/TTL
+                        </a>, '&#160;')
+                  else if($f = 'geojson') then
+                        if($model("data")/descendant::tei:location/tei:geo) then 
+                        (<a href="{concat(replace($id,$global:base-uri,$global:nav-base),'.geojson')}" class="btn btn-default btn-xs" id="teiBtn" data-toggle="tooltip" title="Click to view the GeoJSON data for this record." >
+                             <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> GeoJSON
+                        </a>, '&#160;')
+                        else()
+                  else if($f = 'kml') then
+                        if($model("data")/descendant::tei:location/tei:geo) then
+                            (<a href="{concat(replace($id,$global:base-uri,$global:nav-base),'.kml')}" class="btn btn-default btn-xs" id="teiBtn" data-toggle="tooltip" title="Click to view the KML data for this record." >
+                             <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> KML
+                            </a>, '&#160;')
+                         else()                           
+                   else () 
+                
+            }
+            <br/>
+        </div>
+    else ()
+};
 
 (:~  
  : Display any TEI nodes passed to the function via the paths parameter
@@ -200,7 +248,7 @@ declare %templates:wrap function app:display-work($node as node(), $model as map
                         (
                         app:work-toc($data),
                         global:tei2html($infobox),
-                        app:external-relationships($node, $model,'dct:isPartOf', 'nhsl','',''),
+                        app:external-relationships($node, $model,'dcterms:isPartOf', 'nhsl','',''),
                         app:external-relationships($node, $model,'skos:broadMatch', 'nhsl','',''),
                         app:external-relationships($node, $model,'syriaca:sometimesCirculatesWith','nhsl','',''),
                         app:external-relationships($node, $model,'syriaca:part-of-tradition','nhsl','',''),
@@ -431,7 +479,9 @@ declare %templates:wrap function app:contact-form($node as node(), $model as map
                 <input type="hidden" name="id" value="{request:get-parameter('id', '')}"/>
                 <input type="hidden" name="collection" value="{$collection}"/>
                 <!-- start reCaptcha API-->
-                <div class="g-recaptcha" data-sitekey="{$global:recaptcha}"></div>
+                {if($global:recaptcha != '') then                                
+                    <div class="g-recaptcha" data-sitekey="{$global:recaptcha}"></div>                
+                else ()}
             </div>
             <div class="modal-footer">
                 <button class="btn btn-default" data-dismiss="modal">Close</button><input id="email-submit" type="submit" value="Send e-mail" class="btn"/>
