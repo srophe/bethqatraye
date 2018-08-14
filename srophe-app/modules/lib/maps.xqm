@@ -58,9 +58,9 @@ declare function maps:build-leaflet-map($nodes as node()*, $total-count as xs:in
                                     popupAnchor:  [-3, -76]
                                 }
                             });                                            
-            var greenIcon =    L.AwesomeMarkers.icon({
+            var redIcon =    L.AwesomeMarkers.icon({
                                 icon:'fa-circle',
-                                markerColor: 'green'
+                                markerColor: 'red'
                              })
                 
             var geojson = L.geoJson(placesgeo, {onEachFeature: function (feature, layer){
@@ -69,17 +69,8 @@ declare function maps:build-leaflet-map($nodes as node()*, $total-count as xs:in
                                 feature.properties.name + "</a>" + (feature.properties.type ? "Type: " + feature.properties.type : "") +
                                 (feature.properties.desc ? "<span class='map-pop-desc'>"+ feature.properties.desc +"</span>" : "");
                                 layer.bindPopup(popupContent);
-                            /*
-                                switch (feature.properties.type) {
-                                    case 'born-at': return layer.setIcon(orangeIcon);
-                                    case 'died-at':   return layer.setIcon(redIcon);
-                                    case 'has-literary-connection-to-place':   return layer.setIcon(purpleIcon);
-                                    case 'has-relation-to-place':   return layer.setIcon(blueIcon);
-                                    default : return layer.setIcon(greenIcon);
-                                 }
-                                 */
                                  
-                                 return layer.setIcon(greenIcon);
+                                 return layer.setIcon(redIcon);
                                 }
                             })
         var map = L.map('map').fitBounds(geojson.getBounds(),{maxZoom: 5});     
