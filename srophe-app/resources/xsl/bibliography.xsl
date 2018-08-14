@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:t="http://www.tei-c.org/ns/1.0" xmlns:x="http://www.w3.org/1999/xhtml" xmlns:saxon="http://saxon.sf.net/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:local="http://syriaca.org/ns" exclude-result-prefixes="xs t x saxon local" version="2.0">
+<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:saxon="http://saxon.sf.net/" xmlns:local="http://syriaca.org/ns" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:t="http://www.tei-c.org/ns/1.0" xmlns:x="http://www.w3.org/1999/xhtml" xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="xs t x saxon local" version="2.0">
 
     <!-- ================================================================== 
        Copyright 2013 New York University
@@ -367,6 +366,7 @@
     <xsl:template match="t:analytic" mode="bibliography">
         <!-- Display authors/editors -->
         <xsl:call-template name="persons-bibliography"/>
+        <xsl:text>, </xsl:text>
         <!-- Analytic title(s) -->
         <xsl:choose>
             <xsl:when test="t:title[starts-with(@xml:lang,'en')]">
@@ -465,6 +465,7 @@
                 <xsl:if test="following-sibling::t:monogr">
                     <xsl:text>, </xsl:text>
                 </xsl:if>
+                <xsl:if test="not(following-sibling::*)"><xsl:text>.</xsl:text></xsl:if>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -480,12 +481,14 @@
                     <xsl:when test="deep-equal(t:editor | t:author, preceding-sibling::t:monogr[1]/t:editor | preceding-sibling::t:monogr[1]/t:author )"/>
                     <xsl:otherwise>
                         <xsl:call-template name="persons-bibliography"/>
+                        <xsl:text>, </xsl:text>
                     </xsl:otherwise>
                 </xsl:choose>
                 <!-- Check authors against preceding, suppress if equivalent -->
             </xsl:when>
             <xsl:otherwise>
                 <xsl:call-template name="persons-bibliography"/>
+                <xsl:text>, </xsl:text>
             </xsl:otherwise>
         </xsl:choose>
         <!-- Titles -->
@@ -511,7 +514,8 @@
                 </xsl:if>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:text>. </xsl:text>
+                <!-- Suppress '.' based on feedback here: https://github.com/srophe/syriac-corpus-app/issues/111 open to re-evaluate -->
+<!--                <xsl:text>. </xsl:text>-->
             </xsl:otherwise>
         </xsl:choose>
 
@@ -569,8 +573,9 @@
                         </xsl:choose>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:text> </xsl:text>
+                        <xsl:text>, (</xsl:text>
                         <xsl:apply-templates select="t:imprint" mode="footnote"/>
+                        <xsl:text>)</xsl:text>
                     </xsl:otherwise>
                 </xsl:choose>
                 <xsl:if test="following-sibling::*[1][self::t:monogr]">
@@ -777,9 +782,11 @@
         </xsl:variable>
         <xsl:if test="$rcount &gt; 0">
             <xsl:value-of select="normalize-space($bookAuth)"/>
+            <!--
             <xsl:if test="not(ends-with(normalize-space($bookAuth),'.'))">
                 <xsl:text>. </xsl:text>
             </xsl:if>
+            -->
         </xsl:if>
     </xsl:template>
 
@@ -882,7 +889,7 @@
      levels)
      ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
     <xsl:template match="t:date | t:publisher | t:pubPlace | t:placeName | t:foreign" mode="footnote" priority="1">
-        <xsl:if test="(preceding-sibling::* and not(self::t:pubPlace)) or preceding-sibling::text()">
+        <xsl:if test="(preceding-sibling::* and name(.) != 'pubPlace')">
             <xsl:text> </xsl:text>
         </xsl:if>
         <span class="{local-name()}">
@@ -1070,7 +1077,12 @@
                         </xsl:when>
                     </xsl:choose>
                 </xsl:attribute>
-                <xsl:for-each select="./node()"><xsl:apply-templates select="."/></xsl:for-each></span></xsl:if></xsl:template>
+                <xsl:for-each select="./node()">
+                    <xsl:apply-templates select="."/>
+                </xsl:for-each>
+            </span>
+        </xsl:if>
+    </xsl:template>
 
     <!-- Templates for adding links and icons to uris -->
     <xsl:template match="t:idno | t:ref | t:ptr" mode="links">

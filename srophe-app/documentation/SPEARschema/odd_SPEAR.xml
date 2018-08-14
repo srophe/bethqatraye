@@ -138,10 +138,13 @@
             <memberOf key="model.biblPart" mode="add"/>
           </classes>
           <content>
-            <sequence>
+            <alternate>
+              <sequence>
               <elementRef key="ptr" minOccurs="1" maxOccurs="1"/>
-              <elementRef key="citedRange" minOccurs="1"/>
+              <elementRef key="citedRange" minOccurs="1" maxOccurs="unbounded"/>
             </sequence>
+            <elementRef key="ptr" minOccurs="1" maxOccurs="1"/>
+            </alternate>
           </content>
           <attList>
             <attDef ident="xml:id" mode="add">
@@ -156,6 +159,7 @@
               <valList type="closed">
                 <valItem ident="primary"/>
                 <valItem ident="secondary"/>
+                <valItem ident="urn"/>
               </valList>
             </attDef>
           </attList>
@@ -171,8 +175,15 @@
               </bibl>
             </egXML>
           </exemplum>
+          <exemplum>
+            <egXML xmlns="http://www.tei-c.org/ns/Examples">
+              <bibl type="urn">
+                <ptr target="urn:cts:syriacLit:nhsl8559.syriacCorpus57:8"/>
+              </bibl>
+            </egXML>
+          </exemplum>
           <remarks>
-            <p>SPEAR only uses xml:id and type attributes on the bibl element. This customization keeps bibl in its model classes bur removes it from its attribite classes. It then allows the bibl element to have only xml:id and type attributes and provides a closed list of attribute values for the type attribute when applied to the bibl element.</p>
+            <p>SPEAR only uses xml:id and type attributes on the bibl element. This customization keeps bibl in its model classes but removes it from its attribite classes. It then allows the bibl element to have only xml:id and type attributes and provides a closed list of attribute values for the type attribute when applied to the bibl element. It also allows a bibl element that contains only a ptr element which is used for encoding references to CTS URNs.</p>
           </remarks>
         </elementSpec>
         
@@ -460,8 +471,8 @@
               </valList>
             </attDef>
             <attDef ident="ref" mode="add" usage="opt">
-              <datatype>
-                <dataRef key="att.canonical"/>
+              <datatype minOccurs="1">
+                <dataRef key="teidata.pointer"/>
               </datatype>
             </attDef>
           </attList>
@@ -476,8 +487,8 @@
           </classes>
           <attList>
             <attDef ident="ref" mode="add" usage="req">
-              <datatype>
-                <dataRef key="att.canonical"/>
+              <datatype minOccurs="1">
+                <dataRef key="teidata.pointer"/>
               </datatype>
             </attDef>
           </attList>
@@ -674,7 +685,7 @@
                 <dataRef key="data.pointer"/>
               </datatype>
             </attDef>
-            <attDef ident="resp" usage="req" mode="add"><!-- I want to require this attribute on div but ONLY in divs that are children of body - Schematron. -->
+            <attDef ident="resp" usage="opt" mode="add"><!-- I want to require this attribute on div but ONLY in divs that are children of body - Schematron. -->
               <datatype minOccurs="1" maxOccurs="unbounded">
                 <dataRef key="data.pointer"/>
               </datatype>
@@ -923,7 +934,7 @@
           </classes>
           <attList>
             <attDef ident="ref" usage="req">
-              <datatype>
+              <datatype minOccurs="1" maxOccurs="1">
                 <dataRef key="teidata.pointer"/><!-- I need to figure out a way to require that the attribute value be a syriaca.org person URI. -->
               </datatype>
             </attDef>
@@ -997,7 +1008,7 @@
           </classes>
           <attList>
             <attDef ident="ref" usage="req">
-              <datatype>
+              <datatype minOccurs="1" maxOccurs="1">
                 <dataRef key="teidata.pointer"/><!-- I need to figure out a way to require that the attribute value be a syriaca.org place URI. -->
               </datatype>
             </attDef>
@@ -1029,7 +1040,7 @@
           </classes>
           <attList>
             <attDef ident="ref" mode="replace" usage="req">
-              <datatype>
+              <datatype minOccurs="1">
                 <dataRef key="teidata.enumerated"/>
               </datatype>
               <valList type="closed"><!-- I need to include a brief description of each of these. -->
@@ -1081,10 +1092,12 @@
                 <valItem ident="syriaca:MemberOfGroup"/>
                 <valItem ident="syriaca:MonasticHeadOver"/>
                 <valItem ident="syriaca:Ordination"/>
+                <valItem ident="syriaca:PatronOf"/>
                 <valItem ident="syriaca:Petitioned"/>
                 <valItem ident="syriaca:StudentOf"/>
-                <valItem ident="syriaca:CloseConnection"/>
-                <valItem ident="syriaca:SameAs"/>
+                <valItem ident="syriaca:ProximateEvent"/>
+                <valItem ident="syriaca:SameEvent"/>
+                <valItem ident="dcterms:isPartOf"/><!-- Remove this if we can successfully run browse by part/whole via RDF. -->
               </valList>
             </attDef>
             <attDef ident="type" mode="add" usage="opt">
@@ -1103,25 +1116,14 @@
                 <valItem ident="snap:StepFamilyRelationship"/>
                 <valItem ident="syriaca:AllegedRelationship"/>
                 <valItem ident="syriaca:RitualKinship"/>
+                <valItem ident="part"/>
               </valList>
             </attDef>
-            <attDef ident="ana" mode="add" usage="req">
-              <datatype minOccurs="1" maxOccurs="unbounded">
+            <attDef ident="ana" mode="add" usage="rec">
+              <datatype minOccurs="0" maxOccurs="unbounded">
                 <dataRef key="teidata.enumerated"/>
               </datatype>
-              <valList type="closed"><!-- I need to include a brief description of each of these. -->
-                <valItem ident="clerical"></valItem>
-                <valItem ident="epistolary"></valItem>
-                <valItem ident="family"></valItem>
-                <valItem ident="general"></valItem>
-                <valItem ident="intellectual"></valItem>
-                <valItem ident="legal"></valItem>
-                <valItem ident="military"></valItem>
-                <valItem ident="monastic"></valItem>
-                <valItem ident="personal"></valItem>
-                <valItem ident="professional"></valItem>
-                <valItem ident="religious"></valItem>
-                <valItem ident="slavery"></valItem>
+              <valList type="closed"><!-- I need to include a brief description. -->
                 <valItem ident="event"></valItem>
               </valList>
             </attDef>
@@ -1462,8 +1464,8 @@
             <elementRef key="note" minOccurs="1" maxOccurs="1"/>
           </content>
           <attList>
-            <attDef ident="ref" mode="add" usage="opt">
-              <datatype>
+            <attDef ident="ref" mode="add" usage="req">
+              <datatype minOccurs="1">
                 <dataRef key="teidata.pointer"/>
               </datatype>
             </attDef>
@@ -1551,7 +1553,7 @@
           </content>
           <attList>
             <attDef ident="ref" usage="req">
-              <datatype>
+              <datatype minOccurs="1">
                 <dataRef key="teidata.pointer"/><!-- I need to modify this to employ a controlled vocabulary from a subset of the keyword list. -->
               </datatype>
             </attDef>
@@ -1635,7 +1637,7 @@
           <attList>
             <attDef ident="tag" mode="delete"></attDef>
               <attDef ident="ref" mode="add" usage="req"><!-- Modify this to populate only language options from the keyword list. -->
-              <datatype>
+              <datatype minOccurs="1">
                 <dataRef key="teidata.pointer"/>
               </datatype>
             </attDef>
@@ -1680,8 +1682,8 @@
             <elementRef key="note" minOccurs="1" maxOccurs="1"/>
           </content>
           <attList>
-            <attDef ident="ref" usage="rec">
-              <datatype>
+            <attDef ident="ref" usage="req">
+              <datatype minOccurs="1">
                 <dataRef key="teidata.pointer"/><!-- I need to modify this to employ a controlled vocabulary from a subset of the keyword list. -->
               </datatype>
             </attDef>
@@ -1729,8 +1731,8 @@
                 </valItem>
               </valList>
             </attDef>
-            <attDef ident="ref" usage="rec">
-              <datatype>
+            <attDef ident="ref" usage="req">
+              <datatype minOccurs="1">
                 <dataRef key="teidata.pointer"/><!-- I need to modify this to employ a controlled vocabulary from a subset of the keyword list. -->
               </datatype>
             </attDef>
@@ -1782,8 +1784,8 @@
             <elementRef key="note" minOccurs="1" maxOccurs="1"/>
           </content>
           <attList>
-            <attDef ident="ref" mode="add" usage="opt">
-              <datatype>
+            <attDef ident="ref" mode="add" usage="req">
+              <datatype minOccurs="1">
                 <dataRef key="teidata.pointer"/>
               </datatype>
             </attDef>

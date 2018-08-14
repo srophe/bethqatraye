@@ -28,9 +28,9 @@ else maps:build-leaflet-map($nodes,$total-count)
 declare function maps:build-leaflet-map($nodes as node()*, $total-count as xs:integer?){
     <div id="map-data" style="margin-bottom:3em;">
         <script type="text/javascript" src="{$global:nav-base}/resources/leaflet/leaflet.js"/>
+        <script type="text/javascript" src="{$global:nav-base}/resources/leaflet/leaflet.awesome-markers.min.js"/>
         <script src="http://isawnyu.github.com/awld-js/lib/requirejs/require.min.js" type="text/javascript"/>
         <script src="http://isawnyu.github.com/awld-js/awld.js?autoinit" type="text/javascript"/>
-        <script type="text/javascript" src="{$global:nav-base}/resources/leaflet/leaflet.awesome-markers.min.js"/>
         <div id="map"/>
         {
             if($total-count gt 0) then 
@@ -52,48 +52,36 @@ declare function maps:build-leaflet-map($nodes as node()*, $total-count as xs:in
             var placesgeo = ]]>{geojson:geojson($nodes)}
             <![CDATA[                                
             var sropheIcon = L.Icon.extend({
-                                            options: {
-                                                iconSize:     [38, 38],
-                                                iconAnchor:   [22, 94],
-                                                popupAnchor:  [-3, -76]
-                                                }
-                                            });
-                                            var redIcon =
-                                                L.AwesomeMarkers.icon({
-                                                    icon:'fa-circle',
-                                                    markerColor: 'red'
-                                                }),
-                                            orangeIcon =  
-                                                L.AwesomeMarkers.icon({
-                                                    icon:'fa-circle',
-                                                    markerColor: 'orange'
-                                                }),
-                                            purpleIcon = 
-                                                L.AwesomeMarkers.icon({
-                                                    icon:'fa-circle',
-                                                    markerColor: 'purple'
-                                                }),
-                                            blueIcon =  L.AwesomeMarkers.icon({
-                                                    icon:'fa-circle',
-                                                    markerColor: 'blue'
-                                                });
-                                        
+                                options: {
+                                    iconSize:     [38, 38],
+                                    iconAnchor:   [22, 94],
+                                    popupAnchor:  [-3, -76]
+                                }
+                            });                                            
+            var greenIcon =    L.AwesomeMarkers.icon({
+                                icon:'fa-circle',
+                                markerColor: 'green'
+                             })
+                
             var geojson = L.geoJson(placesgeo, {onEachFeature: function (feature, layer){
-                                            var popupContent = 
-                                            "<a href='" + feature.properties.uri + "' class='map-pop-title'>" +
-                                            feature.properties.name + "</a>" + 
-                                            (feature.properties.type ? "Type: " + feature.properties.type : "") +
-                                            (feature.properties.desc ? "<span class='map-pop-desc'>"+ feature.properties.desc +"</span>" : "");
-                                            layer.bindPopup(popupContent);
-                                            switch (feature.properties.type) {
-                                                case 'born-at': return layer.setIcon(orangeIcon);
-                                                case 'died-at':   return layer.setIcon(redIcon);
-                                                case 'has-literary-connection-to-place':   return layer.setIcon(purpleIcon);
-                                                case 'has-relation-to-place':   return layer.setIcon(blueIcon);
-                                            }
-                                            
-                                        }
-                                })
+                            var popupContent = 
+                                "<a href='" + feature.properties.uri + "' class='map-pop-title'>" +
+                                feature.properties.name + "</a>" + (feature.properties.type ? "Type: " + feature.properties.type : "") +
+                                (feature.properties.desc ? "<span class='map-pop-desc'>"+ feature.properties.desc +"</span>" : "");
+                                layer.bindPopup(popupContent);
+                            /*
+                                switch (feature.properties.type) {
+                                    case 'born-at': return layer.setIcon(orangeIcon);
+                                    case 'died-at':   return layer.setIcon(redIcon);
+                                    case 'has-literary-connection-to-place':   return layer.setIcon(purpleIcon);
+                                    case 'has-relation-to-place':   return layer.setIcon(blueIcon);
+                                    default : return layer.setIcon(greenIcon);
+                                 }
+                                 */
+                                 
+                                 return layer.setIcon(greenIcon);
+                                }
+                            })
         var map = L.map('map').fitBounds(geojson.getBounds(),{maxZoom: 5});     
         terrain.addTo(map);
                                         
