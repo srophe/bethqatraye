@@ -17,7 +17,7 @@
             culture, history, and literature of Syriac communities from antiquity to the present.</description>
         <!-- Contact email -->
         <contact>info@syriaca.org</contact>
-        <!-- Logo name (assumes path to logo is $app-root/resources/img/) -->
+        <!-- Logo name (assumes path to logo is $app-root/resources/images/) -->
         <logo>syriaca-logo.png</logo>
         <!-- Web Site URL -->
         <url>http://bethqatraye.org/</url>
