@@ -59,10 +59,8 @@ let $title := if($node/descendant::*[@syriaca-tags="#syriaca-headword"]) then $n
 let $desc := if($node/descendant::tei:desc[1]/tei:quote) then 
                 concat('"',$node/descendant::tei:desc[1]/tei:quote,'"')
              else $node/descendant::tei:desc[1]
-let $type := if($node/descendant::tei:relationType != '') then 
-                string($node/descendant::tei:relationType)
-              else if($node/descendant::tei:place/@type) then 
-                string($node/descendant::tei:place/@type)
+let $type := if($node/descendant::tei:region[@ref="http://syriaca.org/place/37"]) then 
+                'Beth Qaṭraye (region)'
               else ()   
 let $coords := if($node/descendant::tei:location[@subtype = 'preferred']) then $node/descendant::tei:location[@subtype = 'preferred']/tei:geo else $node/descendant::tei:geo[1]
 return 

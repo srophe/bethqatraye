@@ -59,41 +59,27 @@ declare function maps:build-leaflet-map($nodes as node()*, $total-count as xs:in
                                             var redIcon =
                                                 L.AwesomeMarkers.icon({
                                                     icon:'glyphicon-flag',
+                                                   //icon:'fa-circle',
                                                     markerColor: 'red'
                                                 }),
-                                            orangeIcon =  
-                                                L.AwesomeMarkers.icon({
+                                            greenIcon =  L.AwesomeMarkers.icon({
                                                     icon:'glyphicon-flag',
-                                                    markerColor: 'orange'
-                                                }),
-                                            purpleIcon = 
-                                                L.AwesomeMarkers.icon({
-                                                    icon:'glyphicon-flag',
-                                                    markerColor: 'purple'
-                                                }),
-                                            blueIcon =  L.AwesomeMarkers.icon({
-                                                    icon:'glyphicon-flag',
-                                                    markerColor: 'blue'
+                                                    markerColor: 'green'
                                                 });
                                         
             var geojson = L.geoJson(placesgeo, {onEachFeature: function (feature, layer){
                             var typeText = feature.properties.type
                             var popupContent = 
                                 "<a href='" + feature.properties.uri + "' class='map-pop-title'>" +
-                                feature.properties.name + "</a>" + (feature.properties.type ? "Type: " + typeText : "") +
+                                feature.properties.name + "</a>" + (feature.properties.type ? "Region: " + typeText : "") +
                                 (feature.properties.desc ? "<span class='map-pop-desc'>"+ feature.properties.desc +"</span>" : "");
                                 layer.bindPopup(popupContent);
-        
+                                
+                                //return layer.setIcon(redIcon);
+                                //switch icon based on feature property, 
                                 switch (feature.properties.type) {
-                                    case 'born-at': return layer.setIcon(orangeIcon);
-                                    case 'syriaca:bornAt' : return layer.setIcon(orangeIcon);
-                                    case 'died-at':   return layer.setIcon(redIcon);
-                                    case 'syriaca:diedAt' : return layer.setIcon(redIcon);
-                                    case 'has-literary-connection-to-place':   return layer.setIcon(purpleIcon);
-                                    case 'syriaca:hasLiteraryConnectionToPlace' : return layer.setIcon(purpleIcon);
-                                    case 'has-relation-to-place':   return layer.setIcon(blueIcon);
-                                    case 'syriaca:hasRelationToPlace' :   return layer.setIcon(blueIcon);
-                                    default : '';
+                                    case 'Beth Qaṭraye (region)': return layer.setIcon(greenIcon);
+                                    default : return layer.setIcon(redIcon);;
                                  }               
                                 }
                             })

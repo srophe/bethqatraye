@@ -1,4 +1,14 @@
 <meta xmlns="http://exist-db.org/xquery/repo">
+    <description>The Syriac Reference Portal</description>
+    <author>Winona Salesky</author>
+    <website>http://bethqatraye.org/</website>
+    <status>beta</status>
+    <license>GNU-LGPL</license>
+    <copyright>true</copyright>
+    <type>application</type>
+    <target>bethqatraye</target>
+    <prepare>pre-install.xql</prepare>
+    <finish>post-install.xql</finish>
     <config>
         <!-- App title -->
         <title>Syriaca.org: The Syriac Reference Portal</title>
@@ -45,7 +55,8 @@
                 record-URI-pattern="URI for building links to record views."
                 app-root="folder name in app" 
                 data-root="folder name in data"/>-->
-            <collection name="bethqatraye" title="Beth Qatraye Gazetteer" collection-URI="http://syriaca.org/bethqatraye" series="The Syriac Gazetteer" app-root="geo" data-root="places" record-URI-pattern="http://syriaca.org/place/"/>
+            <collection name="bethqatraye" title="Beth Qatraye Gazetteer" 
+                collection-URI="http://syriaca.org/bethqatraye" series="The Syriac Gazetteer" app-root="/" data-root="places" record-URI-pattern="http://syriaca.org/place/"/>
         </collections>
     </config>
     <deployed>2017-05-09T22:56:20.244-04:00</deployed>
