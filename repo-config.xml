@@ -17,7 +17,7 @@
             culture, history, and literature of Syriac communities from antiquity to the present.</description>
         <!-- Contact email -->
         <contact>info@syriaca.org</contact>
-        <!-- Logo name (assumes path to logo is $app-root/resources/images/) -->
+        <!-- Logo name (assumes path to logo is $app-root/resources/img/) -->
         <logo>syriaca-logo.png</logo>
         <!-- Web Site URL -->
         <url>http://bethqatraye.org/</url>
@@ -55,8 +55,7 @@
                 record-URI-pattern="URI for building links to record views."
                 app-root="folder name in app" 
                 data-root="folder name in data"/>-->
-            <collection name="bethqatraye" title="Beth Qatraye Gazetteer" 
-                collection-URI="http://syriaca.org/bethqatraye" series="The Syriac Gazetteer" app-root="/" data-root="places" record-URI-pattern="http://syriaca.org/place/"/>
+            <collection name="bethqatraye" title="Beth Qatraye Gazetteer" collection-URI="http://syriaca.org/bethqatraye" series="The Syriac Gazetteer" app-root="/" data-root="places" record-URI-pattern="http://syriaca.org/place/"/>
         </collections>
     </config>
     <deployed>2017-05-09T22:56:20.244-04:00</deployed>
