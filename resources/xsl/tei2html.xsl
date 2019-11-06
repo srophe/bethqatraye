@@ -575,31 +575,47 @@
                 <xsl:if test="t:persName[not(empty(descendant-or-self::text()))]">
                     <h4>Names:</h4>
                     <ul class="persNames">
-                        <xsl:apply-templates select="
-                            t:persName[@syriaca-tags='#syriaca-headword' and starts-with(@xml:lang,'syr')] |
-                            t:persName[@srophe:tags='#headword' and starts-with(@xml:lang,'syr')]" mode="list">
-                            <xsl:sort lang="syr" select="."/>
-                        </xsl:apply-templates>
-                        <xsl:apply-templates select="
-                            t:persName[@syriaca-tags='#syriaca-headword' and starts-with(@xml:lang,'en')] |
-                            t:persName[@srophe:tags='#headword' and starts-with(@xml:lang,'en')]" mode="list">
-                            <xsl:sort collation="{$mixed}" select="."/>
-                        </xsl:apply-templates>
-                        <xsl:apply-templates select="
-                            t:persName[(not(@syriaca-tags) or 
-                                        @syriaca-tags!='#syriaca-headword') 
-                                        and (not(@srophe:tags) or @srophe:tags!='#headword') and starts-with(@xml:lang, 'syr')]" mode="list">
-                            <xsl:sort lang="syr" select="."/>
-                        </xsl:apply-templates>
-                        <xsl:apply-templates select="t:persName[starts-with(@xml:lang, 'ar')]" mode="list">
-                            <xsl:sort lang="ar" select="."/>
-                        </xsl:apply-templates>
-                        <xsl:apply-templates select="
-                            t:persName[(not(@syriaca-tags) or @syriaca-tags!='#syriaca-headword')
-                            and (not(@srophe:tags) or @srophe:tags!='#headword') and not(starts-with(@xml:lang, 'syr') 
-                            or starts-with(@xml:lang, 'ar')) and not(@syriaca-tags='#syriaca-simplified-script')]" mode="list">
-                            <xsl:sort collation="{$mixed}" select="."/>
-                        </xsl:apply-templates> 
+                        <xsl:choose>
+                            <xsl:when test="t:persName[@srophe:tags]">
+                                <xsl:apply-templates select="t:persName[@srophe:tags='#headword' and starts-with(@xml:lang,'syr')]" mode="list">
+                                    <xsl:sort lang="syr" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select="t:persName[@srophe:tags='#headword' and starts-with(@xml:lang,'en')]" mode="list">
+                                    <xsl:sort collation="{$mixed}" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select="t:persName[(not(@srophe:tags) or @srophe:tags !='#headword') and starts-with(@xml:lang, 'syr')]" mode="list">
+                                    <xsl:sort lang="syr" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select="t:persName[starts-with(@xml:lang, 'ar')]" mode="list">
+                                    <xsl:sort lang="ar" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select="t:persName[(not(@srophe:tags) or @srophe:tags!='#headword') and not(starts-with(@xml:lang, 'syr') or starts-with(@xml:lang, 'ar')) and not(@srophe:tags='#syriaca-simplified-script')]" mode="list">
+                                    <xsl:sort collation="{$mixed}" select="."/>
+                                </xsl:apply-templates>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:apply-templates select="
+                                    t:persName[@syriaca-tags='#syriaca-headword' and starts-with(@xml:lang,'syr')]" mode="list">
+                                    <xsl:sort lang="syr" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select="
+                                    t:persName[@syriaca-tags='#syriaca-headword' and starts-with(@xml:lang,'en')]" mode="list">
+                                    <xsl:sort collation="{$mixed}" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select="
+                                    t:persName[(not(@syriaca-tags) or @syriaca-tags!='#syriaca-headword')  and starts-with(@xml:lang, 'syr')]" mode="list">
+                                    <xsl:sort lang="syr" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select="t:persName[starts-with(@xml:lang, 'ar')]" mode="list">
+                                    <xsl:sort lang="ar" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select="
+                                    t:persName[(not(@syriaca-tags) or @syriaca-tags!='#syriaca-headword')and not(starts-with(@xml:lang, 'syr') 
+                                    or starts-with(@xml:lang, 'ar')) and not(@syriaca-tags='#syriaca-simplified-script')]" mode="list">
+                                    <xsl:sort collation="{$mixed}" select="."/>
+                                </xsl:apply-templates> 
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </ul>
                 </xsl:if>
                 <br class="clearfix"/>
@@ -611,24 +627,44 @@
         <xsl:if test="self::t:bibl[starts-with(@xml:id,'work-')] and t:title[not(@type=('initial-rubric','final-rubric','abbreviation'))]">
             <div class="well">
                 <h3>Titles</h3>
-                <ul>                
+                <ul> 
                     <xsl:for-each select="t:title[(not(@type) or not(@type=('initial-rubric','final-rubric','abbreviation'))) and not(@syriaca-tags='#syriaca-simplified-script')]">
-                        <xsl:apply-templates select=".[contains(@syriaca-tags,'#syriaca-headword') and starts-with(@xml:lang,'en')] |
-                            .[contains(@srophe:tags,'#headword') and starts-with(@xml:lang,'en')]" mode="list">
-                            <xsl:sort collation="{$mixed}" select="."/>
-                        </xsl:apply-templates>
-                        <xsl:apply-templates select=".[contains(@syriaca-tags,'#syriaca-headword') and starts-with(@xml:lang,'syr')] | .[contains(@srophe:tags,'#headword') and starts-with(@xml:lang,'syr')]" mode="list">
-                            <xsl:sort lang="syr" select="."/>
-                        </xsl:apply-templates>
-                        <xsl:apply-templates select=".[(not(@syriaca-tags) or not(contains(@syriaca-tags,'#syriaca-headword'))) and starts-with(@xml:lang, 'syr')] | .[(not(@srophe:tags) or not(contains(@srophe:tags,'#headword'))) and starts-with(@xml:lang, 'syr')]" mode="list">
-                            <xsl:sort lang="syr" select="."/>
-                        </xsl:apply-templates>
-                        <xsl:apply-templates select=".[starts-with(@xml:lang, 'ar')]" mode="list">
-                            <xsl:sort lang="ar" select="."/>
-                        </xsl:apply-templates>
-                        <xsl:apply-templates select=".[(not(@syriaca-tags) or not(contains(@syriaca-tags,'#syriaca-headword'))) and not(starts-with(@xml:lang, 'syr') or starts-with(@xml:lang, 'ar'))] | .[(not(@srophe:tags) or not(contains(@srophe:tags,'#headword'))) and not(starts-with(@xml:lang, 'syr') or starts-with(@xml:lang, 'ar'))]" mode="list">
-                            <xsl:sort collation="{$mixed}" select="."/>
-                        </xsl:apply-templates>
+                        <xsl:choose>
+                            <xsl:when test="@srophe:tags">
+                                <xsl:apply-templates select=".[contains(@srophe:tags,'#headword') and starts-with(@xml:lang,'en')]" mode="list">
+                                    <xsl:sort collation="{$mixed}" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select=".[contains(@srophe:tags,'#headword') and starts-with(@xml:lang,'syr')]" mode="list">
+                                    <xsl:sort lang="syr" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select=".[(not(@srophe:tags) or not(contains(@srophe:tags,'#headword'))) and starts-with(@xml:lang, 'syr')]" mode="list">
+                                    <xsl:sort lang="syr" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select=".[starts-with(@xml:lang, 'ar')]" mode="list">
+                                    <xsl:sort lang="ar" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select=".[(not(@syriaca-tags) or not(contains(@syriaca-tags,'#syriaca-headword'))) and not(starts-with(@xml:lang, 'syr') or starts-with(@xml:lang, 'ar'))] | .[(not(@srophe:tags) or not(contains(@srophe:tags,'#headword'))) and not(starts-with(@xml:lang, 'syr') or starts-with(@xml:lang, 'ar'))]" mode="list">
+                                    <xsl:sort collation="{$mixed}" select="."/>
+                                </xsl:apply-templates>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:apply-templates select=".[contains(@syriaca-tags,'#syriaca-headword') and starts-with(@xml:lang,'en')]" mode="list">
+                                    <xsl:sort collation="{$mixed}" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select=".[contains(@syriaca-tags,'#syriaca-headword') and starts-with(@xml:lang,'syr')]" mode="list">
+                                    <xsl:sort lang="syr" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select=".[(not(@syriaca-tags) or not(contains(@syriaca-tags,'#syriaca-headword'))) and starts-with(@xml:lang, 'syr')]" mode="list">
+                                    <xsl:sort lang="syr" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select=".[starts-with(@xml:lang, 'ar')]" mode="list">
+                                    <xsl:sort lang="ar" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select=".[(not(@syriaca-tags) or not(contains(@syriaca-tags,'#syriaca-headword'))) and not(starts-with(@xml:lang, 'syr') or starts-with(@xml:lang, 'ar'))]" mode="list">
+                                    <xsl:sort collation="{$mixed}" select="."/>
+                                </xsl:apply-templates>
+                            </xsl:otherwise>
+                        </xsl:choose>    
                     </xsl:for-each>
                 </ul>
                 <xsl:if test="t:title[@type='abbreviation']">
@@ -726,21 +762,43 @@
                 <div id="placenames" class="well">
                     <h3>Names</h3>
                     <ul>
-                        <xsl:apply-templates select="t:placeName[@syriaca-tags='#syriaca-headword' and @xml:lang='syr'] | t:placeName[@srophe:tags='#headword' and @xml:lang='syr']" mode="list">
-                            <xsl:sort lang="syr" select="."/>
-                        </xsl:apply-templates>
-                        <xsl:apply-templates select="t:placeName[@syriaca-tags='#syriaca-headword' and @xml:lang='en'] | t:placeName[@srophe:tags='#headword' and @xml:lang='en']" mode="list">
-                            <xsl:sort collation="{$mixed}" select="."/>
-                        </xsl:apply-templates>
-                        <xsl:apply-templates select="t:placeName[(not(@syriaca-tags) or @syriaca-tags!='#syriaca-headword') and starts-with(@xml:lang, 'syr')] | t:placeName[(not(@srophe:tags) or @srophe:tags!='#syriaca-headword') and starts-with(@xml:lang, 'syr')]" mode="list">
-                            <xsl:sort lang="syr" select="."/>
-                        </xsl:apply-templates>
-                        <xsl:apply-templates select="t:placeName[starts-with(@xml:lang, 'ar')]" mode="list">
-                            <xsl:sort lang="ar" select="."/>
-                        </xsl:apply-templates>
-                        <xsl:apply-templates select="t:placeName[(not(@syriaca-tags) or @syriaca-tags!='#syriaca-headword') and not(starts-with(@xml:lang, 'syr') or starts-with(@xml:lang, 'ar')) and not(@syriaca-tags='#syriaca-simplified-script')] | t:placeName[(not(@srophe:tags) or @srophe:tags!='#headword') and not(starts-with(@xml:lang, 'syr') or starts-with(@xml:lang, 'ar')) and not(@srophe:tags='#syriaca-simplified-script')]" mode="list">
-                            <xsl:sort collation="{$mixed}" select="."/>
-                        </xsl:apply-templates>
+                        <xsl:choose>
+                            <xsl:when test="t:placeName[@srophe:tags]">
+                                <xsl:apply-templates select="t:placeName[@srophe:tags='#headword' and @xml:lang='syr']" mode="list">
+                                    <xsl:sort lang="syr" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select="t:placeName[@srophe:tags='#headword' and @xml:lang='en']" mode="list">
+                                    <xsl:sort collation="{$mixed}" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select="t:placeName[(not(@srophe:tags) or @srophe:tags!='#syriaca-headword') and starts-with(@xml:lang, 'syr')]" mode="list">
+                                    <xsl:sort lang="syr" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select="t:placeName[starts-with(@xml:lang, 'ar')]" mode="list">
+                                    <xsl:sort lang="ar" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select="t:placeName[(not(@srophe:tags) or @srophe:tags!='#headword') and not(starts-with(@xml:lang, 'syr') or starts-with(@xml:lang, 'ar')) and not(@srophe:tags='#syriaca-simplified-script')]" mode="list">
+                                    <xsl:sort collation="{$mixed}" select="."/>
+                                </xsl:apply-templates>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:apply-templates select="t:placeName[@syriaca-tags='#syriaca-headword' and @xml:lang='syr']" mode="list">
+                                    <xsl:sort lang="syr" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select="t:placeName[@syriaca-tags='#syriaca-headword' and @xml:lang='en']" mode="list">
+                                    <xsl:sort collation="{$mixed}" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select="t:placeName[(not(@syriaca-tags) or @syriaca-tags!='#syriaca-headword') and starts-with(@xml:lang, 'syr')]" mode="list">
+                                    <xsl:sort lang="syr" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select="t:placeName[starts-with(@xml:lang, 'ar')]" mode="list">
+                                    <xsl:sort lang="ar" select="."/>
+                                </xsl:apply-templates>
+                                <xsl:apply-templates select="t:placeName[(not(@syriaca-tags) or @syriaca-tags!='#syriaca-headword') and not(starts-with(@xml:lang, 'syr') or starts-with(@xml:lang, 'ar')) and not(@syriaca-tags='#syriaca-simplified-script')]" mode="list">
+                                    <xsl:sort collation="{$mixed}" select="."/>
+                                </xsl:apply-templates>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        
                     </ul>
                 </div>
             </xsl:if>
