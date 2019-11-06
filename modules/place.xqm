@@ -13,6 +13,7 @@ import module namespace templates="http://exist-db.org/xquery/templates" ;
 
 declare namespace http="http://expath.org/ns/http-client";
 declare namespace xslt="http://exist-db.org/xquery/transform";
+declare namespace srophe="https://srophe.app";
 declare namespace tei="http://www.tei-c.org/ns/1.0";
 
 declare namespace transform="http://exist-db.org/xquery/transform";
@@ -30,7 +31,7 @@ declare %templates:wrap function place:h1($node as node(), $model as map(*)){
     let $title := $model("hits")//tei:place
     let $title-nodes := 
             <srophe-title xmlns="http://www.tei-c.org/ns/1.0">
-                {($title//tei:placeName[@syriaca-tags='#syriaca-headword'],$title/descendant::tei:idno, $title/descendant::tei:location)}
+                {($title//tei:placeName[@srophe:tags='#headword' or @syriaca-tags='#syriaca-headword'],$title/descendant::tei:idno, $title/descendant::tei:location)}
             </srophe-title>
     return global:tei2html($title-nodes)
 };
@@ -150,7 +151,10 @@ declare function place:related-places($node as node(), $model as map(*)){
                                         return
                                              attribute {name($att)} {$att},                      
                                     for $get-related in collection($config:data-root || "/places/tei")/id($place-id)
-                                    return $get-related/tei:placeName[@syriaca-tags='#syriaca-headword'][@xml:lang='en'])
+                                    return 
+                                        if($get-related/tei:placeName[@srophe:tags='#headword'][@xml:lang='en']) then
+                                            $get-related/tei:placeName[@srophe:tags='#headword'][@xml:lang='en']
+                                        else $get-related/tei:placeName[@syriaca-tags='#syriaca-headword'][@xml:lang='en'])
                                 }
                                 </relation>
                             
@@ -168,7 +172,10 @@ declare function place:related-places($node as node(), $model as map(*)){
                                     return
                                          attribute {name($att)} {$att},                      
                                 for $get-related in collection($config:data-root || "/places/tei")/id($place-id)
-                                return $get-related/tei:placeName[@syriaca-tags='#syriaca-headword'][@xml:lang='en'])
+                                return 
+                                    if($get-related/tei:placeName[@srophe:tags='#headword'][@xml:lang='en']) then
+                                        $get-related/tei:placeName[@srophe:tags='#headword'][@xml:lang='en']
+                                    else $get-related/tei:placeName[@syriaca-tags='#syriaca-headword'][@xml:lang='en'])
                             }
                             </relation>
                     let $mutual := 
@@ -189,7 +196,7 @@ declare function place:related-places($node as node(), $model as map(*)){
                                             for $get-related in collection($config:data-root || "/places/tei")/id($place-id)
                                             let $type := string($get-related/@type)
                                             return 
-                                                (attribute type {$type}, $get-related/tei:placeName[@syriaca-tags='#syriaca-headword'][@xml:lang='en']))
+                                                (attribute type {$type}, if($get-related/tei:placeName[@srophe:tags='#headword'][@xml:lang='en']) then $get-related/tei:placeName[@srophe:tags='#headword'][@xml:lang='en'] else $get-related/tei:placeName[@syriaca-tags='#syriaca-headword'][@xml:lang='en']))
                                             }
                                             </mutual>
                                     }

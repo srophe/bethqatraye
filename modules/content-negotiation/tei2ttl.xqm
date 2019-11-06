@@ -13,6 +13,7 @@ import module namespace functx="http://www.functx.com";
 
 declare namespace output="http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
+declare namespace srophe="https://srophe.app";
 
 declare option exist:serialize "method=text media-type=text/turtle indent=yes";
 
@@ -189,7 +190,10 @@ for $name in $rec/descendant::tei:body/descendant::tei:placeName | $rec/descenda
 return 
     if($name/parent::tei:place or $name/parent::tei:person) then  
             concat('&#xa; lawd:hasName [',
-                if($name/@syriaca-tags='#syriaca-headword') then
+                if($name/@srophe:tags='#headword') then
+                    string-join((tei2ttl:make-triple('','lawd:primaryForm',tei2ttl:make-literal($name/text(),$name/@xml:lang, ())),
+                    tei2ttl:attestation($rec, $name/@source))) 
+                else if($name/@syriaca-tags='#syriaca-headword') then
                     string-join((tei2ttl:make-triple('','lawd:primaryForm',tei2ttl:make-literal($name/text(),$name/@xml:lang, ())),
                     tei2ttl:attestation($rec, $name/@source))) 
                 else 
@@ -501,9 +505,13 @@ return
         tei2ttl:make-triple(tei2ttl:make-uri($id), 'rdf:type', tei2ttl:rec-type($rec)),
         tei2ttl:make-triple((), 'a', tei2ttl:rec-type($rec)),
         tei2ttl:make-triple((),'rdfs:label',
-                if($rec/descendant::*[@syriaca-tags='#syriaca-headword']) then
+                if($rec/descendant::*[@srophe:tags='#headword']) then
+                    string-join(for $headword in $rec/descendant::*[@srophe:tags='#headword'][. != '']
+                        return tei2ttl:make-literal($headword/descendant::text(),if($headword/@xml:lang) then string($headword/@xml:lang) else (),()),', ')
+                else if($rec/descendant::*[@syriaca-tags='#syriaca-headword']) then
                     string-join(for $headword in $rec/descendant::*[@syriaca-tags='#syriaca-headword'][. != '']
                         return tei2ttl:make-literal($headword/descendant::text(),if($headword/@xml:lang) then string($headword/@xml:lang) else (),()),', ')
+                
                 else if($rec/descendant::tei:body/tei:listPlace/tei:place) then
                     string-join(for $headword in $rec/descendant::tei:body/tei:listPlace/tei:place/tei:placeName[. != '']
                         return tei2ttl:make-literal($headword/descendant::text(),if($headword/@xml:lang) then string($headword/@xml:lang) else (),()),', ')                        
@@ -566,7 +574,10 @@ return
         tei2ttl:record(string-join((
             tei2ttl:make-triple(tei2ttl:make-uri(concat($id,'/html')), 'a', 'rdfs:Resource;'),
             tei2ttl:make-triple((),'dcterms:title',
-                    if($rec/descendant::*[@syriaca-tags='#syriaca-headword']) then
+                    if($rec/descendant::*[@srophe:tags='#headword']) then
+                        string-join(for $headword in $rec/descendant::*[@srophe:tags='#headword'][. != '']
+                            return tei2ttl:make-literal($headword/descendant::text(),if($headword/@xml:lang) then string($headword/@xml:lang) else (),()),', ')
+                    else if($rec/descendant::*[@syriaca-tags='#syriaca-headword']) then
                         string-join(for $headword in $rec/descendant::*[@syriaca-tags='#syriaca-headword'][. != '']
                             return tei2ttl:make-literal($headword/descendant::text(),if($headword/@xml:lang) then string($headword/@xml:lang) else (),()),', ')
                     else if($rec/descendant::tei:body/tei:listPlace/tei:place) then
@@ -586,7 +597,10 @@ return
         tei2ttl:record(string-join((
             tei2ttl:make-triple(tei2ttl:make-uri(concat($id,'/tei')), 'a', 'rdfs:Resource;'),
             tei2ttl:make-triple((),'dcterms:title',
-                    if($rec/descendant::*[@syriaca-tags='#syriaca-headword']) then
+                    if($rec/descendant::*[@srophe:tags='#headword']) then
+                        string-join(for $headword in $rec/descendant::*[@srophe:tags='#headword'][. != '']
+                            return tei2ttl:make-literal($headword/descendant::text(),if($headword/@xml:lang) then string($headword/@xml:lang) else (),()),', ')
+                    else if($rec/descendant::*[@syriaca-tags='#syriaca-headword']) then
                         string-join(for $headword in $rec/descendant::*[@syriaca-tags='#syriaca-headword'][. != '']
                             return tei2ttl:make-literal($headword/descendant::text(),if($headword/@xml:lang) then string($headword/@xml:lang) else (),()),', ')
                     else if($rec/descendant::tei:body/tei:listPlace/tei:place) then
@@ -606,7 +620,10 @@ return
         tei2ttl:record(string-join((
             tei2ttl:make-triple(tei2ttl:make-uri(concat($id,'/ttl')), 'a', 'rdfs:Resource;'),
             tei2ttl:make-triple((),'dcterms:title',
-                    if($rec/descendant::*[@syriaca-tags='#syriaca-headword']) then
+                    if($rec/descendant::*[@srophe:tags='#headword']) then
+                        string-join(for $headword in $rec/descendant::*[@srophe:tags='#headword'][. != '']
+                            return tei2ttl:make-literal($headword/descendant::text(),if($headword/@xml:lang) then string($headword/@xml:lang) else (),()),', ')
+                    else if($rec/descendant::*[@syriaca-tags='#syriaca-headword']) then
                         string-join(for $headword in $rec/descendant::*[@syriaca-tags='#syriaca-headword'][. != '']
                             return tei2ttl:make-literal($headword/descendant::text(),if($headword/@xml:lang) then string($headword/@xml:lang) else (),()),', ')
                     else if($rec/descendant::tei:body/tei:listPlace/tei:place) then
@@ -623,7 +640,6 @@ return
             tei2ttl:make-triple('','dcterms:format', tei2ttl:make-literal('text/turtle',(),())),
             tei2ttl:bibl-citation($rec)
         )))        
-    
         )
     
     ),'')(: end string-join-1:) 

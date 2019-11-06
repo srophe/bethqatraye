@@ -9,6 +9,7 @@ module namespace geokml="http://syriaca.org/srophe/geokml";
 :)
 
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
+declare namespace srophe="https://srophe.app";
 
 (:~
  : Serialize XML as KML
@@ -37,7 +38,8 @@ declare function geokml:kml($nodes as node()*){
 declare function geokml:kml-element($node as node()*) as element()*{
 let $id := if($node//tei:idno[@type='URI']) then $node//tei:idno[@type='URI'][1]
            else $node//tei:idno[1]
-let $title := if($node/descendant::*[@syriaca-tags="#syriaca-headword"]) then $node/descendant::*[@syriaca-tags="#syriaca-headword"][1] 
+let $title := if($node/descendant::*[@srophe:tags="#headword"]) then $node/descendant::*[@srophe:tags="#headword"][1] 
+              else if($node/descendant::*[@syriaca-tags="#syriaca-headword"]) then $node/descendant::*[@syriaca-tags="#syriaca-headword"][1] 
               else $node//tei:title[1]
 let $desc := if($node/descendant::tei:desc[1]/tei:quote) then 
                 concat('"',$node/descendant::tei:desc[1]/tei:quote,'"')

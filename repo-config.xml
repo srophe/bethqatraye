@@ -20,15 +20,15 @@
         <!-- Logo name (assumes path to logo is $app-root/resources/img/) -->
         <logo>syriaca-logo.png</logo>
         <!-- Web Site URL -->
-        <url>http://bethqatraye.org/</url>
+        <url>https://bqgazetteer.bethmardutho.org/</url>
         <!-- Root of app for building dynamic links. Default is eXist app root -->
-        <nav-base>/exist/apps/bethqatraye</nav-base>
+        <nav-base>https://bqgazetteer.bethmardutho.org</nav-base>
         <!-- eXist app root for app deployment-->
         <app-root>bethqatraye</app-root>
         <!-- eXist data app root for gazetteer data -->
         <data-root>bethqatraye-data</data-root>
         <!-- Base URI for identifiers in app data -->
-        <base_uri>http://syriaca.org</base_uri>
+        <base_uri>http://bqgazetteer.bethmardutho.org</base_uri>
         <!-- Absolute (from app root) Path to ODD file used for translating controlled values. May be left blank. -->
         <odd>/documentation/syriaca-tei-main.odd</odd>
         <!-- xpath to unique identifier for record, syriaca.org uses tei:idno[@type='URL'], this is the default value -->
@@ -55,7 +55,7 @@
                 record-URI-pattern="URI for building links to record views."
                 app-root="folder name in app" 
                 data-root="folder name in data"/>-->
-            <collection name="bethqatraye" title="Beth Qatraye Gazetteer" collection-URI="http://syriaca.org/bethqatraye" series="The Syriac Gazetteer" app-root="/" data-root="places" record-URI-pattern="http://syriaca.org/place/"/>
+            <collection name="bethqatraye" title="Beth Qatraye Gazetteer" collection-URI="" series="The Syriac Gazetteer" app-root="/" data-root="places" record-URI-pattern="http://bqgazetteer.bethmardutho.org/place/"/>
         </collections>
     </config>
     <deployed>2017-05-09T22:56:20.244-04:00</deployed>

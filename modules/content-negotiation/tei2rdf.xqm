@@ -12,6 +12,8 @@ import module namespace config="http://syriaca.org/srophe/config" at "../config.
 import module namespace functx="http://www.functx.com";
 
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
+declare namespace srophe="https://srophe.app";
+
 declare namespace foaf = "http://xmlns.com/foaf/0.1";
 declare namespace lawd = "http://lawd.info/ontology";
 declare namespace skos = "http://www.w3.org/2004/02/skos/core#";
@@ -198,7 +200,10 @@ declare function tei2rdf:rec-type($rec){
 
 (: Decode record label and title based on Syriaca.org headwords if available 'rdfs:label' or dcterms:title:)
 declare function tei2rdf:rec-label-and-titles($rec, $element as xs:string?){
-    if($rec/descendant::*[contains(@syriaca-tags,'#syriaca-headword')]) then 
+    if($rec/descendant::*[contains(@srophe:tags,'#headword')]) then 
+        for $headword in $rec/descendant::*[contains(@srophe:tags,'#headword')][node()]
+        return tei2rdf:create-element($element, string($headword/@xml:lang), string-join($headword/descendant-or-self::text(),''), 'literal')
+    else if($rec/descendant::*[contains(@syriaca-tags,'#syriaca-headword')]) then 
         for $headword in $rec/descendant::*[contains(@syriaca-tags,'#syriaca-headword')][node()]
         return tei2rdf:create-element($element, string($headword/@xml:lang), string-join($headword/descendant-or-self::text(),''), 'literal')
     else if($rec/descendant::tei:body/tei:listPlace/tei:place) then 
@@ -216,7 +221,14 @@ declare function tei2rdf:rec-label-and-titles($rec, $element as xs:string?){
 declare function tei2rdf:names($rec){ 
     for $name in $rec/descendant::tei:body/tei:listPlace/tei:place/tei:placeName | $rec/descendant::tei:body/tei:listPerson/tei:person/tei:persName
     return 
-        if($name[contains(@syriaca-tags,'#syriaca-headword')]) then 
+        if($name[contains(@srophe:tags,'#headword')]) then 
+                element { xs:QName('lawd:hasName') } {
+                    element { xs:QName('rdf:Description') } {(
+                        tei2rdf:create-element('lawd:primaryForm', string($name/@xml:lang), string-join($name/descendant-or-self::text(),' '), 'literal'),
+                        tei2rdf:attestation($rec, $name/@source)   
+                    )} 
+                } 
+        else if($name[contains(@syriaca-tags,'#syriaca-headword')]) then 
                 element { xs:QName('lawd:hasName') } {
                     element { xs:QName('rdf:Description') } {(
                         tei2rdf:create-element('lawd:primaryForm', string($name/@xml:lang), string-join($name/descendant-or-self::text(),' '), 'literal'),

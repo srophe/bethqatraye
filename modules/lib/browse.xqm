@@ -19,6 +19,7 @@ import module namespace tei2html="http://syriaca.org/srophe/tei2html" at "../con
 
 (: Namespaces :)
 declare namespace tei="http://www.tei-c.org/ns/1.0";
+declare namespace srophe="https://srophe.app";
 declare namespace html="http://www.w3.org/1999/xhtml";
 
 (: Global Variables :)
@@ -166,7 +167,7 @@ declare function browse:get-map($hits as node()*){
         let $locations := 
             for $id in $places
             for $geo in collection($config:data-root || '/places/tei')//tei:idno[. = $id][ancestor::tei:TEI[descendant::tei:geo]]
-            let $title := $geo/ancestor::tei:TEI/descendant::*[@syriaca-tags="#syriaca-headword"][1]
+            let $title := if($geo/ancestor::tei:TEI/descendant::*[@srophe:tags="#headword"]) then $geo/ancestor::tei:TEI/descendant::*[@srophe:tags="#headword"][1] else $geo/ancestor::tei:TEI/descendant::*[@syriaca-tags="#syriaca-headword"][1]
             let $type := string($geo/ancestor::tei:TEI/descendant::tei:place/@type)
             let $geo := $geo/ancestor::tei:TEI/descendant::tei:geo
             return 

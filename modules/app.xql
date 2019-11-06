@@ -23,6 +23,7 @@ import module namespace tei2html="http://syriaca.org/srophe/tei2html" at "conten
 (: Namespaces :)
 declare namespace http="http://expath.org/ns/http-client";
 declare namespace tei="http://www.tei-c.org/ns/1.0";
+declare namespace srophe="https://srophe.app";
 declare namespace html="http://www.w3.org/1999/xhtml";
 
 (: Global Variables:)
@@ -133,7 +134,9 @@ declare function app:display-nodes($node as node(), $model as map(*), $paths as 
 declare function app:h1($node as node(), $model as map(*)){
  global:tei2html(
  <srophe-title xmlns="http://www.tei-c.org/ns/1.0">{(
-    if($model("hits")/descendant::*[@syriaca-tags='#syriaca-headword']) then
+    if($model("hits")/descendant::*[@srophe:tags='#headword']) then
+        $model("hits")/descendant::*[@srophe:tags='#headword']
+    else if($model("hits")/descendant::*[@syriaca-tags='#syriaca-headword']) then
         $model("hits")/descendant::*[@syriaca-tags='#syriaca-headword']
     else $model("hits")/descendant::tei:titleStmt[1]/tei:title[1], 
     $model("hits")/descendant::tei:publicationStmt/tei:idno[@type="URI"][1]

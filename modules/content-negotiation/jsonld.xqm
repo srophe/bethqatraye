@@ -14,6 +14,7 @@ declare namespace output="http://www.w3.org/2010/xslt-xquery-serialization";
 declare namespace sparql="http://www.w3.org/2005/sparql-results#";
 declare namespace json = "http://www.json.org";
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
+declare namespace srophe="https://srophe.app";
 
 declare function jsonld:sparql-JSON($results){
     for $node in $results
@@ -50,7 +51,17 @@ declare function jsonld:rdf-JSON($node as node()*){
 declare function jsonld:generic($node as node()*) {
     (
     <id>{replace($node/descendant::tei:idno[@type='URI'][1],'/tei','')}</id>,
-    if($node/descendant::*[contains(@syriaca-tags,'#syriaca-headword')]) then 
+    if($node/descendant::*[contains(@srophe:tags,'#headword')]) then 
+        for $headword in $node/descendant::*[contains(@srophe:tags,'#headword')]
+        return
+         <name>
+            {
+            if($headword/@xml:lang != '') then
+                element { string($headword/@xml:lang) } { normalize-space(string-join($headword/descendant-or-self::text(),'')) }
+            else  normalize-space(string-join($headword/descendant-or-self::text(),''))
+            }
+            </name>
+    else if($node/descendant::*[contains(@syriaca-tags,'#syriaca-headword')]) then 
         for $headword in $node/descendant::*[contains(@syriaca-tags,'#syriaca-headword')]
         return
          <name>

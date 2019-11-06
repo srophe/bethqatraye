@@ -7,6 +7,7 @@ import module namespace global="http://syriaca.org/srophe/global" at "../lib/glo
 
 declare namespace util="http://exist-db.org/xquery/util";
 declare namespace tei="http://www.tei-c.org/ns/1.0";
+declare namespace srophe="https://srophe.app";
 declare namespace xlink = "http://www.w3.org/1999/xlink";
 
 declare variable $places:q {request:get-parameter('q', '')};
@@ -320,14 +321,19 @@ declare function places:query-string() as xs:string?{
 
 declare function places:results-node($hit){
     let $root := $hit//tei:place   
-    let $title-en := $root/tei:placeName[@syriaca-tags='#syriaca-headword'][contains(@xml:lang,'en')][1]
+    let $title-en := $root/tei:placeName[@syriaca-tags='#syriaca-headword'][contains(@xml:lang,'en')][1] | $root/tei:placeName[@srophe:tags='#headword'][contains(@xml:lang,'en')][1] 
     let $title-syr := 
-                    if($root/tei:placeName[@syriaca-tags='#syriaca-headword'][@xml:lang='syr'][1]) then 
+                    if($root/tei:placeName[@srophe:tags='#headword'][@xml:lang='syr'][1]) then 
+                        (<bdi dir="ltr" lang="en" xml:lang="en"><span> -  </span></bdi>,
+                            <bdi dir="rtl" lang="syr" xml:lang="syr">
+                                {$root/tei:placeName[@srophe:tags='#headword'][@xml:lang='syr'][1]}
+                            </bdi>)
+                    else if($root/tei:placeName[@syriaca-tags='#syriaca-headword'][@xml:lang='syr'][1]) then 
                         (<bdi dir="ltr" lang="en" xml:lang="en"><span> -  </span></bdi>,
                             <bdi dir="rtl" lang="syr" xml:lang="syr">
                                 {$root/tei:placeName[@syriaca-tags='#syriaca-headword'][@xml:lang='syr'][1]}
                             </bdi>)
-                    else ''
+                    else ()
     let $type := if($root/@type) then  
                     <bdi dir="ltr" lang="en" xml:lang="en"> ({string($root/@type)})</bdi>
                   else ''  

@@ -21,6 +21,7 @@ declare namespace tei="http://www.tei-c.org/ns/1.0";
 declare namespace xlink = "http://www.w3.org/1999/xlink";
 declare namespace transform="http://exist-db.org/xquery/transform";
 declare namespace schema = "http://schema.org/";
+declare namespace srophe="https://srophe.app";
 declare namespace rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
 (:~ 
  : Parameters passed from the url  
@@ -154,9 +155,9 @@ return
                                       let $title := 
                                         if($rec/ancestor::tei:place) then 
                                             <place xml:id="{$rec/ancestor::tei:place/@xml:id}" type="{$rec/ancestor::tei:place/@type}" xmlns="http://www.tei-c.org/ns/1.0">
-                                                {($rec/ancestor::tei:place/tei:placeName[@syriaca-tags="#syriaca-headword"][1])}
+                                                {(if($rec/ancestor::tei:place/tei:placeName[@srophe:tags="#headword"][1]) then $rec/ancestor::tei:place/tei:placeName[@srophe:tags="#headword"][1] else $rec/ancestor::tei:place/tei:placeName[@syriaca-tags="#syriaca-headword"][1])}
                                             </place>
-                                        else $rec/ancestor::tei:TEI/descendant::*[@syriaca-tags="#syriaca-headword"][1]
+                                        else if($rec/ancestor::tei:TEI/descendant::*[@srophe:tags="#headword"]) then $rec/ancestor::tei:TEI/descendant::*[@srophe:tags="#headword"][1] else $rec/ancestor::tei:TEI/descendant::*[@syriaca-tags="#syriaca-headword"][1]
                                       return 
                                         <item uri="{$rel-rec}" xmlns="http://www.tei-c.org/ns/1.0">
                                             {$title}
@@ -182,10 +183,10 @@ declare function person:get-related($rec as node()*){
 for $related in $rec//tei:relation
 let $uris := string($related/@passive)
 for $item-uri in tokenize($uris,' ')
-let $rec := collection($config:data-root)//tei:idno[. = $item-uri]
-let $geo := if($rec/ancestor::tei:TEI//tei:geo) then $rec/ancestor::tei:TEI//tei:geo
-                else ()
-let $title := string(root($rec)/descendant::*[@syriaca-tags="#syriaca-headword"][1])
+let $idno := collection($config:data-root)//tei:idno[. = $item-uri]
+let $rec := root($idno)
+let $geo := if($rec/descendant::tei:geo) then $rec/descendant::tei:geo else ()
+let $title := if($rec/descendant::*[@srophe:tags="#headword"][1]) then $rec/descendant::*[@srophe:tags="#headword"][1] else $rec/descendant::*[@syriaca-tags="#syriaca-headword"][1]
 let $type := if(root($rec)/descendant::tei:place/@type) then concat(' - ', string($rec/ancestor::tei:TEI/descendant::tei:place/@type)) else ()
 let $desc := string($related/tei:desc)
 return 
@@ -362,7 +363,7 @@ declare %templates:wrap function person:display-persons-map($node as node(), $mo
     let $locations := 
         for $id in $places
         for $geo in collection($config:data-root || '/places/tei')//tei:idno[. = $id][ancestor::tei:TEI[descendant::tei:geo]]
-        let $title := $geo/ancestor::tei:TEI/descendant::*[@syriaca-tags="#syriaca-headword"][1]
+        let $title := if($geo/ancestor::tei:TEI/descendant::*[@srophe:tags="#headword"]) then $geo/ancestor::tei:TEI/descendant::*[@srophe:tags="#headword"][1] else $geo/ancestor::tei:TEI/descendant::*[@syriaca-tags="#syriaca-headword"][1]
         let $type := string($geo/ancestor::tei:TEI/descendant::tei:place/@type)
         let $geo := $geo/ancestor::tei:TEI/descendant::tei:geo
         return 
