@@ -1,7 +1,7 @@
 (:~   
  : Builds place page and place page functions
  :)
-xquery version "3.0";
+xquery version "3.1";
 
 module namespace place="http://syriaca.org/srophe/place";
 import module namespace config="http://syriaca.org/srophe/config" at "config.xqm";
@@ -251,32 +251,30 @@ declare %templates:wrap function place:citation($node as node(), $model as map(*
 :)
 declare %templates:wrap function place:link-icons-list($node as node(), $model as map(*)){
 let $data := $model("hits")
-let $links:= $data/descendant::tei:place/descendant::tei:idno | $data/descendant::tei:place/descendant::tei:location
-return (:global:tei2html($links):)
-    if($links != '') then
+return 
         <div id="see-also" class="well">
             <h3>See Also</h3>
             <ul>{(
                 for $idno in $data/descendant::tei:place/descendant::tei:idno[not(starts-with(.,$config:base-uri)) and not(contains(.,'wikipedia'))]
                 return 
-                    if([contains(.,'csc.org.il')]) then
-                        <li><a href="{normalize-space(.)}"> 
-                            {concat('"',substring-before(substring-after(normalize-space(.),'sK='),'&amp;sT='),'" in the Comprehensive Bibliography on Syriac Christianity')}
+                    if($idno[contains(.,'csc.org.il')]) then
+                        <li><a href="{normalize-space($idno)}"> 
+                            {concat('"',substring-before(substring-after(normalize-space($idno),'sK='),'&amp;sT='),'" in the Comprehensive Bibliography on Syriac Christianity')}
                         </a></li>
-                    else if([contains(.,'http://worldcat.org/identities')]) then
-                        <li><a href="{normalize-space(.)}"> 
-                            {concat('"',substring-after(.,'http://worldcat.org/identities/'),'" in WorldCat Identities')}
+                    else if($idno[contains(.,'http://worldcat.org/identities')]) then
+                        <li><a href="{normalize-space($idno)}"> 
+                            {concat('"',substring-after($idno,'http://worldcat.org/identities/'),'" in WorldCat Identities')}
                         </a></li>
-                    else if([contains(.,'http://viaf.org/')]) then
-                        <li><a href="{normalize-space(.)}">VIAF</a></li>
-                    else if([contains(.,'pleiades')]) then
-                        <li><a href="{normalize-space(.)}"> 
+                    else if($idno[contains(.,'http://viaf.org/')]) then
+                        <li><a href="{normalize-space($idno)}">VIAF</a></li>
+                    else if($idno[contains(.,'pleiades')]) then
+                        <li><a href="{normalize-space($idno)}"> 
                             <img src="{$config:nav-base}/resources/images/circle-pi-25.png" 
                             alt="Image of the Greek letter pi in blue; small icon of the Pleiades project" 
                             title="click to view {$data/descendant::tei:title[1]} in Pleiades"/> View in Pleiades</a>
                         </li>
                     else
-                        <li><a href="{normalize-space(.)}">{normalize-space(.)}</a></li>,
+                        <li><a href="{normalize-space($idno)}">{normalize-space($idno)}</a></li>,
                  for $geo in $data/descendant::tei:location[@type='gps']/tei:geo
                  let $coords := tokenize(normalize-space($geo), '\s+')
                  let $geoRef := concat($coords[1],', ',$coords[2])
@@ -296,8 +294,7 @@ return (:global:tei2html($links):)
                 </li>,   
                 for $idno in $data/descendant::tei:place/descendant::tei:idno[contains(.,'wikipedia')]
                 return 
-                    <li><a href="{.}"><img src="{$config:nav-base}/resources/images/Wikipedia-25.png" alt="The Wikipedia icon" title="click to view {$data/descendant::tei:title[1]} in Wikipedia"/>"{$data/descendant::tei:title[1]}" in Wikipedia</a></li>
+                    <li><a href="{$idno}"><img src="{$config:nav-base}/resources/images/Wikipedia-25.png" alt="The Wikipedia icon" title="click to view {$data/descendant::tei:title[1]} in Wikipedia"/>"{$data/descendant::tei:title[1]}" in Wikipedia</a></li>
             )}</ul>
         </div>
-    else ()
 };
