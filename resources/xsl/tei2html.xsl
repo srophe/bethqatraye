@@ -1219,11 +1219,16 @@
             <xsl:variable name="prev-uri" select="replace($resource-id,$current-id,string($prev-id))"/>                
             <small>
                 <span class="uri">
+                    <!--
                     <xsl:if test="starts-with($nav-base,'/exist/apps')">
                         <a href="{replace($prev-uri,$base-uri,$nav-base)}">
                             <span class="glyphicon glyphicon-backward" aria-hidden="true"/>
                         </a>
                     </xsl:if>
+                    -->
+                    <a href="{replace($prev-uri,$base-uri,$nav-base)}">
+                        <span class="glyphicon glyphicon-backward" aria-hidden="true"/>
+                    </a>
                     <xsl:text> </xsl:text>
                     <button type="button" class="btn btn-default btn-xs" id="idnoBtn" data-clipboard-action="copy" data-clipboard-target="#syriaca-id">
                         <span class="srp-label">URI</span>
@@ -1243,11 +1248,16 @@
                         });
                     </script>
                     <xsl:text> </xsl:text>
+                    <!--
                     <xsl:if test="starts-with($nav-base,'/exist/apps')">
                         <a href="{replace($next-uri,$base-uri,$nav-base)}">
                             <span class="glyphicon glyphicon-forward" aria-hidden="true"/>
                         </a>
                     </xsl:if>
+                    -->
+                    <a href="{replace($next-uri,$base-uri,$nav-base)}">
+                        <span class="glyphicon glyphicon-forward" aria-hidden="true"/>
+                    </a>
                 </span>
                 <xsl:if test="t:seriesStmt/t:biblScope/t:title">
                     <span class="series pull-right" style="margin-left:2em; padding-left:2em; display:inline">
