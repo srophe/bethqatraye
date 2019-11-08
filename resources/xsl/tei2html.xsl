@@ -1332,21 +1332,20 @@
                     Term:  <xsl:apply-templates select="descendant::*[contains(@syriaca-tags,'#syriaca-headword')][starts-with(@xml:lang,'en')][not(empty(node()))][1] | descendant::*[contains(@srophe:tags,'#headword')][starts-with(@xml:lang,'en')][not(empty(node()))][1]" mode="plain"/>
                 </xsl:when>
                 <xsl:when test="descendant::*[contains(@syriaca-tags,'#syriaca-headword')] or descendant::*[contains(@srophe:tags,'#headword')]">
-                    <xsl:apply-templates select="descendant::*[contains(@syriaca-tags,'#syriaca-headword')][starts-with(@xml:lang,'en')][not(empty(node()))][1] | descendant::*[contains(@srophe:tags,'#headword')][starts-with(@xml:lang,'en')][not(empty(node()))][1]" mode="plain"/>
-                    <xsl:text> - </xsl:text>
-                    <xsl:choose>
-                        <xsl:when test="descendant::*[contains(@syriaca-tags,'#anonymous-description')] | descendant::*[contains(@srophe:tags,'#anonymous-description')]">
-                            <xsl:value-of select="descendant::*[contains(@syriaca-tags,'#anonymous-description')][1] | descendant::*[contains(@srophe:tags,'#anonymous-description')][1]"/>
-                        </xsl:when>
-                        <xsl:when test="descendant::*[contains(@syriaca-tags,'#syriaca-headword')][starts-with(@xml:lang,'syr')] | descendant::*[contains(@srophe:tags,'#headword')][starts-with(@xml:lang,'syr')]">
-                            <span lang="syr" dir="rtl">
-                                <xsl:apply-templates select="descendant::*[contains(@syriaca-tags,'#syriaca-headword')][starts-with(@xml:lang,'syr')][1] | descendant::*[contains(@srophe:tags,'#headword')][starts-with(@xml:lang,'syr')][1]" mode="plain"/>
-                            </span>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            [ Syriac Not Available ]
-                        </xsl:otherwise>
-                    </xsl:choose>
+                    <xsl:for-each select="descendant::*[contains(@syriaca-tags,'#syriaca-headword')] | descendant::*[contains(@srophe:tags,'#headword')]">
+                        <xsl:sort select="if(@xml:lang = 'en') then 1
+                            else if(@xml:lang = 'fr') then 2
+                            else if(@xml:lang = 'as') then 3
+                            else if(@xml:lang = 'syr') then 3
+                            else 4" order="ascending"/>
+                            <xsl:choose>
+                                <xsl:when test="starts-with(@xml:lang, 'syr') or starts-with(@xml:lang, 'ar')">
+                                    <xsl:apply-templates select=".[not(empty(node()))]" mode="plain"/>
+                                </xsl:when>
+                                <xsl:otherwise><xsl:apply-templates select=".[not(empty(node()))]" mode="plain"/></xsl:otherwise>
+                            </xsl:choose>
+                            <xsl:if test="position() != last()"> - </xsl:if>
+                    </xsl:for-each>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:apply-templates select="descendant-or-self::t:title[1]"/>

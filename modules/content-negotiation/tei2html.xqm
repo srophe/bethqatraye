@@ -101,41 +101,26 @@ declare function tei2html:tei2html($nodes as node()*) as item()* {
             default return tei2html:tei2html($node/node())
 };
 
-(:~ 
- : Display idno with copy icon and paging (if relevant)
-:)
-declare function tei2html:idno-title-display($id){
-    let $id-string := substring-after(tokenize($id,'/')[last()],'-')
-    let $id-num := if($id-string castable as xs:integer) then $id-string cast as xs:integer else 0
-    let $next := $id-num + 1
-    let $prev := $id-num - 1
-    let $next-url := concat(substring-before($id,'-'),'-',string($next))
-    let $prev-url := concat(substring-before($id,'-'),'-',string($prev))
+(:xml:Lang=en, fr, as, syr:)
+declare function tei2html:rec-headwords($rec){
+    let $headwords := 
+        for $headword in $rec/descendant::*[contains(@srophe:tags,'headword') or contains(@syriaca-tags,'#syriaca-headword')]
+        let $lang := $rec/@xml:lang
+        order by 
+            if($lang = 'en') then (0) 
+            else if($lang = 'fr') then (1) 
+            else if($lang = 'as') then (2) 
+            else if($lang = 'syr') then (3) 
+            else (4), $lang
+        return tei2html:tei2html($headword)
     return 
-        <div style="margin:0 1em 1em; color: #999999;" xmlns="http://www.w3.org/1999/xhtml">
-            <small>
-                <span class="uri">
-                    <a href="{replace($prev-url, $config:base-uri, $config:nav-base)}"><span class="glyphicon glyphicon-backward" aria-hidden="true"/></a>
-                    &#160;<button type="button" class="btn btn-default btn-xs" id="idnoBtn" data-clipboard-action="copy" data-clipboard-target="#syriaca-id">
-                        <span class="srp-label">URI</span>
-                    </button>&#160;
-                    <span id="syriaca-id">{$id}</span>
-                    <script>
-                        <![CDATA[
-                            var clipboard = new Clipboard('#idnoBtn');
-                            clipboard.on('success', function(e) {
-                            console.log(e);
-                            });
-                            
-                            clipboard.on('error', function(e) {
-                            console.log(e);
-                            });]]>
-                    </script>
-                    <a href="{replace($next-url,$config:base-uri, $config:nav-base)}"><span class="glyphicon glyphicon-forward" aria-hidden="true"/></a>
-                </span>
-            </small>
-        </div>
+        if($headwords != '') then
+            let $count := count($headwords)
+            for $h at $p in $headwords
+            return ($h, if($p lt $count) then ' - ' else ())
+        else $rec/descendant-or-self::tei:title[1]/text()
 };
+
 (:~ 
  : Display idno with copy icon and paging (if relevant)
 :)
@@ -263,25 +248,17 @@ declare function tei2html:summary-view-persons($nodes as node()*, $id as xs:stri
 };
 
 (: Special short view template for Places :)
-declare function tei2html:summary-view-places($nodes as node()*, $id as xs:string?) as item()* {
-    let $title := if($nodes/descendant-or-self::*[@srophe:tags='#headword'][@xml:lang='en']) then 
-                    $nodes/descendant-or-self::*[@srophe:tags='#headword'][@xml:lang='en'][1]
-                  else if($nodes/descendant-or-self::*[@syriaca-tags='#syriaca-headword'][@xml:lang='en']) then 
-                    $nodes/descendant-or-self::*[@syriaca-tags='#syriaca-headword'][@xml:lang='en'][1]
-                  else $nodes/descendant-or-self::tei:title[1]/text()
-    let $syr-title := 
-                if($nodes/descendant::*[contains(@srophe:tags,'#headword')][matches(@xml:lang,'^syr')][1]) then
-                     <span xml:lang="syr" lang="syr" dir="rtl">{string-join($nodes/descendant::*[contains(@srophe:tags,'#headword')][matches(@xml:lang,'^syr')][1]//text(),' ')}</span>
-                else if($nodes/descendant::*[contains(@syriaca-tags,'#syriaca-headword')][matches(@xml:lang,'^syr')][1]) then
-                     <span xml:lang="syr" lang="syr" dir="rtl">{string-join($nodes/descendant::*[contains(@syriaca-tags,'#syriaca-headword')][matches(@xml:lang,'^syr')][1]//text(),' ')}</span>
-                else if($nodes/descendant::*[contains(@syriaca-tags,'#syriaca-headword')]) then 
-                    '[Syriac Not Available]'
-                else () 
+declare function tei2html:summary-view-places($nodes as item()*, $id as xs:string?) as item()* {
+    let $title := tei2html:rec-headwords($nodes)
     let $series := for $a in distinct-values($nodes/descendant::tei:seriesStmt/tei:biblScope/tei:title)
                    return tei2html:translate-series($a)                
     return 
         <div class="short-rec-view">
-                        <a href="{replace(replace($id,$config:base-uri,$config:nav-base),'/tei','')}" dir="ltr">{(tei2html:tei2html($title),if($nodes/descendant::tei:place/@type) then concat(' (',string($nodes/descendant::tei:place/@type),') ') else (),if($syr-title != '') then (' - ', $syr-title) else())}</a>
+                        <a href="{replace(replace($id,$config:base-uri,$config:nav-base),'/tei','')}" dir="ltr">
+                        {($title,
+                        if($nodes/descendant::tei:place/@type) then 
+                        concat(' (',string($nodes/descendant::tei:place/@type),') ') 
+                        else ())}</a>
             <button type="button" class="btn btn-sm btn-default copy-sm clipboard"  
                 data-toggle="tooltip" title="Copies record title &amp; URI to clipboard." 
                 data-clipboard-action="copy" data-clipboard-text="{normalize-space($title[1])} - {normalize-space($id[1])}">
