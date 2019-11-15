@@ -58,7 +58,7 @@ declare function browse:show-hits($node as node(), $model as map(*), $collection
                     data-toggle="collapse" data-target="#filterMap" 
                     href="#filterMap" data-text-swap="+ Show"> - Hide </a></span>
                 <div class="collapse in" id="filterMap">
-                      {facet:html-list-facets-as-buttons(facet:count($hits, $facet-config/descendant::facet:facet-definition))}  
+                      {facet:html-list-facets-as-buttons(facet:count($hits[descendant::tei:geo], $facet-config/descendant::facet:facet-definition))}  
                 </div>
             </div>
         </div>
@@ -297,4 +297,22 @@ declare function browse:browse-type($collection){
             else  ()
         }
     </ul>
+};
+
+declare function browse:large-map($node as node(), $model as map(*), $collection, $sort-options as xs:string*, $facets as xs:string?){
+let $hits := util:eval(concat("collection($config:data-root)//tei:TEI[descendant::tei:geo]",facet:facet-filter(global:facet-definition-file($collection))))
+let $facet-config := global:facet-definition-file($collection)
+return 
+<div xmlns="http://www.w3.org/1999/xhtml" id="browseMap">
+    {browse:get-map($hits)}
+    <div id="map-filters" class="map-overlay">
+                <span class="filter-label">Filter Map 
+                    <a class="pull-right small togglelink text-info" 
+                    data-toggle="collapse" data-target="#filterMap" 
+                    href="#filterMap" data-text-swap="+ Show"> - Hide </a></span>
+                <div class="collapse in" id="filterMap">
+                      {facet:html-list-facets-as-buttons(facet:count($hits[descendant::tei:geo], $facet-config/descendant::facet:facet-definition))}  
+                </div>
+            </div>
+</div>
 };
