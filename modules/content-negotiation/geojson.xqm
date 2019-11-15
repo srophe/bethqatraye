@@ -61,9 +61,16 @@ let $title := if($node/descendant::*[@srophe:tags="#headword"]) then $node/desce
 let $desc := if($node/descendant::tei:desc[1]/tei:quote) then 
                 concat('"',$node/descendant::tei:desc[1]/tei:quote,'"')
              else $node/descendant::tei:desc[1]
-let $type := if($node/descendant::tei:region[@ref="http://syriaca.org/place/37"]) then 
-                'Beth Qaṭraye (region)'
-              else ()   
+let $type := 
+            if($id = 'http://bqgazetteer.bethmardutho.org/place/37' or $id= 'http://bqgazetteer.bethmardutho.org/place/37/tei') then 
+                'bq'
+            else if($node/descendant::tei:region[@ref="http://bqgazetteer.bethmardutho.org/place/37"] and $node/descendant::tei:location[@type="gps"][@subtype="representative"]) then 
+                'bqRepresentative' 
+             else if($node/descendant::tei:location[@type="gps"][@subtype="representative"]) then 
+                'representative' 
+             else if($node/descendant::tei:region[@ref="http://bqgazetteer.bethmardutho.org/place/37"]) then 
+                'bqRegion' 
+             else ()   
 let $coords := if($node/descendant::tei:location[@subtype = 'preferred']) then $node/descendant::tei:location[@subtype = 'preferred']/tei:geo else $node/descendant::tei:geo[1]
 return 
     <json:value>
@@ -80,9 +87,7 @@ return
             {if($desc != '') then
                 <desc>{string-join($desc,' ')}</desc> 
             else(),
-            if($type != '') then
-                <type>{$type}</type> 
-            else ()
+            <type>{$type}</type> 
             }
         </properties>
     </json:value>

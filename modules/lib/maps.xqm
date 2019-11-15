@@ -56,34 +56,50 @@ declare function maps:build-leaflet-map($nodes as node()*, $total-count as xs:in
                                                 popupAnchor:  [-3, -76]
                                                 }
                                             });
-                                            var redIcon =
-                                                L.AwesomeMarkers.icon({
-                                                    icon:'glyphicon-flag',
-                                                   //icon:'fa-circle',
-                                                    markerColor: 'red'
-                                                }),
-                                            greenIcon =  L.AwesomeMarkers.icon({
-                                                    icon:'glyphicon-flag',
-                                                    markerColor: 'green'
+                                            var redIcon = L.icon({
+                                                iconUrl: 'resources/leaflet/images/marker-icon-red.png',
+                                                shadowUrl: 'resources/leaflet/images/marker-shadow.png',                                            
+                                            }),
+                                            lightRedIcon = L.icon({
+                                                iconUrl: 'resources/leaflet/images/marker-icon-light-red.png',
+                                                shadowUrl: 'resources/leaflet/images/marker-shadow.png',                                            
+                                            })
+                                             blueIcon = L.icon({
+                                                iconUrl: 'resources/leaflet/images/marker-icon.png',
+                                                shadowUrl: 'resources/leaflet/images/marker-shadow.png',                                            
+                                            }),
+                                             lightBlueIcon = L.icon({
+                                                iconUrl: 'resources/leaflet/images/marker-icon-light-blue.png',
+                                                shadowUrl: 'resources  leaflet/images/marker-shadow.png',                                            
+                                            })
+                                            bqIcon = L.icon({
+                                                iconUrl: 'resources/leaflet/images/marker-icon-bq.png',
+                                                shadowUrl: 'resources  leaflet/images/marker-shadow.png',   
                                                 });
                                         
             var geojson = L.geoJson(placesgeo, {onEachFeature: function (feature, layer){
                             var typeText = feature.properties.type
                             var popupContent = 
                                 "<a href='" + feature.properties.uri + "' class='map-pop-title'>" +
-                                feature.properties.name + "</a>" + (feature.properties.type ? "Region: " + typeText : "") +
+                                feature.properties.name + "</a>"  +
                                 (feature.properties.desc ? "<span class='map-pop-desc'>"+ feature.properties.desc +"</span>" : "");
                                 layer.bindPopup(popupContent);
                                 
                                 //return layer.setIcon(redIcon);
                                 //switch icon based on feature property, 
                                 switch (feature.properties.type) {
-                                    case 'Beth Qaṭraye (region)': return layer.setIcon(greenIcon);
-                                    default : return layer.setIcon(redIcon);;
+                                    case 'bqRegion': return layer.setIcon(redIcon);
+                                    case 'bqRepresentative': return layer.setIcon(lightRedIcon);
+                                    case 'representative': return layer.setIcon(lightBlueIcon);
+                                    case 'representative': return layer.setIcon(blueIcon);
+                                    case 'bq': return layer.setIcon(bqIcon);
+                                    default : return layer.setIcon(blueIcon);
                                  }               
                                 }
                             })
-        var map = L.map('map').fitBounds(geojson.getBounds(),{maxZoom: 5});     
+        var map = L.map('map').fitBounds(geojson.getBounds(),{maxZoom: 5});
+        map.panTo(new L.LatLng(25.4,53.1));
+       //var map = L.map('map').setView([53.1,25.4], 5);
         terrain.addTo(map);
                                         
         L.control.layers({
