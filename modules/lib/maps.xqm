@@ -49,31 +49,39 @@ declare function maps:build-leaflet-map($nodes as node()*, $total-count as xs:in
                                 
             var placesgeo = ]]>{geojson:geojson($nodes)}
             <![CDATA[                                
-            var sropheIcon = L.Icon.extend({
-                                            options: {
-                                                iconSize:     [35, 35],
-                                                iconAnchor:   [22, 94],
-                                                popupAnchor:  [-3, -76]
-                                                }
-                                            });
                                             var redIcon = L.icon({
                                                 iconUrl: '$nav-base/resources/leaflet/images/marker-icon-red.png',
+                                                iconSize: [25, 41], // size of the icon
+                                                iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
+                                                popupAnchor: [0, -41],
                                                 shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
                                             }),
                                             lightRedIcon = L.icon({
                                                 iconUrl: '$nav-base/resources/leaflet/images/marker-icon-light-red.png',
+                                                iconSize: [25, 41], // size of the icon
+                                                iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
+                                                popupAnchor: [0, -41],
                                                 shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
                                             })
                                              blueIcon = L.icon({
                                                 iconUrl: '$nav-base/resources/leaflet/images/marker-icon.png',
+                                                iconSize: [25, 41], // size of the icon
+                                                iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
+                                                popupAnchor: [0, -41],
                                                 shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
                                             }),
                                              lightBlueIcon = L.icon({
                                                 iconUrl: '$nav-base/resources/leaflet/images/marker-icon-light-blue.png',
+                                                iconSize: [25, 41], // size of the icon
+                                                iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
+                                                popupAnchor: [0, -41],
                                                 shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
                                             })
                                             bqIcon = L.icon({
                                                 iconUrl: '$nav-base/resources/leaflet/images/marker-icon-bq.png',
+                                                iconSize: [25, 41], // size of the icon
+                                                iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
+                                                popupAnchor: [0, -41],
                                                 shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',   
                                                 });
                                         
