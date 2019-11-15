@@ -57,24 +57,24 @@ declare function maps:build-leaflet-map($nodes as node()*, $total-count as xs:in
                                                 }
                                             });
                                             var redIcon = L.icon({
-                                                iconUrl: 'resources/leaflet/images/marker-icon-red.png',
-                                                shadowUrl: 'resources/leaflet/images/marker-shadow.png',                                            
+                                                iconUrl: '$nav-base/resources/leaflet/images/marker-icon-red.png',
+                                                shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
                                             }),
                                             lightRedIcon = L.icon({
-                                                iconUrl: 'resources/leaflet/images/marker-icon-light-red.png',
-                                                shadowUrl: 'resources/leaflet/images/marker-shadow.png',                                            
+                                                iconUrl: '$nav-base/resources/leaflet/images/marker-icon-light-red.png',
+                                                shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
                                             })
                                              blueIcon = L.icon({
-                                                iconUrl: 'resources/leaflet/images/marker-icon.png',
-                                                shadowUrl: 'resources/leaflet/images/marker-shadow.png',                                            
+                                                iconUrl: '$nav-base/resources/leaflet/images/marker-icon.png',
+                                                shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
                                             }),
                                              lightBlueIcon = L.icon({
-                                                iconUrl: 'resources/leaflet/images/marker-icon-light-blue.png',
-                                                shadowUrl: 'resources  leaflet/images/marker-shadow.png',                                            
+                                                iconUrl: '$nav-base/resources/leaflet/images/marker-icon-light-blue.png',
+                                                shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
                                             })
                                             bqIcon = L.icon({
-                                                iconUrl: 'resources/leaflet/images/marker-icon-bq.png',
-                                                shadowUrl: 'resources  leaflet/images/marker-shadow.png',   
+                                                iconUrl: '$nav-base/resources/leaflet/images/marker-icon-bq.png',
+                                                shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',   
                                                 });
                                         
             var geojson = L.geoJson(placesgeo, {onEachFeature: function (feature, layer){
@@ -98,7 +98,7 @@ declare function maps:build-leaflet-map($nodes as node()*, $total-count as xs:in
                                 }
                             })
         var map = L.map('map').fitBounds(geojson.getBounds(),{maxZoom: 5});
-        map.panTo(new L.LatLng(25.4,53.1));
+        //map.panTo(new L.LatLng(25.4,53.1));
        //var map = L.map('map').setView([53.1,25.4], 5);
         terrain.addTo(map);
                                         
