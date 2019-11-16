@@ -275,7 +275,7 @@
                                     <xsl:text> </xsl:text>
                                 </xsl:if>
                             </xsl:for-each>
-                            <xsl:apply-templates select="text()"/>
+                           <!-- <xsl:apply-templates select="text()"/>-->
                             <xsl:sequence select="$passThrough"/>
                             <xsl:if test="descendant::t:idno[@type='URI']">
                                 <span class="footnote-links">
