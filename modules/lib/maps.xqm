@@ -62,7 +62,7 @@ declare function maps:build-leaflet-map($nodes as node()*, $total-count as xs:in
                                                 iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
                                                 popupAnchor: [0, -41],
                                                 shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
-                                            })
+                                            }),
                                              blueIcon = L.icon({
                                                 iconUrl: '$nav-base/resources/leaflet/images/marker-icon.png',
                                                 iconSize: [25, 41], // size of the icon
@@ -76,7 +76,7 @@ declare function maps:build-leaflet-map($nodes as node()*, $total-count as xs:in
                                                 iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
                                                 popupAnchor: [0, -41],
                                                 shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
-                                            })
+                                            }),
                                             bqIcon = L.icon({
                                                 iconUrl: '$nav-base/resources/leaflet/images/marker-icon-bq.png',
                                                 iconSize: [25, 41], // size of the icon
@@ -105,7 +105,7 @@ declare function maps:build-leaflet-map($nodes as node()*, $total-count as xs:in
                                  }               
                                 }
                             })
-        var map = L.map('map').fitBounds(geojson.getBounds(),{maxZoom: 5});
+        var map = L.map('map').fitBounds(geojson.getBounds(),{maxZoom: 5}).setZoom(5);
         //map.panTo(new L.LatLng(25.4,53.1));
        //var map = L.map('map').setView([53.1,25.4], 5);
         terrain.addTo(map);
