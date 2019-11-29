@@ -1,11 +1,4 @@
-<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" 
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-    xmlns:t="http://www.tei-c.org/ns/1.0" 
-    xmlns:x="http://www.w3.org/1999/xhtml" 
-    xmlns:saxon="http://saxon.sf.net/" 
-    xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-    xmlns:srophe="https://srophe.app" 
-    xmlns:local="http://syriaca.org/ns" exclude-result-prefixes="xs t x saxon local" version="2.0">
+<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:t="http://www.tei-c.org/ns/1.0" xmlns:x="http://www.w3.org/1999/xhtml" xmlns:srophe="https://srophe.app" xmlns:saxon="http://saxon.sf.net/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:local="http://syriaca.org/ns" exclude-result-prefixes="xs t x saxon local" version="2.0">
 
  <!-- ================================================================== 
        Copyright 2013 New York University  
@@ -110,7 +103,7 @@
                         <xsl:value-of select="$config//*:collection[@name=$collection]/@title"/>
                     </xsl:when>
                     <xsl:when test="$config//*:collection[@title=$collection]">
-                        <xsl:value-of select="$config//*:collection[@title=$collection]/@title"></xsl:value-of>
+                        <xsl:value-of select="$config//*:collection[@title=$collection]/@title"/>
                     </xsl:when>
                     <xsl:otherwise><xsl:value-of select="$repository-title"/></xsl:otherwise>
                 </xsl:choose>
@@ -594,24 +587,19 @@
                                 </xsl:apply-templates>
                             </xsl:when>
                             <xsl:otherwise>
-                                <xsl:apply-templates select="
-                                    t:persName[@syriaca-tags='#syriaca-headword' and starts-with(@xml:lang,'syr')]" mode="list">
+                                <xsl:apply-templates select="                                     t:persName[@syriaca-tags='#syriaca-headword' and starts-with(@xml:lang,'syr')]" mode="list">
                                     <xsl:sort lang="syr" select="."/>
                                 </xsl:apply-templates>
-                                <xsl:apply-templates select="
-                                    t:persName[@syriaca-tags='#syriaca-headword' and starts-with(@xml:lang,'en')]" mode="list">
+                                <xsl:apply-templates select="                                     t:persName[@syriaca-tags='#syriaca-headword' and starts-with(@xml:lang,'en')]" mode="list">
                                     <xsl:sort collation="{$mixed}" select="."/>
                                 </xsl:apply-templates>
-                                <xsl:apply-templates select="
-                                    t:persName[(not(@syriaca-tags) or @syriaca-tags!='#syriaca-headword')  and starts-with(@xml:lang, 'syr')]" mode="list">
+                                <xsl:apply-templates select="                                     t:persName[(not(@syriaca-tags) or @syriaca-tags!='#syriaca-headword')  and starts-with(@xml:lang, 'syr')]" mode="list">
                                     <xsl:sort lang="syr" select="."/>
                                 </xsl:apply-templates>
                                 <xsl:apply-templates select="t:persName[starts-with(@xml:lang, 'ar')]" mode="list">
                                     <xsl:sort lang="ar" select="."/>
                                 </xsl:apply-templates>
-                                <xsl:apply-templates select="
-                                    t:persName[(not(@syriaca-tags) or @syriaca-tags!='#syriaca-headword')and not(starts-with(@xml:lang, 'syr') 
-                                    or starts-with(@xml:lang, 'ar')) and not(@syriaca-tags='#syriaca-simplified-script')]" mode="list">
+                                <xsl:apply-templates select="                                     t:persName[(not(@syriaca-tags) or @syriaca-tags!='#syriaca-headword')and not(starts-with(@xml:lang, 'syr')                                      or starts-with(@xml:lang, 'ar')) and not(@syriaca-tags='#syriaca-simplified-script')]" mode="list">
                                     <xsl:sort collation="{$mixed}" select="."/>
                                 </xsl:apply-templates> 
                             </xsl:otherwise>
@@ -1333,11 +1321,7 @@
                 </xsl:when>
                 <xsl:when test="descendant::*[contains(@syriaca-tags,'#syriaca-headword')] or descendant::*[contains(@srophe:tags,'#headword')]">
                     <xsl:for-each select="descendant::*[contains(@syriaca-tags,'#syriaca-headword')] | descendant::*[contains(@srophe:tags,'#headword')]">
-                        <xsl:sort select="if(@xml:lang = 'en') then 1
-                            else if(@xml:lang = 'fr') then 2
-                            else if(@xml:lang = 'as') then 3
-                            else if(@xml:lang = 'syr') then 3
-                            else 4" order="ascending"/>
+                        <xsl:sort select="if(@xml:lang = 'en') then 1                             else if(@xml:lang = 'fr') then 2                             else if(@xml:lang = 'as') then 3                             else if(@xml:lang = 'syr') then 3                             else 4" order="ascending"/>
                             <xsl:choose>
                                 <xsl:when test="starts-with(@xml:lang, 'syr') or starts-with(@xml:lang, 'ar')">
                                     <xsl:apply-templates select=".[not(empty(node()))]" mode="plain"/>
@@ -1499,6 +1483,11 @@
     </xsl:template>
     <xsl:template match="t:sources">
         <xsl:call-template name="sources"/>
+    </xsl:template>
+    <xsl:template match="t:bibliography">
+        <ul class="list-unstyled">
+         <xsl:apply-templates select="t:bibl" mode="footnote"/>
+        </ul>    
     </xsl:template>
     <!-- Named template for sources calls bibliography.xsl -->
     <xsl:template name="sources">
