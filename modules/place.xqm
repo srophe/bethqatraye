@@ -288,6 +288,7 @@ declare %templates:wrap function place:citation($node as node(), $model as map(*
 :)
 declare %templates:wrap function place:link-icons-list($node as node(), $model as map(*)){
 let $data := $model("hits")
+let $title := replace(string-join($data//tei:title[@level='a']/text(),''),'—','')
 return 
         <div id="see-also" class="well">
             <h3>See Also</h3>
@@ -330,8 +331,8 @@ return
                     </a>
                 </li>,   
                 for $idno in $data/descendant::tei:place/descendant::tei:idno[contains(.,'wikipedia')]
-                return 
-                    <li><a href="{$idno}"><img src="{$config:nav-base}/resources/images/Wikipedia-25.png" alt="The Wikipedia icon" title="click to view {$data/descendant::tei:title[1]} in Wikipedia"/>"{$data/descendant::tei:title[1]}" in Wikipedia</a></li>
+                return  
+                    <li><a href="{$idno}"><img src="{$config:nav-base}/resources/images/Wikipedia-25.png" alt="The Wikipedia icon" title="click to view {$title} in Wikipedia"/> "{$title}" in Wikipedia</a></li>
             )}</ul>
         </div>
 };
