@@ -521,7 +521,7 @@
     <!-- P -->
     <!-- Main page modules for syriaca.org display -->
     <xsl:template match="t:place | t:person | t:bibl[starts-with(@xml:id,'work-')] | t:entryFree">
-        <xsl:if test="not(empty(t:desc[not(starts-with(@xml:id,'abstract'))][1]))">
+        <xsl:if test="not(empty(t:desc[not(starts-with(@xml:id,'abstract'))][1])) or not(t:desc[@type = 'abstract'])">
             <div id="description">
                 <h3>Brief Descriptions</h3>
                 <ul>

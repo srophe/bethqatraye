@@ -226,7 +226,7 @@ declare function tei2html:summary-view-persons($nodes as node()*, $id as xs:stri
                 </span>
             else ()}
             {if($nodes/descendant-or-self::*[starts-with(@xml:id,'abstract')]) then 
-                for $abstract in $nodes/descendant::*[starts-with(@xml:id,'abstract')]
+                for $abstract in $nodes/descendant::*[starts-with(@xml:id,'abstract')] | $nodes/descendant::*[@type = 'abstract']
                 let $string := string-join($abstract/descendant-or-self::*/text(),' ')
                 let $blurb := 
                     if(count(tokenize($string, '\W+')[. != '']) gt 25) then  
@@ -282,8 +282,8 @@ declare function tei2html:summary-view-places($nodes as item()*, $id as xs:strin
                     } 
                 </span>
              else ()}
-            {if($nodes/descendant-or-self::*[starts-with(@xml:id,'abstract')]) then 
-                for $abstract in $nodes/descendant::*[starts-with(@xml:id,'abstract')]
+            {if($nodes/descendant-or-self::*[starts-with(@xml:id,'abstract')] or $nodes/descendant::*[@type = 'abstract']) then 
+                for $abstract in $nodes/descendant::*[starts-with(@xml:id,'abstract')] | $nodes/descendant::*[@type = 'abstract']
                 let $string := string-join($abstract/descendant-or-self::*/text(),' ')
                 let $blurb := 
                     if(count(tokenize($string, '\W+')[. != '']) gt 25) then  
@@ -319,8 +319,8 @@ declare function tei2html:summary-view-keyword($nodes as node()*, $id as xs:stri
                 data-clipboard-action="copy" data-clipboard-text="{normalize-space($title)} - {normalize-space($id)}">
                     <span class="glyphicon glyphicon-copy" aria-hidden="true"/>
             </button>
-            {if($nodes/descendant::*[starts-with(@xml:id,'abstract')]) then 
-                for $abstract in $nodes/descendant::*[starts-with(@xml:id,'abstract')]
+            {if($nodes/descendant::*[starts-with(@xml:id,'abstract')] or $nodes/descendant::*[@type = 'abstract']) then 
+                for $abstract in $nodes/descendant::*[starts-with(@xml:id,'abstract')] | $nodes/descendant::*[@type = 'abstract']
                 let $string := string-join($abstract/descendant-or-self::*/text(),' ')
                 let $blurb := 
                     if(count(tokenize($string, '\W+')[. != '']) gt 25) then  
@@ -358,8 +358,8 @@ declare function tei2html:summary-view-generic($nodes as node()*, $id as xs:stri
                     <span class="glyphicon glyphicon-copy" aria-hidden="true"/>
             </button>
             {if($series != '') then <span class="results-list-desc type" dir="ltr" lang="en">{(' (',$series,') ')}</span> else ()}
-            {if($nodes/descendant-or-self::*[starts-with(@xml:id,'abstract')]) then 
-                for $abstract in $nodes/descendant::*[starts-with(@xml:id,'abstract')]
+            {if($nodes/descendant-or-self::*[starts-with(@xml:id,'abstract')] or $nodes/descendant::*[@type = 'abstract']) then 
+                for $abstract in $nodes/descendant::*[starts-with(@xml:id,'abstract')] | $nodes/descendant::*[@type = 'abstract']
                 let $string := string-join($abstract/descendant-or-self::*/text(),' ')
                 let $blurb := 
                     if(count(tokenize($string, '\W+')[. != '']) gt 25) then  
@@ -457,8 +457,8 @@ declare function tei2html:summary-view-spear($nodes as node()*, $id as xs:string
                     } 
                 </span>
             else ()}
-            {if($nodes/descendant-or-self::*[starts-with(@xml:id,'abstract')]) then 
-                for $abstract in $nodes/descendant::*[starts-with(@xml:id,'abstract')]
+            {if($nodes/descendant-or-self::*[starts-with(@xml:id,'abstract')] or $nodes/descendant::*[@type = 'abstract']) then 
+                for $abstract in $nodes/descendant::*[starts-with(@xml:id,'abstract')] | $nodes/descendant::*[@type = 'abstract']
                 let $string := string-join($abstract/descendant-or-self::*/text(),' ')
                 let $blurb := 
                     if(count(tokenize($string, '\W+')[. != '']) gt 25) then  

@@ -34,10 +34,47 @@ declare %templates:wrap function place:h1($node as node(), $model as map(*)){
                 {($title//tei:placeName[@srophe:tags='#headword' or @syriaca-tags='#syriaca-headword'],$title/descendant::tei:idno, $title/descendant::tei:location)}
             </srophe-title>
     return global:tei2html($title-nodes)
+(:
+    let $rec := $model("hits")
+    let $idString := tokenize($place:id,'/')[last()]
+    let $idSubstring := if(contains($idString,'-')) then substring-after($idString,'-') else $idString
+    let $currentID := if($idSubstring  castable as xs:integer) then $idSubstring cast as xs:integer else 0
+    let $nextID := $currentID + 1
+    let $prevID := $currentID - 1
+    let $nextURL := replace($place:id,$currentID,string($nextID))
+    let $prevURL := replace($place:id,$currentID,string($prevID))
+    return 
+        (
+        <div class="row title">
+            <h1 class="col-md-8">{tei2html:rec-headwords($rec)}</h1>
+            {place:link-icons-list($node, $model)}
+        </div>,
+        <div class="idno seriesStmt" style="margin:0; margin-top:-1em; margin-bottom: 1em; padding:1em; color: #999999;">
+            <small class="uri">
+                <a href="{replace($prevURL,$config:base-uri,$config:nav-base)}"><span class="glyphicon glyphicon-backward" aria-hidden="true"/></a>
+                &#160;
+                <button type="button" class="btn btn-default btn-xs" id="idnoBtn" data-clipboard-action="copy" data-clipboard-target="#syriaca-id"><span class="srp-label">URI</span></button>
+                &#160;
+                <span id="syriaca-id">{$place:id}</span>
+                &#160;
+                <a href="{replace($nextURL,$config:base-uri,$config:nav-base)}"><span class="glyphicon glyphicon-forward" aria-hidden="true"/></a>
+            </small>
+            <script><![CDATA[
+                var clipboard = new Clipboard('#idnoBtn');
+                clipboard.on('success', function(e) {
+                console.log(e);
+                });
+                        
+                clipboard.on('error', function(e) {
+                console.log(e);
+                });]]>
+            </script>
+        </div>)
+:)
 };
 
 declare %templates:wrap function place:abstract($node as node(), $model as map(*)){
-    let $abstract := $model("hits")//tei:place/tei:desc[starts-with(@xml:id,'abstract')]
+    let $abstract := $model("hits")//tei:place/tei:desc[starts-with(@xml:id,'abstract')] | $model("hits")//tei:place/tei:desc[@type = 'abstract']
     let $abstract-nodes := 
     <place xmlns="http://www.tei-c.org/ns/1.0">
             {$abstract}
@@ -93,7 +130,7 @@ return
 :)
 declare %templates:wrap function place:body($node as node(), $model as map(*)){
     let $ref-id := concat($config:base-uri,'/place/',$place:id)
-    let $desc-nodes := $model("hits")/descendant::tei:place/tei:desc[not(starts-with(@xml:id,'abstract'))]
+    let $desc-nodes := $model("hits")/descendant::tei:place/tei:desc[not(starts-with(@xml:id,'abstract'))] | $model("hits")//tei:place/tei:desc[@type = 'abstract']
     let $notes-nodes := $model("hits")/descendant::tei:place/tei:note
     let $events-nodes := $model("hits")/descendant::tei:place/tei:event
     let $nested-loc := 
