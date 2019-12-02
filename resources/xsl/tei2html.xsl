@@ -1324,7 +1324,7 @@
                         <xsl:sort select="if(@xml:lang = 'en') then 1                             else if(@xml:lang = 'fr') then 2                             else if(@xml:lang = 'as') then 3                             else if(@xml:lang = 'syr') then 3                             else 4" order="ascending"/>
                             <xsl:choose>
                                 <xsl:when test="starts-with(@xml:lang, 'syr') or starts-with(@xml:lang, 'ar')">
-                                    <xsl:apply-templates select=".[not(empty(node()))]" mode="plain"/>
+                                    <span lang="{string(@xml:lang)}"><xsl:apply-templates select=".[not(empty(node()))]" mode="plain"/></span>
                                 </xsl:when>
                                 <xsl:otherwise><xsl:apply-templates select=".[not(empty(node()))]" mode="plain"/></xsl:otherwise>
                             </xsl:choose>
