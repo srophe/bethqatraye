@@ -292,10 +292,16 @@ let $title := replace(string-join($data//tei:title[@level='a']/text(),''),'—',
 return 
         <div id="see-also" class="well">
             <h3>See Also</h3>
-            <ul>{(
+            <ul class="list-unstyled">{(
                 for $idno in $data/descendant::tei:place/descendant::tei:idno[not(starts-with(.,$config:base-uri)) and not(contains(.,'wikipedia'))]
                 return 
-                    if($idno[contains(.,'csc.org.il')]) then
+                    if($idno[contains(.,'syriaca.org')]) then
+                        <li><a href="{normalize-space($idno)}"> 
+                            <img src="{$config:nav-base}/resources/images/syriaca-logo-blue.png" 
+                            alt="Syriaca.org logo" 
+                            title="click to view {$data/descendant::tei:title[1]} in Syriaca.org" height="24px"/> View in Syriaca.org
+                        </a></li>
+                    else if($idno[contains(.,'csc.org.il')]) then
                         <li><a href="{normalize-space($idno)}"> 
                             {concat('"',substring-before(substring-after(normalize-space($idno),'sK='),'&amp;sT='),'" in the Comprehensive Bibliography on Syriac Christianity')}
                         </a></li>
