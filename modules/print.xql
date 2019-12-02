@@ -40,7 +40,10 @@ return
         <li>{$r/descendant::tei:place/tei:idno[2]/text()}</li>
      </ul>
      <p><em>Author: </em> {$author}</p>
+     
+     <p>END ENTRY</p>
      <hr/>
+     
  </div>
 };
 
