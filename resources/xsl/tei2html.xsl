@@ -521,7 +521,7 @@
     <!-- P -->
     <!-- Main page modules for syriaca.org display -->
     <xsl:template match="t:place | t:person | t:bibl[starts-with(@xml:id,'work-')] | t:entryFree">
-        <xsl:if test="not(empty(t:desc[not(starts-with(@xml:id,'abstract'))][1])) or not(t:desc[@type = 'abstract'])">
+        <xsl:if test="t:desc[not(starts-with(@xml:id,'abstract')) and not(@type = 'abstract')]">
             <div id="description">
                 <h3>Brief Descriptions</h3>
                 <ul>
@@ -1321,7 +1321,7 @@
                 </xsl:when>
                 <xsl:when test="descendant::*[contains(@syriaca-tags,'#syriaca-headword')] or descendant::*[contains(@srophe:tags,'#headword')]">
                     <xsl:for-each select="descendant::*[contains(@syriaca-tags,'#syriaca-headword')] | descendant::*[contains(@srophe:tags,'#headword')]">
-                        <xsl:sort select="if(@xml:lang = 'en') then 1 else if(@xml:lang = 'fr') then 2                             else if(@xml:lang = 'as') then 3                             else if(@xml:lang = 'syr') then 3                             else 4" order="ascending"/>
+                        <xsl:sort select="if(@xml:lang = 'en') then 1                             else if(@xml:lang = 'fr') then 2                             else if(@xml:lang = 'as') then 3                             else if(@xml:lang = 'syr') then 3                             else 4" order="ascending"/>
                             <xsl:choose>
                                 <xsl:when test="starts-with(@xml:lang, 'syr') or starts-with(@xml:lang, 'ar')">
                                     <span lang="{string(@xml:lang)}"><xsl:apply-templates select=".[not(empty(node()))]" mode="plain"/></span>
