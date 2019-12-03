@@ -851,24 +851,21 @@ return
         <div class="panel panel-default" style="margin-top:1em;" xmlns="http://www.w3.org/1999/xhtml">
             <div class="panel-heading">
             <a href="#" data-toggle="collapse" data-target="#showLinkedData">Linked Data  </a>
-            <span class="glyphicon glyphicon-question-sign text-info moreInfo" aria-hidden="true" data-toggle="tooltip" title="This sidebar provides links via Syriaca.org to 
+            <span class="glyphicon glyphicon-question-sign text-info moreInfo" aria-hidden="true" data-toggle="tooltip" 
+            title="This sidebar provides links via Syriaca.org to 
             additional resources beyond this record. 
             We welcome your additions, please use the e-mail button on the right to contact Syriaca.org about submitting additional links."></span>
             <button class="btn btn-default btn-xs pull-right" data-toggle="modal" data-target="#submitLinkedData" style="margin-right:1em;"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></button>
             </div>
-            <div class="panel-body">
+            <div class="panel-body collapse in" id="showLinkedData">
                 {(
-                    let $other-resources := distinct-values(
-                        ($data//@ref[contains(.,'http://syriaca.org/')], 
-                        tokenize($data//@active[contains(.,'http://syriaca.org/')],' '), 
-                        tokenize($data//@passive[contains(.,'http://syriaca.org/')],' '), 
-                        tokenize($data//@mutual[contains(.,'http://syriaca.org/')],' '),$data//tei:idno[contains(.,'http://syriaca.org/')]))
+                 if($model("hits")//@ref[contains(.,'http://syriaca.org/')] or $model("hits")//tei:idno[@type='URI']) then
+                    let $other-resources := distinct-values($model("hits")//@ref[contains(.,'http://syriaca.org/') and not(contains(.,'http://syriaca.org/person.xml'))] | $model("hits")//tei:idno[@type='URI'])
                     let $count := count($other-resources)
                     return 
                         <div class="other-resources" xmlns="http://www.w3.org/1999/xhtml">
-                            <h4>Resources related to {$count} topics in this article. </h4>
                             <div class="collapse in" id="showOtherResources">
-                                <form class="form-inline hidden" action="{$config:nav-base}/api/sparql" method="post">
+                                <form class="form-inline hidden" action="modules/sparql-requests.xql" method="post">
                                     <input type="hidden" name="format" id="format" value="json"/>
                                     <textarea id="query" class="span9" rows="15" cols="150" name="query" type="hidden">
                                       <![CDATA[
@@ -876,22 +873,21 @@ return
                                         prefix lawd: <http://lawd.info/ontology/>
                                         prefix skos: <http://www.w3.org/2004/02/skos/core#>
                                         prefix dcterms: <http://purl.org/dc/terms/>  
-                            	        
-                            	        SELECT ?uri (SAMPLE(?l) AS ?label) (SAMPLE(?uriSubject) AS ?subjects) (SAMPLE(?uriCitations) AS ?citations)
-                                        {
-                                            ?uri rdfs:label ?l
-                                            FILTER (?uri IN ( ]]>{string-join(for $r in subsequence($other-resources,1,10) return concat('<',$r,'>'),',')}<![CDATA[)).
-                                            FILTER ( langMatches(lang(?l), 'en')).
-                                            OPTIONAL{
-                                                 {SELECT ?uri ( count(?s) as ?uriSubject ) { ?s dcterms:relation ?uri } GROUP BY ?uri }  }
-                                            OPTIONAL{
-                                                 {SELECT ?uri ( count(?o) as ?uriCitations ) { ?uri lawd:hasCitation ?o 
-                                                         OPTIONAL{ ?uri skos:closeMatch ?o.}
-                                                 } GROUP BY ?uri }
-                                           }           
-                                        }
-                                        GROUP BY ?uri                                            
-                                            
+                                                                                	        
+                                        SELECT ?uri (SAMPLE(?l) AS ?label) (SAMPLE(?uriSubject) AS ?subjects) (SAMPLE(?uriCitations) AS ?citations)
+                                            {
+                                                ?uri rdfs:label ?l
+                                                FILTER (?uri IN (]]>{string-join(for $r in subsequence($other-resources,1,10) return concat('<',$r,'>'),',')}<![CDATA[)).
+                                                FILTER ( langMatches(lang(?l), 'en')).
+                                                OPTIONAL{
+                                                    {SELECT ?uri ( count(?s) as ?uriSubject ) { ?s dcterms:relation ?uri } GROUP BY ?uri }  }
+                                                    OPTIONAL{
+                                                        {SELECT ?uri ( count(?o) as ?uriCitations ) { ?uri lawd:hasCitation ?o 
+                                                                OPTIONAL{ ?uri skos:closeMatch ?o.}
+                                                        } GROUP BY ?uri }
+                                                    }           
+                                            }
+                                        GROUP BY ?uri  
                                       ]]>  
                                     </textarea>
                                 </form>
@@ -899,7 +895,7 @@ return
                                 {if($count gt 10) then
                                     <div>
                                         <div class="collapse" id="showMoreResources">
-                                            <form class="form-inline hidden" action="{$config:nav-base}/api/sparql" method="post">
+                                            <form class="form-inline hidden" action="modules/sparql-requests.xql" method="post">
                                                 <input type="hidden" name="format" id="format" value="json"/>
                                                 <textarea id="query" class="span9" rows="15" cols="150" name="query" type="hidden">
                                                   <![CDATA[
@@ -907,22 +903,22 @@ return
                                                     prefix lawd: <http://lawd.info/ontology/>
                                                     prefix skos: <http://www.w3.org/2004/02/skos/core#>
                                                     prefix dcterms: <http://purl.org/dc/terms/>  
-                                        	        
-                                        	        SELECT ?uri (SAMPLE(?l) AS ?label) (SAMPLE(?uriSubject) AS ?subjects) (SAMPLE(?uriCitations) AS ?citations)
-                                                    {
-                                                        ?uri rdfs:label ?l
-                                                        FILTER (?uri IN ( ]]>{string-join(for $r in subsequence($other-resources,11,$count) return concat('<',$r,'>'),',')}<![CDATA[)).
-                                                        FILTER ( langMatches(lang(?l), 'en')).
-                                                        OPTIONAL{
-                                                             {SELECT ?uri ( count(?s) as ?uriSubject ) { ?s dcterms:relation ?uri } GROUP BY ?uri }  }
-                                                        OPTIONAL{
-                                                             {SELECT ?uri ( count(?o) as ?uriCitations ) { ?uri lawd:hasCitation ?o 
-                                                                     OPTIONAL{ ?uri skos:closeMatch ?o.}
-                                                             } GROUP BY ?uri }
-                                                       }           
-                                                    }
-                                                    GROUP BY ?uri                                                                                     
-                                                  ]]>  
+                                                                                            	        
+                                                    SELECT ?uri (SAMPLE(?l) AS ?label) (SAMPLE(?uriSubject) AS ?subjects) (SAMPLE(?uriCitations) AS ?citations)
+                                                        {
+                                                            ?uri rdfs:label ?l
+                                                            FILTER (?uri IN (]]>{string-join(for $r in subsequence($other-resources,10,$count) return concat('<',$r,'>'),',')}<![CDATA[)).
+                                                            FILTER ( langMatches(lang(?l), 'en')).
+                                                            OPTIONAL{
+                                                                {SELECT ?uri ( count(?s) as ?uriSubject ) { ?s dcterms:relation ?uri } GROUP BY ?uri }  }
+                                                                OPTIONAL{
+                                                                    {SELECT ?uri ( count(?o) as ?uriCitations ) { ?uri lawd:hasCitation ?o 
+                                                                            OPTIONAL{ ?uri skos:closeMatch ?o.}
+                                                                    } GROUP BY ?uri }
+                                                                }           
+                                                        }
+                                                    GROUP BY ?uri  
+                                                  ]]>
                                                 </textarea>
                                             </form>
                                         </div>
@@ -931,9 +927,8 @@ return
                                 else ()
                                 }
                             </div>
-<!--                            <a href="#" class="btn btn-default togglelink" style="width:100%;" data-toggle="collapse" data-target="#showOtherResources" data-text-swap="Hide Other Resources" id="getLinkedData">Show Other Resources</a>-->
                             <script>
-                               <![CDATA[
+                            <![CDATA[
                                 $(document).ready(function() {
                                     $('#showOtherResources').children('form').each(function () {
                                         var url = $(this).attr('action');
@@ -978,6 +973,7 @@ return
                             ]]>
                             </script>
                         </div>
+                 else () 
                 )}
             </div>
         </div>       
