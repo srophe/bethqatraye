@@ -288,7 +288,7 @@ declare %templates:wrap function place:citation($node as node(), $model as map(*
 :)
 declare %templates:wrap function place:link-icons-list($node as node(), $model as map(*)){
 let $data := $model("hits")
-let $title := replace(string-join($data//tei:title[@level='a']/text(),''),'—','')
+let $title := replace(string-join($data/descendant::tei:teiHeader/descendant::tei:title[@level='a'][1]/text(),''),'—','')
 return 
         <div id="see-also" class="well">
             <h3>See Also</h3>
@@ -302,11 +302,11 @@ return
                             title="click to view {$data/descendant::tei:title[1]} in Syriaca.org" height="24px"/> View in Syriaca.org
                         </a></li>
                     else if($idno[contains(.,'csc.org.il')]) then
-                        <li><a href="{normalize-space($idno)}"> 
+                        <li><a href="{normalize-space($idno)}"> <span class="glyphicon glyphicon-book"></span>&#160;
                             {concat('"',substring-before(substring-after(normalize-space($idno),'sK='),'&amp;sT='),'" in the Comprehensive Bibliography on Syriac Christianity')}
                         </a></li>
                     else if($idno[contains(.,'http://worldcat.org/identities')]) then
-                        <li><a href="{normalize-space($idno)}"> 
+                        <li><a href="{normalize-space($idno)}"> <span class="glyphicon glyphicon-book"></span>&#160;
                             {concat('"',substring-after($idno,'http://worldcat.org/identities/'),'" in WorldCat Identities')}
                         </a></li>
                     else if($idno[contains(.,'http://viaf.org/')]) then
@@ -318,7 +318,7 @@ return
                             title="click to view {$data/descendant::tei:title[1]} in Pleiades"/> View in Pleiades</a>
                         </li>
                     else
-                        <li><a href="{normalize-space($idno)}">{normalize-space($idno)}</a></li>,
+                        <li><a href="{normalize-space($idno)}"><span class="glyphicon glyphicon-book"></span>&#160;{normalize-space($idno)}</a></li>,
                  for $geo in $data/descendant::tei:location[@type='gps']/tei:geo
                  let $coords := tokenize(normalize-space($geo), '\s+')
                  let $geoRef := concat($coords[1],', ',$coords[2])
