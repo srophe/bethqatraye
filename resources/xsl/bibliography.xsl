@@ -267,7 +267,8 @@
                             <xsl:call-template name="persons"/>
                             <xsl:text> </xsl:text>
                             <xsl:for-each select="t:title">
-                                <xsl:apply-templates select="self::*" mode="footnote"/>
+                                <xsl:if test="@level='a'">"</xsl:if><xsl:apply-templates select="self::*" mode="footnote"/>
+                                <xsl:if test="@level='a'">,"</xsl:if>
                                 <xsl:if test="following-sibling::t:title[@level = 'j']">
                                     <xsl:text> In</xsl:text>
                                 </xsl:if>

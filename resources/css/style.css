@@ -274,8 +274,12 @@ pre {
 /* T */
 .tab-content {padding-top:.25em;}
 .text {margin:0}
-.title {border-bottom:1px solid grey}
+.title {
+ /* border-bottom:1px solid grey */
+     font-style: italic; 
+  }
 .title-journal, .title-monographic{font-style:italic;}
+
 .tooltip {
       padding:.25em;
       overflow:visible;
