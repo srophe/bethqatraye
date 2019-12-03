@@ -841,12 +841,13 @@ return
  : Display related Syriaca.org names
 :)
 declare %templates:wrap function app:linked-data($node as node(), $model as map(*)){
-    (:if($model("data")//@ref[contains(.,'http://syriaca.org/')] and $model("data")//tei:idno[@type="subject"][contains(.,'http://syriaca.org/')]) then:) 
-    if($model("data")//@ref[contains(.,'http://syriaca.org/')] 
-    or $model("data")//@active[contains(.,'http://syriaca.org/')] 
-    or $model("data")//@passive[contains(.,'http://syriaca.org/')] 
-    or $model("data")//@mutual[contains(.,'http://syriaca.org/')] 
-    or $model("data")//tei:idno[contains(.,'http://syriaca.org/')]) then
+let $data := $model("hits")//tei:body
+return  
+    if($data//@ref[contains(.,'http://syriaca.org/')] 
+    or $data//@active[contains(.,'http://syriaca.org/')] 
+    or $data//@passive[contains(.,'http://syriaca.org/')] 
+    or $data//@mutual[contains(.,'http://syriaca.org/')] 
+    or $data//tei:idno[contains(.,'http://syriaca.org/')]) then
         <div class="panel panel-default" style="margin-top:1em;" xmlns="http://www.w3.org/1999/xhtml">
             <div class="panel-heading">
             <a href="#" data-toggle="collapse" data-target="#showLinkedData">Linked Data  </a>
@@ -857,12 +858,11 @@ declare %templates:wrap function app:linked-data($node as node(), $model as map(
             </div>
             <div class="panel-body">
                 {(
-                 if($model("data")//@ref[contains(.,'http://syriaca.org/')] or $model("data")//@active[contains(.,'http://syriaca.org/')] or $model("data")//@passive[contains(.,'http://syriaca.org/')] or $model("data")//@mutual[contains(.,'http://syriaca.org/')]) then
                     let $other-resources := distinct-values(
-                        ($model("data")//@ref[contains(.,'http://syriaca.org/')], 
-                        tokenize($model("data")//@active[contains(.,'http://syriaca.org/')],' '), 
-                        tokenize($model("data")//@passive[contains(.,'http://syriaca.org/')],' '), 
-                        tokenize($model("data")//@mutual[contains(.,'http://syriaca.org/')],' ')))
+                        ($data//@ref[contains(.,'http://syriaca.org/')], 
+                        tokenize($data//@active[contains(.,'http://syriaca.org/')],' '), 
+                        tokenize($data//@passive[contains(.,'http://syriaca.org/')],' '), 
+                        tokenize($data//@mutual[contains(.,'http://syriaca.org/')],' '),$data//tei:idno[contains(.,'http://syriaca.org/')]))
                     let $count := count($other-resources)
                     return 
                         <div class="other-resources" xmlns="http://www.w3.org/1999/xhtml">
@@ -978,9 +978,8 @@ declare %templates:wrap function app:linked-data($node as node(), $model as map(
                             ]]>
                             </script>
                         </div>
-                 else () 
                 )}
             </div>
         </div>       
-    else()
+    else ()    
 };
