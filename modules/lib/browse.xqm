@@ -58,7 +58,8 @@ declare function browse:show-hits($node as node(), $model as map(*), $collection
                     data-toggle="collapse" data-target="#filterMap" 
                     href="#filterMap" data-text-swap="+ Show"> - Hide </a></span>
                 <div class="collapse in" id="filterMap">
-                      {facet:html-list-facets-as-buttons(facet:count($hits[descendant::tei:geo], $facet-config/descendant::facet:facet-definition))}  
+                    {(facet:selected-facets-display($facet-config/descendant::facet:facets/facet:facet-definition), 
+                   facet:output-html-facets($hits[descendant::tei:geo], $facet-config/descendant::facet:facets/facet:facet-definition[@name="Type"]))}
                 </div>
             </div>
         </div>
@@ -75,7 +76,8 @@ declare function browse:show-hits($node as node(), $model as map(*), $collection
            </div>
            <br/>
            <div class="row">
-            <div class="col-md-3">{facet:html-list-facets-as-buttons(facet:count($hits, $facet-config/descendant::facet:facet-definition))}</div>
+            <div class="col-md-3">{(facet:selected-facets-display($facet-config/descendant::facet:facets/facet:facet-definition), 
+                    facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition))}</div>
             <div class="col-md-9">
                {(
                    if(($browse:lang = 'syr') or ($browse:lang = 'ar')) then (attribute dir {"rtl"}) else(),  
@@ -242,10 +244,13 @@ declare function browse:by-type($hits, $collection, $sort-options){
         {if($browse:view='type') then 
             if($collection = ('geo','places')) then 
                 browse:browse-type($collection)
-            else facet:html-list-facets-as-buttons(facet:count($hits, $facet-config/descendant::facet:facet-definition[@name="Type"]))
+            else (facet:selected-facets-display($facet-config/descendant::facet:facets/facet:facet-definition), 
+                   facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition[@name="Type"])) 
          else if($browse:view = 'date') then 
-            facet:html-list-facets-as-buttons(facet:count($hits, $facet-config/descendant::facet:facet-definition[@name="Century"]))
-         else facet:html-list-facets-as-buttons(facet:count($hits, $facet-config/descendant::facet:facet-definition))         
+            (facet:selected-facets-display($facet-config/descendant::facet:facets/facet:facet-definition), 
+                   facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition[@name="Century"]))
+         else (facet:selected-facets-display($facet-config/descendant::facet:facets/facet:facet-definition), 
+                   facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition))         
         }</div>,
     <div class="col-md-8" xmlns="http://www.w3.org/1999/xhtml">{
         if($browse:view='type') then
@@ -304,14 +309,15 @@ let $hits := util:eval(concat("collection($config:data-root)//tei:TEI[descendant
 let $facet-config := global:facet-definition-file($collection)
 return 
 <div xmlns="http://www.w3.org/1999/xhtml" id="browseMap">
-    {browse:get-map($hits)}
+    {maps:build-map($hits,count($hits))}
     <div id="map-filters" class="map-overlay">
                 <span class="filter-label">Filter Map 
                     <a class="pull-right small togglelink text-info" 
                     data-toggle="collapse" data-target="#filterMap" 
                     href="#filterMap" data-text-swap="+ Show"> - Hide </a></span>
                 <div class="collapse in" id="filterMap">
-                      {facet:html-list-facets-as-buttons(facet:count($hits[descendant::tei:geo], $facet-config/descendant::facet:facet-definition))}  
+                   {(facet:selected-facets-display($facet-config/descendant::facet:facets/facet:facet-definition), 
+                   facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition[@name="Type"]))}  
                 </div>
             </div>
 </div>
