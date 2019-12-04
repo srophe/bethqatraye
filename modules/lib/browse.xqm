@@ -58,8 +58,7 @@ declare function browse:show-hits($node as node(), $model as map(*), $collection
                     data-toggle="collapse" data-target="#filterMap" 
                     href="#filterMap" data-text-swap="+ Show"> - Hide </a></span>
                 <div class="collapse in" id="filterMap">
-                    {(facet:selected-facets-display($facet-config/descendant::facet:facets/facet:facet-definition), 
-                   facet:output-html-facets($hits[descendant::tei:geo], $facet-config/descendant::facet:facets/facet:facet-definition[@name="Type"]))}
+                    {(facet:output-html-facets($hits[descendant::tei:geo], $facet-config/descendant::facet:facets/facet:facet-definition[@name="Type"]))}
                 </div>
             </div>
         </div>
@@ -76,8 +75,7 @@ declare function browse:show-hits($node as node(), $model as map(*), $collection
            </div>
            <br/>
            <div class="row">
-            <div class="col-md-3">{(facet:selected-facets-display($facet-config/descendant::facet:facets/facet:facet-definition), 
-                    facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition))}</div>
+            <div class="col-md-3">{(facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition))}</div>
             <div class="col-md-9">
                {(
                    if(($browse:lang = 'syr') or ($browse:lang = 'ar')) then (attribute dir {"rtl"}) else(),  
@@ -244,13 +242,10 @@ declare function browse:by-type($hits, $collection, $sort-options){
         {if($browse:view='type') then 
             if($collection = ('geo','places')) then 
                 browse:browse-type($collection)
-            else (facet:selected-facets-display($facet-config/descendant::facet:facets/facet:facet-definition), 
-                   facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition[@name="Type"])) 
+            else facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition[@name="Type"]) 
          else if($browse:view = 'date') then 
-            (facet:selected-facets-display($facet-config/descendant::facet:facets/facet:facet-definition), 
-                   facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition[@name="Century"]))
-         else (facet:selected-facets-display($facet-config/descendant::facet:facets/facet:facet-definition), 
-                   facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition))         
+            facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition[@name="Century"])
+         else facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition)         
         }</div>,
     <div class="col-md-8" xmlns="http://www.w3.org/1999/xhtml">{
         if($browse:view='type') then
@@ -316,8 +311,7 @@ return
                     data-toggle="collapse" data-target="#filterMap" 
                     href="#filterMap" data-text-swap="+ Show"> - Hide </a></span>
                 <div class="collapse in" id="filterMap">
-                   {(facet:selected-facets-display($facet-config/descendant::facet:facets/facet:facet-definition), 
-                   facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition[@name="Type"]))}  
+                   {facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition[@name="Type"])}  
                 </div>
             </div>
 </div>
