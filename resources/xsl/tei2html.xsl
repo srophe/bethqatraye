@@ -1171,7 +1171,7 @@
         <xsl:call-template name="h1"/>
     </xsl:template>
     <xsl:template name="h1">
-        <div class="row title">
+        <div class="row main-title">
             <h1 class="col-md-8">
                 <!-- Format title, calls template in place-title-std.xsl -->
                 <xsl:call-template name="title"/>
