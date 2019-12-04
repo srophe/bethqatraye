@@ -11,6 +11,7 @@ import module namespace facet="http://expath.org/ns/facet" at "facet.xqm";
 import module namespace functx="http://www.functx.com";
 
 declare namespace tei="http://www.tei-c.org/ns/1.0";
+declare namespace srophe="https://srophe.app";
 
 (:~
  : Return document by id/tei:idno or document path
