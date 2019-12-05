@@ -37,7 +37,11 @@ declare variable $browse:perpage {request:get-parameter('perpage', 25) cast as x
  : @param $facets facet xml file name, relative to collection directory
 :)  
 declare function browse:get-all($node as node(), $model as map(*), $collection as xs:string*, $element as xs:string?, $facets as xs:string?){
-    map{"hits" := data:get-records($collection, $element) }
+    let $data := if($browse:view = 'syriac' or $browse:lang = 'syr' or $browse:view = 'arabic' or $browse:lang = 'ar') then
+                    data:get-records($collection, 'tei:place/tei:placeName')
+                 else data:get-records($collection, $element)
+    return 
+        map{"hits" := $data}
 };
 
 (:
@@ -48,8 +52,42 @@ declare function browse:show-hits($node as node(), $model as map(*), $collection
   let $hits := $model("hits")
   let $facet-config := global:facet-definition-file($collection)
   return 
-    (
-    if($browse:view = 'map') then 
+    if($browse:view != '' and $browse:view != 'map') then
+        <div class="col-md-12" xmlns="http://www.w3.org/1999/xhtml">
+            <div class="float-container">
+                <div class="{if(($browse:lang = 'syr') or ($browse:lang = 'ar')) then "pull-left" else "pull-right paging"}">
+                    {page:pages($hits, $collection, $browse:start, $browse:perpage,'', $sort-options)}
+                </div>
+                    {
+                        if($browse:view = ('type','date','facets','other','ܐ-ܬ','ا-ي') ) then ()
+                        else browse:browse-abc-menu()
+                    }
+           </div>
+           <br/>
+            <div class="row">
+             {
+                 if($facet-config != '') then
+                    <div class="col-md-3">{(facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition))}</div> 
+                 else () 
+                 }
+             <div class="{if($facet-config != '') then 'col-md-9' else 'col-md-12'}">
+                {(
+                    if(($browse:lang = 'syr') or ($browse:lang = 'ar')) then (attribute dir {"rtl"}) else(),  
+                    if($browse:alpha-filter != '') then  
+                     <h3>{(
+                        if(($browse:lang = 'syr') or ($browse:lang = 'ar')) then (attribute dir {"rtl"}, attribute lang {"syr"}, attribute class {"label pull-right"}) 
+                        else attribute class {"label"},
+                        $browse:alpha-filter)}</h3>
+                    else (),
+                    <div class="results {if($browse:lang = 'syr' or $browse:lang = 'ar') then 'syr-list' else 'en-list'}">
+                        {if(($browse:lang = 'syr') or ($browse:lang = 'ar')) then (attribute dir {"rtl"}) else()}
+                        {browse:display-hits($hits)}
+                    </div>
+                )}
+              </div>
+          </div> 
+        </div>
+    else 
         <div class="col-md-12 map-lg" xmlns="http://www.w3.org/1999/xhtml" id="browseMap">
             {browse:get-map($hits)}
             <div id="map-filters" class="map-overlay">
@@ -62,61 +100,6 @@ declare function browse:show-hits($node as node(), $model as map(*), $collection
                 </div>
             </div>
         </div>
-    else if($facet-config != '') then
-        <div class="col-md-12" xmlns="http://www.w3.org/1999/xhtml">
-            <div class="float-container">
-                <div class="{if(($browse:lang = 'syr') or ($browse:lang = 'ar')) then "pull-left" else "pull-right paging"}">
-                    {page:pages($hits, $collection, $browse:start, $browse:perpage,'', $sort-options)}
-                </div>
-                    {
-                        if($browse:view = ('type','date','facets','other','ܐ-ܬ','ا-ي') ) then ()
-                        else browse:browse-abc-menu()
-                    }
-           </div>
-           <br/>
-           <div class="row">
-            <div class="col-md-3">{(facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition))}</div>
-            <div class="col-md-9">
-               {(
-                   if(($browse:lang = 'syr') or ($browse:lang = 'ar')) then (attribute dir {"rtl"}) else(),  
-                   if($browse:alpha-filter != '') then  
-                    <h3>{(
-                       if(($browse:lang = 'syr') or ($browse:lang = 'ar')) then (attribute dir {"rtl"}, attribute lang {"syr"}, attribute class {"label pull-right"}) 
-                       else attribute class {"label"},
-                       $browse:alpha-filter)}</h3>
-                   else (),
-                   <div class="results {if($browse:lang = 'syr' or $browse:lang = 'ar') then 'syr-list' else 'en-list'}">
-                       {if(($browse:lang = 'syr') or ($browse:lang = 'ar')) then (attribute dir {"rtl"}) else()}
-                       {browse:display-hits($hits)}
-                   </div>
-               )}
-             </div>
-         </div> 
-        </div>
-    else
-        <div class="{if($browse:view = 'type' or $browse:view = 'date' or $browse:view = 'facets') then 'col-md-8 col-md-push-4' else 'col-md-12'}" xmlns="http://www.w3.org/1999/xhtml">
-           {( if(($browse:lang = 'syr') or ($browse:lang = 'ar')) then (attribute dir {"rtl"}) else(),
-                <div class="float-container">
-                    <div class="{if(($browse:lang = 'syr') or ($browse:lang = 'ar')) then "pull-left" else "pull-right paging"}">
-                         {page:pages($hits, $collection, $browse:start, $browse:perpage,'', $sort-options)}
-                    </div>
-                    {
-                    if($browse:view = ('type','date','facets','other','ܐ-ܬ','ا-ي') ) then ()
-                    else browse:browse-abc-menu()
-                    }
-                </div>,
-                <h3>{(
-                    if(($browse:lang = 'syr') or ($browse:lang = 'ar')) then (attribute dir {"rtl"}, attribute lang {"syr"}, attribute class {"label pull-right"}) 
-                    else attribute class {"label"},
-                    if($browse:view = ('type','date','facets','other','ܐ-ܬ','ا-ي') ) then ()
-                    else if($browse:alpha-filter != '') then $browse:alpha-filter else 'A')}</h3>,
-                <div class="results {if($browse:lang = 'syr' or $browse:lang = 'ar') then 'syr-list' else 'en-list'}">
-                    {if(($browse:lang = 'syr') or ($browse:lang = 'ar')) then (attribute dir {"rtl"}) else()}
-                    {browse:display-hits($hits)}
-                </div>
-            )}
-        </div>
-    )
 };
 
 (:
@@ -208,7 +191,7 @@ declare function browse:browse-abc-menu(){
         {
             if(($browse:lang = 'syr')) then  
                 (attribute dir {"rtl"},
-                for $letter in tokenize('ܐ ܒ ܓ ܕ ܗ ܘ ܙ ܚ ܛ ܝ ܟ ܠ ܡ ܢ ܣ ܥ ܦ ܩ ܪ ܫ ܬ ALL', ' ')
+                for $letter in tokenize('ܐ ܒ ܓ ܕ ܗ ܘ ܙ ܚ ܛ ܝ ܟ ܠ ܡ ܢ ܣ ܥ ܦ ܩ ܪ ܫ ܬ ', ' ')
                 return 
                     if($letter = 'ALL') then 
                          <li class="syr-menu {if($browse:alpha-filter = $letter) then "selected badge" else()}" lang="en"><a href="?lang={$browse:lang}&amp;alpha-filter={$letter}{if($browse:view != '') then concat('&amp;view=',$browse:view) else()}{if(request:get-parameter('element', '') != '') then concat('&amp;element=',request:get-parameter('element', '')) else()}">{$letter}</a></li>                        
@@ -216,21 +199,22 @@ declare function browse:browse-abc-menu(){
                     )
             else if(($browse:lang = 'ar')) then
                 (attribute dir {"rtl"},
-                for $letter in tokenize('ا ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ي ALL', ' ')
+                for $letter in tokenize('ا ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ي', ' ')
                 return 
                     if($letter = 'ALL') then
                          <li class="ar-menu {if($browse:alpha-filter = $letter) then "selected badge" else()}" lang="en"><a href="?lang={$browse:lang}&amp;alpha-filter={$letter}{if($browse:view != '') then concat('&amp;view=',$browse:view) else()}{if(request:get-parameter('element', '') != '') then concat('&amp;element=',request:get-parameter('element', '')) else()}">{$letter}</a></li>
                     else <li class="ar-menu {if($browse:alpha-filter = $letter) then "selected badge" else()}" lang="ar"><a href="?lang={$browse:lang}&amp;alpha-filter={$letter}{if($browse:view != '') then concat('&amp;view=',$browse:view) else()}{if(request:get-parameter('element', '') != '') then concat('&amp;element=',request:get-parameter('element', '')) else()}">{$letter}</a></li>
                 )                    
             else if($browse:lang = 'ru') then 
-                for $letter in tokenize('А Б В Г Д Е Ё Ж З И Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я ALL',' ')
+                for $letter in tokenize('А Б В Г Д Е Ё Ж З И Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я',' ')
                 return 
                 <li>{if($browse:alpha-filter = $letter) then attribute class {"selected badge"} else()}<a href="?lang={$browse:lang}&amp;alpha-filter={$letter}{if($browse:view != '') then concat('&amp;view=',$browse:view) else()}{if(request:get-parameter('element', '') != '') then concat('&amp;element=',request:get-parameter('element', '')) else()}">{$letter}</a></li>            
             else                
-                for $letter in tokenize('A B C D E F G H I J K L M N O P Q R S T U V W X Y Z ALL', ' ')
+                for $letter in tokenize('A B C D E F G H I J K L M N O P Q R S T U V W X Y Z', ' ')
                 return
                     <li>{if($browse:alpha-filter = $letter) then attribute class {"selected badge"} else()}<a href="?lang={$browse:lang}&amp;alpha-filter={$letter}{if($browse:view != '') then concat('&amp;view=',$browse:view) else()}{if(request:get-parameter('element', '') != '') then concat('&amp;element=',request:get-parameter('element', '')) else()}">{$letter}</a></li>
         }
+        <li class="{if($browse:lang = 'syr') then 'syr-menu' else if($browse:lang = 'ar') then 'ar-menu' else ()} {if($browse:alpha-filter = 'ALL') then "selected badge" else()}" lang="en"><a href="?lang={$browse:lang}&amp;alpha-filter=ALL{if($browse:view != '') then concat('&amp;view=',$browse:view) else()}{if(request:get-parameter('element', '') != '') then concat('&amp;element=',request:get-parameter('element', ''))  else()}">All Entries</a></li>
         </ul>
     </div>
 };

@@ -62,7 +62,7 @@ let $pagination-links :=
                 <ul class="pagination pull-right">
                     {((: Show 'Previous' for all but the 1st page of results :)
                         if ($current-page = 1) then ()
-                        else <li><a href="{concat($param-string, $perpage * ($current-page - 2)) }">Prev</a></li>,
+                        else <li><a href="{concat($param-string, $perpage * ($current-page - 2)) }" title="Previous page"><span class="glyphicon glyphicon-backward"></span></a></li>,
                         (: Show links to each page of results :)
                         let $max-pages-to-show := 8
                         let $padding := xs:integer(round($max-pages-to-show div 2))
@@ -83,10 +83,10 @@ let $pagination-links :=
                              else <li><a href="{concat($param-string, $newstart)}">{$page}</a></li>,
                         (: Shows 'Next' for all but the last page of results :)
                         if ($start + $perpage ge $total-result-count) then ()
-                        else <li><a href="{concat($param-string, $start + $perpage)}">Next</a></li>,
+                        else <li><a href="{concat($param-string, $start + $perpage)}" title="Next page"><span class="glyphicon glyphicon-forward"></span></a></li>,
                         if($sort-options != '') then page:sort($param-string, $start, $sort-options)
                         else(),
-                        <li><a href="{concat($param-string,'1&amp;perpage=',$total-result-count)}">All</a></li>,
+                        <li><a href="{concat($param-string,'1&amp;perpage=',$total-result-count)}">All Results</a></li>,
                         if($search-string != '') then
                             <li class="pull-right search-new"><a href="search.html"><span class="glyphicon glyphicon-search"/> New</a></li>
                         else ()    
