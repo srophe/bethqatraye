@@ -278,10 +278,11 @@
                             </xsl:for-each>
                            <!-- <xsl:apply-templates select="text()"/>-->
                             <xsl:sequence select="$passThrough"/>
-                            <xsl:if test="descendant::t:idno[@type='URI']">
+                            <xsl:if test="descendant::t:idno[@type='URI'] or descendant::t:ref[not(ancestor::note)] or descendant::t:ptr">
                                 <span class="footnote-links">
                                     <xsl:apply-templates select="descendant::t:idno[@type='URI']" mode="links"/>
                                     <xsl:apply-templates select="descendant::t:ref[not(ancestor::note)]" mode="links"/>
+                                    <xsl:apply-templates select="descendant::t:ptr" mode="links"/>
                                 </span>
                             </xsl:if>
                         </xsl:when>
@@ -1152,6 +1153,9 @@
                 <xsl:when test="self::t:ref/@target">
                     <xsl:value-of select="@target"/>
                 </xsl:when>
+                <xsl:when test="self::t:ptr/@target">
+                    <xsl:value-of select="@target"/>
+                </xsl:when>
                 <xsl:otherwise>
                     <xsl:value-of select="text()"/>
                 </xsl:otherwise>
@@ -1181,6 +1185,9 @@
                 <xsl:when test="starts-with($ref,'https://archive.org')">
                     <xsl:text>Link to Archive.org Bibliographic record</xsl:text>
                 </xsl:when>
+                <xsl:when test="starts-with($ref,'http://syriaca.org/bibl/')">
+                    <xsl:text>Link to Syriaca.org Bibliographic record</xsl:text>
+                </xsl:when>
                 <xsl:otherwise>
                     <xsl:text>External link to bibliographic record</xsl:text>
                 </xsl:otherwise>
@@ -1202,6 +1209,9 @@
             </xsl:when>
             <xsl:when test="starts-with($ref,$base-uri)">
                 <img src="{$nav-base}/resources/images/icons-syriaca-sm.png" alt="{concat('Link to ',$repository-title,' Bibliographic Record.')}" height="18px"/>
+            </xsl:when>
+            <xsl:when test="starts-with($ref,'http://syriaca.org/')">
+                <img src="{$nav-base}/resources/images/icons-syriaca-sm.png" alt="Link to Syriaca.org Bibliographic Record." height="18px"/>
             </xsl:when>
             <!-- glyphicon glyphicon-book -->
             <xsl:when test="contains($ref,'worldcat.org/')">
