@@ -69,10 +69,10 @@ declare %templates:wrap function app:record-title($node as node(), $model as map
         if(request:get-parameter('id', '')) then
             string-join(for $n in $data//tei:placeName[@srophe:tags='#headword']
             let $sort := 
-                if(@xml:lang = 'en') then 1                             
-                else if(@xml:lang = 'fr') then 2                            
-                else if(@xml:lang = 'as') then 3                             
-                else if(@xml:lang = 'syr') then 3                             
+                if($n/@xml:lang = 'en') then 1                             
+                else if($n/@xml:lang = 'fr') then 2                            
+                else if($n/@xml:lang = 'as') then 3                             
+                else if($n/@xml:lang = 'syr') then 3                             
                 else 4
             order by $sort
             return $n/text(),' - ')
