@@ -61,7 +61,7 @@ declare function app:get-work($node as node(), $model as map(*)) {
 
 (:~
  : Dynamically build html title based on TEI record and/or sub-module. 
- : @param request:get-parameter('id', '') if id is present find TEI title, otherwise use title of sub-module
+ : @param request:get-parameter('id', '') if id is present find TEI title, otherwise use title of sub-module 
 :)
 declare %templates:wrap function app:record-title($node as node(), $model as map(*), $collection as xs:string?){
     let $data := $model("hits")
