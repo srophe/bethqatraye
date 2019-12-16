@@ -67,7 +67,15 @@ declare %templates:wrap function app:record-title($node as node(), $model as map
     let $data := $model("hits")
     return 
         if(request:get-parameter('id', '')) then
-            replace($data/descendant::tei:titleStmt[1]/tei:title[1]/text(),'-|—','')
+            string-join(for $n in $data//tei:placeName[@srophe:tags='#headword']
+            let $sort := 
+                if(@xml:lang = 'en') then 1                             
+                else if(@xml:lang = 'fr') then 2                            
+                else if(@xml:lang = 'as') then 3                             
+                else if(@xml:lang = 'syr') then 3                             
+                else 4
+            order by $sort
+            return $n/text(),' - ')
         else if($collection != '') then
             string(config:collection-vars($collection)/@title)
         else $config:app-title
