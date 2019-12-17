@@ -96,7 +96,7 @@ declare function place:type-details($data, $type){
             <ul>
             {
                 for $location in $data//tei:location
-                let $sort := if($location[@subtype = 'preferred']) then 0 else 1
+                let $sort := if($location[@subtype = 'preferred']) then 0 else if($location[@subtype = 'representative']) then 1 else 2
                 order by $sort
                 return global:tei2html($location)
             }
