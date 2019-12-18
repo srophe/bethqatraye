@@ -105,7 +105,7 @@ declare function maps:build-leaflet-map($nodes as node()*, $total-count as xs:in
                                  }               
                                 }
                             })
-        var map = L.map('map').fitBounds(geojson.getBounds(),{maxZoom: 5}).setZoom(5);
+        var map = L.map('map',{scrollWheelZoom:false}).fitBounds(geojson.getBounds(),{maxZoom: 5}).setZoom(5);
         //map.panTo(new L.LatLng(25.4,53.1));
        //var map = L.map('map').setView([53.1,25.4], 5);
         terrain.addTo(map);
