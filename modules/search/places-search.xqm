@@ -298,6 +298,32 @@ declare function places:limit-by-lang-ar(){
     else ''
 };
 
+(: BQ location types :)
+declare function places:locationSpecific(){
+    if(request:get-parameter('locationSpecific', '') != '') then 
+        "[descendant::tei:location[@type='gps'][@subtype = 'preferred' or not(@subtype)]]"
+    else ()
+};
+
+declare function places:locationRepresentative(){
+    if(request:get-parameter('locationRepresentative', '') != '') then 
+        "[descendant::tei:location[@type='gps'][@subtype = 'representative']]"
+    else ()
+};
+
+declare function places:BQRegion(){
+    if(request:get-parameter('BQRegion', '') != '') then 
+        "[descendant::tei:location[@type='nested']/tei:region[@ref='http://bqgazetteer.bethmardutho.org/place/37']]"
+    else ()
+};
+
+declare function places:beyondBQRegion(){
+    if(request:get-parameter('beyondBQRegion', '') != '') then 
+       "[not(descendant::tei:location[@type='nested']/tei:region[@ref='http://bqgazetteer.bethmardutho.org/place/37'])]"
+    else ()
+};
+
+
 (:~
  : Builds search string and evaluates string.
  : Search stored in map for use by other functions
@@ -306,15 +332,14 @@ declare function places:query-string() as xs:string?{
     concat("collection('",$config:data-root,"/places/tei')//tei:body",
     data:keyword-search(),
     places:type(),
-    places:place-name(),
-    places:location(),
-    places:event(),places:event-dates(),
-    places:attestation(), places:attestation-dates(), 
-    places:existence(),places:existence-dates(),
-    places:confession(),
+    places:place-name(), 
     data:related-places(),
     data:related-persons(),
-    data:mentioned(),
+    places:locationSpecific(),
+    places:locationRepresentative(),
+    places:BQRegion(),
+    places:beyondBQRegion(),
+    data:idno(),
     places:limit-by-lang-en(),places:limit-by-lang-syr(),places:limit-by-lang-ar()
     )
 };
@@ -396,22 +421,18 @@ declare function places:search-form() {
                         </div> 
                     </div>
                   </div>
-                    <!-- Location --> 
-                    <div class="form-group">
-                        <label for="loc" class="col-sm-2 col-md-3  control-label">Location: </label>
-                        <div class="col-sm-10 col-md-9 ">
-                           <div class="input-group">
-                                <input type="text" id="loc" name="loc" class="form-control keyboard"/>
-                            <div class="input-group-btn">{global:keyboard-select-menu('loc')}</div>
-                            </div>                         
+                  <!-- search by URI box -->
+                  <div class="form-group">            
+                        <label for="related-persons" class="col-sm-2 col-md-3  control-label">Search by URI: </label>
+                        <div class="col-sm-10 col-md-6">
+                            <input type="text" id="idno" name="idno" class="form-control" placeholder="http://bqgazetteer.bethmardutho.org/place/5173"/>
                         </div>
                     </div>
-                    <hr/>               
                 </div>
                 <div class="col-md-5">
                       <!-- Place Type -->
                     <div style="margin-top:1em; padding-left:.5em;">
-                        <label class="control-label">Place Type: </label>
+                        <label class="control-label">Limit by Place Type: </label>
                             <select name="type" id="type" class="input-medium form-control">
                                 <option value="">- Select -</option>
                                 <option value="building">building</option>
@@ -435,9 +456,19 @@ declare function places:search-form() {
                                 <option value="temple">temple</option>
                                 <option value="unknown">unknown</option>
                             </select>
+                        
+                        <br/>
+                        <label class="control-label">Limit by Location Type: </label>
+                        <div class="col-md-offset-1">
+                            <input type="checkbox" name="locationSpecific" value="specific"/> Specific Coordinates<br/>
+                            <input type="checkbox" name="locationRepresentative" value="representative"/> Representative Coordinates<br/>
+                            <input type="checkbox" name="BQRegion" value="BQRegion"/> Beth Qaṭraye Region<br/>
+                            <input type="checkbox" name="beyondBQRegion" value="beyondBQRegion"/> Beyond Beth Qaṭraye Region<br/>
+                        </div>
                         <hr/>
+                        
                     <!-- Language -->
-                       <label class="control-label">Language: </label>
+                       <label class="control-label">Limit by Language: </label>
                         <div class="col-md-offset-1">
                             <input type="checkbox" name="en" value="en"/> English<br/>
                             <input type="checkbox" name="ar" value="ar"/> Arabic<br/>
