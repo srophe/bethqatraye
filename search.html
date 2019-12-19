@@ -1,15 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <div xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude" data-template="templates:surround" data-template-with="templates/page.html" data-template-at="content">
-    <div class="container top-padding">
+    <div class="main-content-block">
         <h1 class="search-header">Advanced Search</h1>
-        <div data-template="search:show-form" data-template-collection="places"/>
-        <div data-template="search:get-results" data-template-collection="places">
-            <!-- Calls paging and search parameters string  -->
-            <div data-template="search:pageination" data-template-collection="places" data-template-sort-options="relevance,title"/>
-            <!-- Prints search results -->
-            <div data-template="search:build-page" data-template-collection="places"/>
-            <div class="page-bottom">
-                <div data-template="search:pageination" data-template-collection="places" data-template-sort-options="relevance,title"/>
+        <!-- <form data-template="search:search-form" data-template-collection="OPTIONAL: COLLECTION NAME"/>--> 
+        <form data-template="search:search-form" data-template-collection="places"/>
+        <div class="results">
+            <div data-template="search:search-data" data-template-collection="places">
+                <div data-template="app:pageination" data-template-collection="places" data-template-search-string="yes" data-template-sort-options="title,author,pubDate"/>
+                <div data-template="app:display-map"/>
+                <div data-template="search:show-hits" data-template-kwic="no"/>
+                <div data-template="app:pageination"/>
             </div>
         </div>
     </div>

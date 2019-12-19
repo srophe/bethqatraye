@@ -313,7 +313,7 @@ declare function places:locationRepresentative(){
 
 declare function places:BQRegion(){
     if(request:get-parameter('BQRegion', '') != '') then 
-        "[descendant::tei:location[@type='nested']/tei:region[@ref='http://bqgazetteer.bethmardutho.org/place/37']]"
+        "[descendant::tei:location[@type='nested']/tei:region[@ref='https://bqgazetteer.bethmardutho.org/place/37']]"
     else ()
 };
 
