@@ -33,7 +33,7 @@ declare function local:display-bibls(){
     <body style="background-color:white; margin:1em;">
     <h1>{$config:app-title} Selected Bibliography</h1>
         {
-        for $rec in tokenize($local:uri,' ')
+        for $rec in distinct-values(tokenize($local:uri,' '))
         let $tei := http:send-request(<http:request http-version="1.1" href="{xs:anyURI(concat($rec,'/tei'))}" method="get"><http:header name="Connection" value="close"/></http:request>)[2]
         return <p>{global:tei2html(<preferredCitation xmlns="http://www.tei-c.org/ns/1.0">{$tei/descendant::tei:biblStruct}</preferredCitation>)}</p>
         }
