@@ -308,6 +308,9 @@
     </xsl:template>
     <!-- suppress biblScope in title mode -->
     <xsl:template match="t:biblScope"/>
+    <xsl:template match="t:preferredCitation">
+        <xsl:apply-templates mode="bibliography"/>.
+    </xsl:template>
     <xsl:template match="t:biblStruct">
         <xsl:choose>
             <xsl:when test="parent::t:body">
