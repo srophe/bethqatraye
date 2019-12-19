@@ -1,5 +1,5 @@
 <meta xmlns="http://exist-db.org/xquery/repo">
-    <description>The Beth Qaṭraye Gazetteer</description>
+    <description>The Syriac Reference Portal</description>
     <author>Winona Salesky</author>
     <website>http://bethqatraye.org/</website>
     <status>beta</status>
@@ -11,17 +11,18 @@
     <finish>post-install.xql</finish>
     <config>
         <!-- App title -->
-        <title>Beth Qaṭraye Gazetteer</title>
+        <title>Syriaca.org: The Syriac Reference Portal</title>
         <!-- App description -->
-        <description>The objective of The Beth Qaṭraye Gazetteer is to collect and analyze information on the pre-Islamic and early Islamic historical geography and toponyms of the Beth Qaṭraye region.</description>
+        <description>A collaborative research project publishling online reference works concerning the
+            culture, history, and literature of Syriac communities from antiquity to the present.</description>
         <!-- Contact email -->
         <contact>info@syriaca.org</contact>
         <!-- Logo name (assumes path to logo is $app-root/resources/img/) -->
-        <logo>bq-icon.png</logo>
+        <logo>syriaca-logo.png</logo>
         <!-- Web Site URL -->
         <url>https://bqgazetteer.bethmardutho.org/</url>
         <!-- Root of app for building dynamic links. Default is eXist app root -->
-        <nav-base>https://bqgazetteer.bethmardutho.org</nav-base>
+        <nav-base>/exist/apps/bethqatraye</nav-base>
         <!-- eXist app root for app deployment-->
         <app-root>bethqatraye</app-root>
         <!-- eXist data app root for gazetteer data -->
@@ -54,7 +55,7 @@
                 record-URI-pattern="URI for building links to record views."
                 app-root="folder name in app" 
                 data-root="folder name in data"/>-->
-            <collection name="bethqatraye" title="Beth Qatraye Gazetteer" collection-URI="" series="" app-root="/" data-root="places" record-URI-pattern="http://bqgazetteer.bethmardutho.org/place/"/>
+            <collection name="bethqatraye" title="Beth Qatraye Gazetteer" collection-URI="" series="The Syriac Gazetteer" app-root="/" data-root="places" record-URI-pattern="https://bqgazetteer.bethmardutho.org/place/"/>
         </collections>
     </config>
     <deployed>2017-05-09T22:56:20.244-04:00</deployed>
