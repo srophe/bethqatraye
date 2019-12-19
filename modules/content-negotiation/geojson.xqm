@@ -62,13 +62,13 @@ let $desc := if($node/descendant::tei:desc[1]/tei:quote) then
                 concat('"',$node/descendant::tei:desc[1]/tei:quote,'"')
              else $node/descendant::tei:desc[1]
 let $type := 
-            if($id = 'http://bqgazetteer.bethmardutho.org/place/37' or $id= 'http://bqgazetteer.bethmardutho.org/place/37/tei') then 
+            if($id = concat($config:base-uri,'/place/37') or $id= concat($config:base-uri,'/place/37/tei')) then 
                 'bq'
-            else if($node/descendant::tei:region[@ref="http://bqgazetteer.bethmardutho.org/place/37"] and $node/descendant::tei:location[@type="gps"][@subtype="representative"]) then 
+            else if($node/descendant::tei:region[@ref= concat($config:base-uri,'/place/37')] and $node/descendant::tei:location[@type="gps"][@subtype="representative"]) then 
                 'bqRepresentative' 
              else if($node/descendant::tei:location[@type="gps"][@subtype="representative"]) then 
                 'representative' 
-             else if($node/descendant::tei:region[@ref="http://bqgazetteer.bethmardutho.org/place/37"]) then 
+             else if($node/descendant::tei:region[@ref= concat($config:base-uri,'/place/37')]) then 
                 'bqRegion' 
              else ()   
 let $coords := if($node/descendant::tei:location[@subtype = 'preferred']) then $node/descendant::tei:location[@subtype = 'preferred']/tei:geo else $node/descendant::tei:geo[1]

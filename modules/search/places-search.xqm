@@ -312,14 +312,14 @@ declare function places:locationRepresentative(){
 };
 
 declare function places:BQRegion(){
-    if(request:get-parameter('BQRegion', '') != '') then 
-        "[descendant::tei:location[@type='nested']/tei:region[@ref='https://bqgazetteer.bethmardutho.org/place/37']]"
+    if(request:get-parameter('BQRegion', '') != '') then  
+        concat("[descendant::tei:location[@type='nested']/tei:region[@ref='",concat($config:base-uri,'/place/37'),"']]")
     else ()
 };
 
 declare function places:beyondBQRegion(){
     if(request:get-parameter('beyondBQRegion', '') != '') then 
-       "[not(descendant::tei:location[@type='nested']/tei:region[@ref='http://bqgazetteer.bethmardutho.org/place/37'])]"
+       concat("[not(descendant::tei:location[@type='nested']/tei:region[@ref='",concat($config:base-uri,'/place/37'),"'])]")
     else ()
 };
 
