@@ -105,13 +105,14 @@ declare function tei2html:tei2html($nodes as node()*) as item()* {
 declare function tei2html:rec-headwords($rec){
     let $headwords := 
         for $headword in $rec/descendant::*[contains(@srophe:tags,'headword') or contains(@syriaca-tags,'#syriaca-headword')]
-        let $lang := $rec/@xml:lang
-        order by 
-            if($lang = 'en') then (0) 
-            else if($lang = 'fr') then (1) 
-            else if($lang = 'as') then (2) 
-            else if($lang = 'syr') then (3) 
-            else (4), $lang
+        let $lang := $headword/@xml:lang
+        let $order := 
+            if($lang = 'en') then 0 
+            else if($lang = 'fr') then 1 
+            else if($lang = 'as') then 2 
+            else if($lang = 'syr') then 3 
+            else 4
+        order by $order, $lang
         return tei2html:tei2html($headword)
     return 
         if($headwords != '') then
