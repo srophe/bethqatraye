@@ -266,18 +266,46 @@
                         <xsl:when test="child::*">
                             <xsl:call-template name="persons"/>
                             <xsl:text> </xsl:text>
-                            <xsl:for-each select="t:title">
-                                <xsl:if test="@level='a'">"</xsl:if><xsl:apply-templates select="self::*" mode="footnote"/>
-                                <xsl:if test="@level='a'">,"</xsl:if>
-                                <xsl:if test="following-sibling::t:title[@level = 'j']">
-                                    <xsl:text> In</xsl:text>
-                                </xsl:if>
-                                <xsl:if test="position() != last()">
-                                    <xsl:text> </xsl:text>
-                                </xsl:if>
-                            </xsl:for-each>
-                           <!-- <xsl:apply-templates select="text()"/>-->
-                            <xsl:sequence select="$passThrough"/>
+                                <xsl:for-each select="t:title">
+                                    <xsl:if test="@level='a'">"</xsl:if><xsl:apply-templates select="self::*" mode="footnote"/>
+                                    <xsl:if test="@level='a'">,"</xsl:if>
+                                    <xsl:if test="following-sibling::t:title[@level = 'j']">
+                                        <xsl:text> In</xsl:text>
+                                    </xsl:if>
+                                    <xsl:if test="position() != last()">
+                                        <xsl:text> </xsl:text>
+                                    </xsl:if>
+                                </xsl:for-each>                                
+                            <xsl:if test="not(empty(t:citedRange))">
+                                <xsl:choose>
+                                    <xsl:when test="not(empty(t:citedRange)) and t:title[last()][not(@level='a')]"><xsl:text>, </xsl:text></xsl:when>
+                                    <xsl:otherwise><xsl:text> </xsl:text></xsl:otherwise>
+                                </xsl:choose>
+                                <xsl:for-each select="t:citedRange">
+                                    <xsl:apply-templates select="." mode="footnote"/>
+                                    <xsl:if test="not(last())">
+                                        <xsl:text>, </xsl:text>
+                                    </xsl:if>
+                                </xsl:for-each>
+                            </xsl:if>
+                            <xsl:if test="not(empty(t:date))">
+                                <xsl:text> (</xsl:text>
+                                <xsl:for-each select="t:date">
+                                    <xsl:apply-templates select="." mode="footnote"/>
+                                </xsl:for-each>
+                                <xsl:text>) </xsl:text>
+                            </xsl:if>
+                            <xsl:if test="not(empty(t:note))">
+                                <xsl:text> </xsl:text>
+                                <xsl:for-each select="t:note">
+                                    <span class="note">Note: <xsl:apply-templates select="." mode="plain"/>
+                                        <xsl:if test="not(ends-with(.,'.'))">
+                                            <xsl:text>.</xsl:text>
+                                        </xsl:if>
+                                    </span>
+                                </xsl:for-each>
+                            </xsl:if>
+                            
                             <xsl:if test="descendant::t:idno[@type='URI'] or descendant::t:ref[not(ancestor::note)] or descendant::t:ptr">
                                 <span class="footnote-links">
                                     <xsl:apply-templates select="descendant::t:idno[@type='URI']" mode="links"/>

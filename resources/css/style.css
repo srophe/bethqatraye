@@ -293,6 +293,7 @@ pre {
     text-align:center;
     }
 /* TEI styles */
+.tei-desc {display:block; margin:1em 0;}
 .tei-event {display:block;}
 .tei-event p{ display:inline !important;}
 
