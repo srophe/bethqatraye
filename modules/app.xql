@@ -842,7 +842,7 @@ return
     
 }; 
 
-
+(: Linked data box for handling sparql queries to syriaca.org :)
 declare %templates:wrap function app:linked-data($node as node(), $model as map(*)){
 let $data := $model("hits")//tei:body
 let $other-resources := distinct-values(($data//@ref[contains(.,'http://syriaca.org/')],

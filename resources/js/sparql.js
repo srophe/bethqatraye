@@ -1,3 +1,4 @@
+//Handle SPARQL requests to Syriaca.org endpoint
 $(document).ready(function () {
     $('#showOtherResources').children('form').each(function () {
         var url = $(this).attr('action');

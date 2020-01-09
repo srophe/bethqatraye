@@ -3,10 +3,8 @@ xquery version "3.1";
 import module namespace http="http://expath.org/ns/http-client";
 (:~
  : Take posted SPARQL query and send it to the Syriaca.org SPARQL endpoint
- : Returns JSON
+ : Returns JSON 
 :)
-
-
 let $query := 
             if(request:get-parameter('query', '')) then  request:get-parameter('query', '') 
             else request:get-data() 
