@@ -506,7 +506,7 @@
     </xsl:template>
     <xsl:template name="ref">
         <xsl:choose>
-            <xsl:when test="parent::t:ref or parent::t:ptr"><xsl:apply-templates/></xsl:when>
+            <xsl:when test="parent::t:ref or parent::t:ptr or parent::*[1]/@ref"><xsl:apply-templates/></xsl:when>
             <xsl:when test="@ref">
                 <a href="{@ref}"><xsl:apply-templates/></a>
             </xsl:when>
