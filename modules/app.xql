@@ -843,34 +843,23 @@ return
 }; 
 
 
-(:
- : Display related Syriaca.org names
-:)
 declare %templates:wrap function app:linked-data($node as node(), $model as map(*)){
 let $data := $model("hits")//tei:body
-let $other-resources := distinct-values(($data//@ref[contains(.,'http://syriaca.org/')], 
+let $other-resources := distinct-values(($data//@ref[contains(.,'http://syriaca.org/')],
+                                    $data//@target[contains(.,'http://syriaca.org/')], 
                                     $data//@active[contains(.,'http://syriaca.org/')], 
                                     $data//@passive[contains(.,'http://syriaca.org/')], 
                                     $data//@mutual[contains(.,'http://syriaca.org/')], 
                                     $data//tei:idno[contains(.,'http://syriaca.org/')]))
 let $count := count($other-resources)
-return  
-    if($count gt 0) then
-        <div class="panel panel-default" style="margin-top:1em;" xmlns="http://www.w3.org/1999/xhtml">
-            <div class="panel-heading">
-            <a href="#" data-toggle="collapse" data-target="#showLinkedData">Linked Data  </a>
-            <span class="glyphicon glyphicon-question-sign text-info moreInfo" aria-hidden="true" data-toggle="tooltip" 
-            title="This sidebar provides links via Syriaca.org to 
-            additional resources beyond this record. 
-            We welcome your additions, please use the e-mail button on the right to contact Syriaca.org about submitting additional links."></span>
-            <button class="btn btn-default btn-xs pull-right" data-toggle="modal" data-target="#submitLinkedData" style="margin-right:1em;"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></button>
-            </div>
-            <div class="panel-body collapse in" id="showLinkedData"> 
-                        <div class="other-resources" xmlns="http://www.w3.org/1999/xhtml">
-                            <div class="collapse in" id="showOtherResources">
-                                <form class="form-inline hidden" action="{$config:nav-base}/modules/sparql-requests.xql" method="post">
-                                    <input type="hidden" name="format" id="format" value="json"/>
-                                    <textarea id="query" class="span9" rows="15" cols="150" name="query" type="hidden">
+return 
+if($count gt 0) then
+    <div xmlns="http://www.w3.org/1999/xhtml">
+        <script type="text/javascript" src="{$config:nav-base}/resources/js/sparql.js"/>
+        <div class="hidden" id="showOtherResources">
+            <form class="form-inline hidden" action="{$config:nav-base}/modules/sparql-requests.xql" method="post">
+                <input type="hidden" name="format" id="format" value="json"/>
+                <textarea id="query" class="span9" rows="15" cols="150" name="query" type="hidden">
                                       <![CDATA[
                                         prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
                                         prefix lawd: <http://lawd.info/ontology/>
@@ -892,15 +881,26 @@ return
                                             }
                                         GROUP BY ?uri  
                                       ]]>  
-                                    </textarea>
-                                </form>
-                                <div id="listOtherResources"></div>
-                                {if($count gt 10) then
-                                    <div>
-                                        <div class="collapse" id="showMoreResources">
-                                            <form class="form-inline hidden" action="{$config:nav-base}/modules/sparql-requests.xql" method="post">
-                                                <input type="hidden" name="format" id="format" value="json"/>
-                                                <textarea id="query" class="span9" rows="15" cols="150" name="query" type="hidden">
+                </textarea>
+            </form>            
+        </div>
+        <div class="panel panel-default hidden" id="linkedDataBox" style="margin-top:1em;">
+            <div class="panel-heading">
+                <a href="#" data-toggle="collapse" data-target="#showLinkedData">Linked Data  </a>
+                <span class="glyphicon glyphicon-question-sign text-info moreInfo" aria-hidden="true" data-toggle="tooltip" 
+                    title="This sidebar provides links via Syriaca.org to 
+                    additional resources beyond this record. 
+                    We welcome your additions, please use the e-mail button on the right to contact Syriaca.org about submitting additional links."></span>
+                <button class="btn btn-default btn-xs pull-right" data-toggle="modal" data-target="#submitLinkedData" style="margin-right:1em;"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></button>
+            </div>
+            <div class="panel-body collapse in" id="showLinkedData"> 
+                <div id="listOtherResources"></div>
+                {if($count gt 10) then
+                    <div>
+                        <div class="collapse" id="showMoreResources">
+                            <form class="form-inline hidden" action="{$config:nav-base}/modules/sparql-requests.xql" method="post">
+                                <input type="hidden" name="format" id="format" value="json"/>
+                                <textarea id="query" class="span9" rows="15" cols="150" name="query" type="hidden">
                                                   <![CDATA[
                                                     prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
                                                     prefix lawd: <http://lawd.info/ontology/>
@@ -922,61 +922,14 @@ return
                                                         }
                                                     GROUP BY ?uri  
                                                   ]]>
-                                                </textarea>
-                                            </form>
-                                        </div>
-                                        <a href="#" class="togglelink" data-toggle="collapse" data-target="#showMoreResources" data-text-swap="Less" id="getMoreLinkedData">See more ...</a>
-                                    </div>
-                                else ()
-                                }
-                            </div>
-                            <script>
-                            <![CDATA[
-                                $(document).ready(function() {
-                                    $('#showOtherResources').children('form').each(function () {
-                                        var url = $(this).attr('action');
-                                            $.post(url, $(this).serialize(), function(data) {
-                                                console.log(data);
-                                                var showOtherResources = $("#listOtherResources");
-                                                var dataArray = data.results.bindings;
-                                                if (!jQuery.isArray(dataArray)) dataArray = [dataArray];
-                                                $.each(dataArray, function (currentIndex, currentElem) {
-                                                            var relatedResources = 'Resources related to <a href="'+ currentElem.uri.value +'">'+ currentElem.label.value + '</a> '
-                                                            var relatedSubjects = (currentElem.subjects) ? '<div class="indent">' + currentElem.subjects.value + ' related subjects</div>' : ''
-                                                            var relatedCitations = (currentElem.citations) ? '<div class="indent">' + currentElem.citations.value + ' related citations</div>' : ''
-                                                                showOtherResources.append(
-                                                                   '<div>' + relatedResources + relatedCitations + relatedSubjects + '</div>'
-                                                                );
-                                                        });
-                                            }).fail( function(jqXHR, textStatus, errorThrown) {
-                                                console.log(textStatus);
-                                            }); 
-                                        });
-                                        $('#getMoreLinkedData').one("click", function(e){
-                                           $('#showMoreResources').children('form').each(function () {
-                                                var url = $(this).attr('action');
-                                                    $.post(url, $(this).serialize(), function(data) {
-                                                        var showOtherResources = $("#showMoreResources"); 
-                                                        var dataArray = data.results.bindings;
-                                                        if (!jQuery.isArray(dataArray)) dataArray = [dataArray];
-                                                        $.each(dataArray, function (currentIndex, currentElem) {
-                                                            var relatedResources = 'Resources related to <a href="'+ currentElem.uri.value +'">'+ currentElem.label.value + '</a> '
-                                                            var relatedSubjects = (currentElem.subjects) ? '<div class="indent">' + currentElem.subjects.value + ' related subjects</div>' : ''
-                                                            var relatedCitations = (currentElem.citations) ? '<div class="indent">' + currentElem.citations.value + ' related citations</div>' : ''
-                                                                showOtherResources.append(
-                                                                   '<div>' + relatedResources + relatedCitations + relatedSubjects + '</div>'
-                                                                );
-                                                        });
-                                                    }).fail( function(jqXHR, textStatus, errorThrown) {
-                                                        console.log(textStatus);
-                                                    }); 
-                                                }); 
-                                        });
-                                });
-                            ]]>
-                            </script>
+                                </textarea>
+                            </form>
                         </div>
+                        <a href="#" class="togglelink" data-toggle="collapse" data-target="#showMoreResources" data-text-swap="Less" id="getMoreLinkedData">See more ...</a>
+                    </div>
+                else ()}
             </div>
-        </div>       
-    else ()    
+        </div>
+    </div>
+else ()    
 };
