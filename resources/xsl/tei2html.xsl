@@ -766,7 +766,7 @@
                                 <xsl:apply-templates select="t:placeName[@srophe:tags='#headword' and @xml:lang='en']" mode="list">
                                     <xsl:sort collation="{$mixed}" select="."/>
                                 </xsl:apply-templates>
-                                <xsl:apply-templates select="t:placeName[(not(@srophe:tags) or @srophe:tags!='#syriaca-headword') and starts-with(@xml:lang, 'syr')]" mode="list">
+                                <xsl:apply-templates select="t:placeName[(not(@srophe:tags) or @srophe:tags!='#headword') and starts-with(@xml:lang, 'syr')]" mode="list">
                                     <xsl:sort lang="syr" select="."/>
                                 </xsl:apply-templates>
                                 <xsl:apply-templates select="t:placeName[starts-with(@xml:lang, 'ar')]" mode="list">
