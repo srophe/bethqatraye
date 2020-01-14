@@ -89,14 +89,15 @@ declare function browse:show-hits($node as node(), $model as map(*), $collection
         </div>
     else 
         <div class="col-md-12 map-lg" xmlns="http://www.w3.org/1999/xhtml" id="browseMap">
-            {browse:get-map($hits)}
+            {browse:get-map($hits[descendant::tei:geo])}
             <div id="map-filters" class="map-overlay">
                 <span class="filter-label">Filter Map 
                     <a class="pull-right small togglelink text-info" 
                     data-toggle="collapse" data-target="#filterMap" 
                     href="#filterMap" data-text-swap="+ Show"> - Hide </a></span>
                 <div class="collapse in" id="filterMap">
-                    {(facet:output-html-facets($hits[descendant::tei:geo], $facet-config/descendant::facet:facets/facet:facet-definition[@name="Type"]))}
+                    {facet:output-html-facets($hits[descendant::tei:geo], $facet-config/descendant::facet:facets/facet:facet-definition[@name="Place Type"])}
+                    {facet:output-html-facets($hits[descendant::tei:geo], $facet-config/descendant::facet:facets/facet:facet-definition[@name="Location Type"])}
                 </div>
             </div>
         </div>
@@ -290,13 +291,12 @@ return
 <div xmlns="http://www.w3.org/1999/xhtml" id="browseMap">
     {maps:build-map($hits,count($hits))}
     <div id="map-filters" class="map-overlay">
-                <span class="filter-label">Filter Map 
-                    <a class="pull-right small togglelink text-info" 
-                    data-toggle="collapse" data-target="#filterMap" 
-                    href="#filterMap" data-text-swap="+ Show"> - Hide </a></span>
-                <div class="collapse in" id="filterMap">
-                   {facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition[@name="Type"])}  
-                </div>
+        <span class="filter-label">Filter Map 
+            <a class="pull-right small togglelink text-info" data-toggle="collapse" data-target="#filterMap" href="#filterMap" data-text-swap="+ Show"> - Hide </a></span>
+            <div class="collapse in" id="filterMap">
+                {facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition[@name="Place Type"])}
+                {facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition[@name="Location Type"])}
             </div>
+    </div>
 </div>
 };

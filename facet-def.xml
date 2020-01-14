@@ -1,24 +1,4 @@
 <facets xmlns="http://expath.org/ns/facet">
-    <!-- 
-    <facet-definition name="Author">
-        <group-by>
-            <sub-path>descendant::tei:seriesStmt/tei:title</sub-path>
-        </group-by>
-        <max-values show="10">60</max-values>
-        <order-by direction="ascending">value</order-by>
-    </facet-definition>
-    -->
-    <!--
-    <facet-definition name="Keyword">
-        <group-by>
-            <sub-path>descendant::tei:placeName[@xml:lang='en']</sub-path>
-        </group-by>
-        <max-values show="10">60</max-values>
-        <order-by direction="descending">count</order-by>
-    </facet-definition>
-    -->
-    <!-- $node/descendant::tei:region[@ref="http://syriaca.org/place/37"] -->
-    <!-- A simple facet for browsing by Syriaca.org person names (filtering on English) -->
     <facet-definition name="Region">
         <group-by>
             <sub-path>descendant::tei:region[@ref="http://syriaca.org/place/37"]</sub-path>
@@ -26,11 +6,24 @@
         <max-values show="10">60</max-values>
         <order-by direction="ascending">value</order-by>
     </facet-definition>
-    <facet-definition name="Type">
+    <facet-definition name="Place Type">
         <group-by>
             <sub-path>descendant::tei:place/@type</sub-path>
         </group-by>
-        <max-values show="10">60</max-values>
+        <max-values show="5">60</max-values>
         <order-by direction="ascending">value</order-by>
+    </facet-definition>
+    <facet-definition name="Location Type">
+        <range type="xs:string">
+            <bucket path="[descendant::tei:location[@type='gps'][@subtype='preferred' or not(@subtype='representative')]]" name="Specific Coordinates" order="1"/>
+            <bucket path="[descendant::tei:location[@type='gps'][@subtype='representative']]" name="Representative Coordinates" order="2"/>
+            <bucket path="[descendant::tei:location[@type='nested']/tei:region[@ref= 'https://bqgazetteer.bethmardutho.org/place/37']]" name="Beth Qaṭraye Region" order="3"/>
+            <bucket path="[not(descendant::tei:location[@type='nested']/tei:region[@ref= 'https://bqgazetteer.bethmardutho.org/place/37'])]" name="Beyond Beth Qaṭraye Region" order="4"/>
+        </range>
+        <group-by function="facet:location-type">
+            <sub-path>descendant::tei:place</sub-path>
+        </group-by>
+        <max-values show="5">40</max-values>
+        <order-by direction="descending">order</order-by>
     </facet-definition>
 </facets>
