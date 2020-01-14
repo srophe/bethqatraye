@@ -18,7 +18,9 @@ xquery version "3.1";
  :)
  
 module namespace facet = "http://expath.org/ns/facet";
+import module namespace config="http://syriaca.org/srophe/config" at "../config.xqm";
 import module namespace global="http://syriaca.org/srophe/global" at "global.xqm";
+
 import module namespace functx="http://www.functx.com";
 declare namespace tei = "http://www.tei-c.org/ns/1.0";
 
@@ -44,7 +46,11 @@ declare function facet:facet-filter($facet-definitions as node()*)  as item()*{
                          else $facet/facet:group-by/facet:sub-path/text()                
             return 
                 if($facet-value != '') then 
-                    if($facet/facet:range) then
+                    if($facet/facet:group-by[@function="facet:location-type"]) then
+                       if($facet/facet:range/facet:bucket[@name = $facet-value]) then 
+                          string($facet/facet:range/facet:bucket[@name = $facet-value]/@path)
+                       else ()
+                    else if($facet/facet:range) then
                         if($facet/facet:group-by[@function='facet:keywordType']) then
                            concat('[',$facet/facet:range/facet:bucket[@name = $facet-value]/@path,']')
                         else if($facet/facet:range/facet:bucket[@name = $facet-value]/@lt and $facet/facet:range/facet:bucket[@name = $facet-value]/@lt != '') then
@@ -53,7 +59,7 @@ declare function facet:facet-filter($facet-definitions as node()*)  as item()*{
                             concat('[',$path,'[', $facet/facet:range/facet:bucket[@name = $facet-value]/@eq ,']]')
                         else concat('[',$path,'[string(.) >= "', facet:type($facet/facet:range/facet:bucket[@name = $facet-value]/@gt, $facet/facet:range/facet:bucket[@name = $facet-value]/@type),'" ]]')
                     else if($facet/facet:group-by[@function="facet:group-by-array"]) then 
-                        concat('[',$path,'[matches(., "',$facet-value,'(\W|$)")]',']')                     
+                        concat('[',$path,'[matches(., "',$facet-value,'(\W|$)")]',']')
                     else concat('[',$path,'[normalize-space(.) = "',replace($facet-value,'"','""'),'"]',']')
                 else()
         ,'')
@@ -329,4 +335,48 @@ declare function facet:controlled-labels($results as item()*, $facet-definitions
         else count($f)
         descending
     return <key xmlns="http://expath.org/ns/facet" count="{count($f)}" value="{$facet-grp}" label="{global:odd2text(tokenize(replace($path[1],'@|\[|\]',''),'/')[last()],string($facet-grp))}"/>    
+};
+
+(: BQ specific funcitons :)
+(:
+Specific Coordinates (evaluate only location[1] type=GPS that is subtype="preferred" or is NOT subtype="representative")
+Representative Coordinates (only location type=GPS and subtype="representative")
+Beth Qaṭraye Region (nested in place/37 see #20)
+Beyond Beth Qaṭraye Region (not nested in place/37 see #20)
+:)
+declare function facet:location-type($results as item()*, $facet-definition as element(facet:facet-definition)*) as element(facet:key)*{
+    (:
+    let $path := concat('$results/',$facet-definition/facet:group-by/facet:sub-path/text())
+    let $sort := $facet-definition/facet:order-by
+    let $specific := util:eval($path)[descendant::tei:location[@type='gps'][@subtype='preferred' or not(@subtype='representative')]]
+    let $representative := util:eval($path)[descendant::tei:location[@type='gps'][@subtype='representative']]
+    let $bqRegion := util:eval($path)[descendant::tei:location[@type='nested']/tei:region[@ref= concat($config:base-uri,'/place/37')]]
+    let $beyoundBQ := util:eval($path)[not(descendant::tei:location[@type='nested']/tei:region[@ref= concat($config:base-uri,'/place/37')])]
+    let $facets := 
+        (
+        facet:key('Specific Coordinates', 'specific', count($specific), $facet-definition),
+        facet:key('Representative Coordinates', 'specific', count($representative), $facet-definition),
+        facet:key('Beth Qaṭraye Region', 'specific', count($bqRegion), $facet-definition),
+        facet:key('Beyond Beth Qaṭraye Region', 'specific', count($beyoundBQ), $facet-definition)
+        )
+    let $count := 4
+    return   
+        facet:list-keys($facets, $count, $facet-definition)
+    :)
+    let $ranges := $facet-definition/facet:range
+    let $sort := $facet-definition/facet:order-by
+    let $facets := 
+        for $range in $ranges/facet:bucket
+        let $path := concat('$results',$range/@path) 
+        let $f := util:eval($path)
+        let $count := count($f)
+        return facet:key(string($range/@name), string($range/@name), count($f), $facet-definition)
+    let $count := count($facets)        
+    return 
+        if($count gt 0) then
+            <div class="facetDefinition facet-grp">
+                <h4>{string($facet-definition/@name)}</h4>
+                {$facets}
+            </div>
+        else ()
 };
