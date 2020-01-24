@@ -42,13 +42,13 @@ body {background-color:#666;}
     /* nice browsers */
     background: rgba(255, 255, 255, 0.8);
     z-index: 1000;
-    border-radius: 20px;
+    border-radius: 14px;
     padding:1em;
     font-size: 12px;
 }
-.map-overlay .btn {font-size: 12px !important;}
+.map-overlay .btn {font-size: 12px;}
 .map-overlay .btn-default{
-    border:none; padding: .25em; background: none !important;
+    border:none; padding: .15em; background: none !important;
 }
 .map-overlay .btn-default.active, .map-overlay .btn-default:active{
     background-image: none;
@@ -56,6 +56,6 @@ body {background-color:#666;}
     -webkit-box-shadow:none;
     box-shadow:none;
      }
-.map-overlay .filter-label {font-size: 14px !important; font-weight: 600; color:#333;}
+.map-overlay .filter-label {font-size: 14px; font-weight: 600; color:#333;}
 
 footer { border:none;}
