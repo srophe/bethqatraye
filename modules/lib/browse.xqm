@@ -49,7 +49,7 @@ declare function browse:get-all($node as node(), $model as map(*), $collection a
  : @param $collection passed from html 
 :)
 declare function browse:show-hits($node as node(), $model as map(*), $collection, $sort-options as xs:string*, $facets as xs:string?){
-  let $hits := $model("hits")
+  let $hits :=  $model("hits") 
   let $facet-config := global:facet-definition-file($collection)
   return 
     if($browse:view != '' and $browse:view != 'map') then
@@ -89,17 +89,20 @@ declare function browse:show-hits($node as node(), $model as map(*), $collection
         </div>
     else 
         <div class="col-md-12 map-lg" xmlns="http://www.w3.org/1999/xhtml" id="browseMap">
-            {browse:get-map($hits[descendant::tei:geo])}
-            <div id="map-filters" class="map-overlay">
-                <span class="filter-label">Filter Map 
-                    <a class="pull-right small togglelink text-info" 
-                    data-toggle="collapse" data-target="#filterMap" 
-                    href="#filterMap" data-text-swap="+ Show"> - Hide </a></span>
-                <div class="collapse in" id="filterMap">
-                    {facet:output-html-facets($hits[descendant::tei:geo], $facet-config/descendant::facet:facets/facet:facet-definition[@name="Place Type"])}
-                    {facet:output-html-facets($hits[descendant::tei:geo], $facet-config/descendant::facet:facets/facet:facet-definition[@name="Location Type"])}
-                </div>
-            </div>
+            {let $geojson := if(request:get-parameter('fq', '') != '') then $hits[descendant::tei:geo]
+                             else doc(xmldb:encode-uri(concat($config:app-root,'/resources/lodHelpers/placeNames.xml')))//tei:place
+             return                              
+                (maps:build-map($hits,count($hits)),
+                <div id="map-filters" class="map-overlay">
+                    <span class="filter-label">Filter Map 
+                        <a class="pull-right small togglelink text-info" 
+                        data-toggle="collapse" data-target="#filterMap" 
+                        href="#filterMap" data-text-swap="+ Show"> - Hide </a></span>
+                    <div class="collapse in" id="filterMap">
+                        {facet:output-html-facets($geojson[descendant::tei:geo], $facet-config/descendant::facet:facets/facet:facet-definition[@name="Place Type"])}
+                        {facet:output-html-facets($geojson[descendant::tei:geo], $facet-config/descendant::facet:facets/facet:facet-definition[@name="Location Type"])}
+                    </div>
+                </div>)}
         </div>
 };
 
@@ -285,7 +288,9 @@ declare function browse:browse-type($collection){
 };
 
 declare function browse:large-map($node as node(), $model as map(*), $collection, $sort-options as xs:string*, $facets as xs:string?){
-let $hits := util:eval(concat("collection($config:data-root)//tei:TEI[descendant::tei:geo]",facet:facet-filter(global:facet-definition-file($collection))))
+let $hits := if(request:get-parameter('fq', '')!= '') then 
+                util:eval(concat("collection($config:data-root)//tei:TEI[descendant::tei:geo]",facet:facet-filter(global:facet-definition-file($collection))))
+             else doc(xmldb:encode-uri(concat($config:app-root,'/resources/lodHelpers/placeNames.xml')))//tei:place                 
 let $facet-config := global:facet-definition-file($collection)
 return 
 <div xmlns="http://www.w3.org/1999/xhtml" id="browseMap">

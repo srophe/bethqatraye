@@ -8,7 +8,7 @@
     </facet-definition>
     <facet-definition name="Place Type">
         <group-by>
-            <sub-path>descendant::tei:place/@type</sub-path>
+            <sub-path>descendant-or-self::tei:place/@type</sub-path>
         </group-by>
         <max-values show="5">60</max-values>
         <order-by direction="ascending">value</order-by>
