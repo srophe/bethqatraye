@@ -98,7 +98,7 @@ declare function browse:show-hits($node as node(), $model as map(*), $collection
                         <a class="pull-right small togglelink text-info" 
                         data-toggle="collapse" data-target="#filterMap" 
                         href="#filterMap" data-text-swap="+ Show"> - Hide </a></span>
-                    <div class="collapse in" id="filterMap">
+                    <div class="collapse" id="filterMap">
                         {facet:output-html-facets($geojson[descendant::tei:geo], $facet-config/descendant::facet:facets/facet:facet-definition[@name="Place Type"])}
                         {facet:output-html-facets($geojson[descendant::tei:geo], $facet-config/descendant::facet:facets/facet:facet-definition[@name="Location Type"])}
                     </div>
@@ -298,7 +298,7 @@ return
     <div id="map-filters" class="map-overlay">
         <span class="filter-label">Filter Map 
             <a class="pull-right small togglelink text-info" data-toggle="collapse" data-target="#filterMap" href="#filterMap" data-text-swap="+ Show"> - Hide </a></span>
-            <div class="collapse in" id="filterMap">
+            <div class="collapse" id="filterMap">
                 {facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition[@name="Place Type"])}
                 {facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition[@name="Location Type"])}
             </div>
