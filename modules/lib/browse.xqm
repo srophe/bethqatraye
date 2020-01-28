@@ -297,7 +297,7 @@ return
     {maps:build-map($hits,count($hits))}
     <div id="map-filters" class="map-overlay">
         <span class="filter-label">Filter Map 
-            <a class="pull-right small togglelink text-info" data-toggle="collapse" data-target="#filterMap" href="#filterMap" data-text-swap="- Hide"> - Show </a></span>
+            <a class="pull-right small togglelink text-info" data-toggle="collapse" data-target="#filterMap" href="#filterMap" data-text-swap="- Hide"> + Show </a></span>
             <div class="collapse" id="filterMap">
                 {facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition[@name="Place Type"])}
                 {facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition[@name="Location Type"])}
