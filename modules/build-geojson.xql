@@ -24,6 +24,7 @@ declare function local:make-place($nodes as node()*){
     }
     <idno>{$nodes//tei:idno[@type='URI'][starts-with(.,$config:base-uri)]}</idno>
     {$nodes/tei:placeName}
+    {$nodes/tei:desc[1]}
     {$nodes/tei:location}
   </place>
 };
