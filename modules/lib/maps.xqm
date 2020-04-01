@@ -29,6 +29,7 @@ declare function maps:build-leaflet-map($nodes as node()*, $total-count as xs:in
     <div id="map-data" style="margin-bottom:3em;">
         <script type="text/javascript" src="{$config:nav-base}/resources/leaflet/leaflet.js"/>
         <script type="text/javascript" src="{$config:nav-base}/resources/leaflet/leaflet.awesome-markers.min.js"/>
+        <script type="text/javascript" src="{$config:nav-base}/resources/leaflet/leaflet.markercluster-src.js"/>
         <div id="map"/>
         {
             if($total-count gt 0) then 
@@ -40,51 +41,51 @@ declare function maps:build-leaflet-map($nodes as node()*, $total-count as xs:in
             }
         <script type="text/javascript">
             <![CDATA[
-            var terrain = L.tileLayer('http://api.tiles.mapbox.com/v3/sgillies.map-ac5eaoks/{z}/{x}/{y}.png', {attribution: "ISAW, 2012"});
-                                
-            /* Not added by default, only through user control action */
+            var terrain = L.tileLayer('http://api.tiles.mapbox.com/v3/sgillies.map-ac5eaoks/{z}/{x}/{y}.png', {attribution: "ISAW, 2012"});            
             var streets = L.tileLayer('http://api.tiles.mapbox.com/v3/sgillies.map-pmfv2yqx/{z}/{x}/{y}.png', {attribution: "ISAW, 2012"});
-                                
             var imperium = L.tileLayer('http://pelagios.dme.ait.ac.at/tilesets/imperium//{z}/{x}/{y}.png', {attribution: 'Tiles: &lt;a href="http://pelagios-project.blogspot.com/2012/09/a-digital-map-of-roman-empire.html"&gt;Pelagios&lt;/a&gt;, 2012; Data: NASA, OSM, Pleiades, DARMC', maxZoom: 11 });
-                                
             var placesgeo = ]]>{geojson:geojson($nodes)}
             <![CDATA[                                
-                                            var redIcon = L.icon({
-                                                iconUrl: '$nav-base/resources/leaflet/images/marker-icon-red.png',
-                                                iconSize: [25, 41], // size of the icon
-                                                iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
-                                                popupAnchor: [0, -41],
-                                                shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
-                                            }),
-                                            lightRedIcon = L.icon({
-                                                iconUrl: '$nav-base/resources/leaflet/images/marker-icon-light-red.png',
-                                                iconSize: [25, 41], // size of the icon
-                                                iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
-                                                popupAnchor: [0, -41],
-                                                shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
-                                            }),
-                                             blueIcon = L.icon({
-                                                iconUrl: '$nav-base/resources/leaflet/images/marker-icon.png',
-                                                iconSize: [25, 41], // size of the icon
-                                                iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
-                                                popupAnchor: [0, -41],
-                                                shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
-                                            }),
-                                             lightBlueIcon = L.icon({
-                                                iconUrl: '$nav-base/resources/leaflet/images/marker-icon-light-blue.png',
-                                                iconSize: [25, 41], // size of the icon
-                                                iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
-                                                popupAnchor: [0, -41],
-                                                shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
-                                            }),
-                                            bqIcon = L.icon({
-                                                iconUrl: '$nav-base/resources/leaflet/images/marker-icon-bq.png',
-                                                iconSize: [25, 41], // size of the icon
-                                                iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
-                                                popupAnchor: [0, -41],
-                                                shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',   
-                                                });
-                                        
+            var redIcon = L.icon({
+                            iconUrl: '$nav-base/resources/leaflet/images/marker-icon-red.png',
+                            iconSize: [25, 41], // size of the icon
+                            iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
+                            popupAnchor: [0, -41],
+                            shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
+                            }),
+                lightRedIcon = L.icon({
+                            iconUrl: '$nav-base/resources/leaflet/images/marker-icon-light-red.png',
+                            iconSize: [25, 41], // size of the icon
+                            iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
+                            popupAnchor: [0, -41],
+                            shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
+                            }),
+                blueIcon = L.icon({
+                            iconUrl: '$nav-base/resources/leaflet/images/marker-icon.png',
+                            iconSize: [25, 41], // size of the icon
+                            iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
+                            popupAnchor: [0, -41],
+                            shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
+                            }),
+               lightBlueIcon = L.icon({
+                            iconUrl: '$nav-base/resources/leaflet/images/marker-icon-light-blue.png',
+                            iconSize: [25, 41], // size of the icon
+                            iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
+                            popupAnchor: [0, -41],
+                            shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
+                            }),
+                bqIcon = L.icon({
+                            iconUrl: '$nav-base/resources/leaflet/images/marker-icon-bq.png',
+                            iconSize: [25, 41], // size of the icon
+                            iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
+                            popupAnchor: [0, -41],
+                            shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',   
+                            });
+            var markers = L.markerClusterGroup({
+                        maxClusterRadius: function (zoom) {
+                            return 1; // radius in pixels
+                        }
+                    });
             var geojson = L.geoJson(placesgeo, {onEachFeature: function (feature, layer){
                             var typeText = feature.properties.type
                             var popupContent = 
@@ -102,19 +103,22 @@ declare function maps:build-leaflet-map($nodes as node()*, $total-count as xs:in
                                     case 'representative': return layer.setIcon(blueIcon);
                                     case 'bq': return layer.setIcon(bqIcon);
                                     default : return layer.setIcon(blueIcon);
-                                 }               
+                                 }
                                 }
                             })
-        var map = L.map('map',{scrollWheelZoom:false}).fitBounds(geojson.getBounds(),{maxZoom: 5}).setZoom(5);
-        //map.panTo(new L.LatLng(25.4,53.1));
-       //var map = L.map('map').setView([53.1,25.4], 5);
+        var map = L.map('map',{scrollWheelZoom:false}).fitBounds(geojson.getBounds(),{maxZoom: 5}).setZoom(5);     
         terrain.addTo(map);
                                         
         L.control.layers({
                         "Terrain (default)": terrain,
                         "Streets": streets,
                         "Imperium": imperium }).addTo(map);
-        geojson.addTo(map);     
+        
+        markers.addLayer(geojson);
+        map.addLayer(markers);
+        //map.fitBounds(markers.getBounds(), {padding: [50,50]});
+          		
+        //geojson.addTo(map);     
         ]]>
         </script>
          <div>
@@ -148,6 +152,62 @@ declare function maps:build-leaflet-map($nodes as node()*, $total-count as xs:in
          </script>
     </div> 
 };
+
+(: Leaflet maps with clusters, uses relationship data to cluster realted items on a specific location :)
+declare function maps:build-leaflet-map-cluster($nodes as node()*){
+    <div id="map-data" style="margin-bottom:3em;">
+        <script type="text/javascript" src="{$config:nav-base}/resources/leaflet/leaflet.js"/>
+        <script type="text/javascript" src="{$config:nav-base}/resources/leaflet/leaflet.awesome-markers.min.js"/>
+        <script type="text/javascript" src="{$config:nav-base}/resources/leaflet/leaflet.markercluster-src.js"/>
+        <div id="map"/>
+        <script type="text/javascript">
+           <![CDATA[
+                  var geoJsonData = ]]>{geojson:geojson($nodes)}<![CDATA[;
+                  var terrain = L.tileLayer('http://api.tiles.mapbox.com/v3/sgillies.map-ac5eaoks/{z}/{x}/{y}.png', {attribution: "ISAW, 2012"});
+                  var streets = L.tileLayer('http://api.tiles.mapbox.com/v3/sgillies.map-pmfv2yqx/{z}/{x}/{y}.png', {attribution: "ISAW, 2012"});
+                  var imperium = L.tileLayer('http://pelagios.dme.ait.ac.at/tilesets/imperium//{z}/{x}/{y}.png', {attribution: 'Tiles: &lt;a href="http://pelagios-project.blogspot.com/2012/09/a-digital-map-of-roman-empire.html"&gt;Pelagios&lt;/a&gt;, 2012; Data: NASA, OSM, Pleiades, DARMC', maxZoom: 11 });
+                  
+                  /*
+          		var tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          			maxZoom: 18,
+          			attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          		});
+                    */
+                    
+          		var map = L.map('map').addLayer(terrain);
+          
+          		var markers = L.markerClusterGroup({
+                        maxClusterRadius: function (zoom) {
+                            return 1; // radius in pixels
+                        }
+                    });
+          
+          		var geoJsonLayer = L.geoJson(geoJsonData, {
+          			onEachFeature: function (feature, layer) {
+          				  var typeText = feature.properties.type
+                            var popupContent = 
+                                "<a href='" + feature.properties.relation.id + "' class='map-pop-title'>" +
+                                feature.properties.relation.title + "</a>" + 
+                                "<br/>Location: <a href='" + feature.properties.uri + "' class='map-pop-title'>" +
+                                feature.properties.name + "</a>"  +
+                                "<br/>Relationship: " + typeText + 
+                                (feature.properties.desc ? "<span class='map-pop-desc'>"+ feature.properties.desc +"</span>" : "");
+          				layer.bindPopup(popupContent);
+          			}
+          		});
+          		L.control.layers({
+                        "Terrain (default)": terrain,
+                        "Streets": streets }).addTo(map);
+                        
+          		markers.addLayer(geoJsonLayer);
+          
+          		map.addLayer(markers);
+          		map.fitBounds(markers.getBounds(), {padding: [50,50]});
+            ]]>
+        </script>
+    </div> 
+};
+
 
 (:~
  : Build Google maps
