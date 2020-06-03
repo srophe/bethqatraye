@@ -3,19 +3,20 @@ xquery version "3.1";
  : Builds HTML browse pages for Srophe Collections and sub-collections 
  : Alphabetical English and Syriac Browse lists, browse by type, browse by date, map browse. 
  :)
-module namespace browse="http://syriaca.org/srophe/browse";
+module namespace browse="http://srophe.org/srophe/browse";
 
 (:eXist templating module:)
 import module namespace templates="http://exist-db.org/xquery/templates" ;
 
 (: Import Srophe application modules. :)
-import module namespace config="http://syriaca.org/srophe/config" at "../config.xqm";
-import module namespace data="http://syriaca.org/srophe/data" at "data.xqm";
+import module namespace config="http://srophe.org/srophe/config" at "../config.xqm";
+import module namespace data="http://srophe.org/srophe/data" at "data.xqm";
 import module namespace facet="http://expath.org/ns/facet" at "facet.xqm";
-import module namespace global="http://syriaca.org/srophe/global" at "lib/global.xqm";
-import module namespace maps="http://syriaca.org/srophe/maps" at "maps.xqm";
-import module namespace page="http://syriaca.org/srophe/page" at "paging.xqm";
-import module namespace tei2html="http://syriaca.org/srophe/tei2html" at "../content-negotiation/tei2html.xqm";
+import module namespace sf="http://srophe.org/srophe/facets" at "facets.xql";
+import module namespace global="http://srophe.org/srophe/global" at "lib/global.xqm";
+import module namespace maps="http://srophe.org/srophe/maps" at "maps.xqm";
+import module namespace page="http://srophe.org/srophe/page" at "paging.xqm";
+import module namespace tei2html="http://srophe.org/srophe/tei2html" at "../content-negotiation/tei2html.xqm";
 
 (: Namespaces :)
 declare namespace tei="http://www.tei-c.org/ns/1.0";
@@ -41,7 +42,7 @@ declare function browse:get-all($node as node(), $model as map(*), $collection a
                     data:get-records($collection, 'tei:place/tei:placeName')
                  else data:get-records($collection, $element)
     return 
-        map{"hits" := $data}
+        map{"hits" : $data[descendant::tei:body[ft:query(., (),sf:facet-query())]]}
 };
 
 (:
@@ -67,7 +68,7 @@ declare function browse:show-hits($node as node(), $model as map(*), $collection
             <div class="row">
              {
                  if($facet-config != '') then
-                    <div class="col-md-3">{(facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition))}</div> 
+                    <div class="col-md-3">{sf:display($hits, $facet-config)}</div> 
                  else () 
                  }
              <div class="{if($facet-config != '') then 'col-md-9' else 'col-md-12'}">
@@ -89,7 +90,9 @@ declare function browse:show-hits($node as node(), $model as map(*), $collection
         </div>
     else 
         <div class="col-md-12 map-lg" xmlns="http://www.w3.org/1999/xhtml" id="browseMap">
-            {let $geojson := if(request:get-parameter('fq', '') != '') then $hits[descendant::tei:geo]
+            {let $geojson :=  if(request:get-parameter('fq', '') != '') then $hits[descendant::tei:geo]
+                              else if(request:get-query-string()) then 
+                                $hits[descendant::tei:geo]  
                              else doc(xmldb:encode-uri(concat($config:app-root,'/resources/lodHelpers/placeNames.xml')))//tei:place
              return                              
                 (maps:build-map($hits,count($hits)),
@@ -99,8 +102,11 @@ declare function browse:show-hits($node as node(), $model as map(*), $collection
                         data-toggle="collapse" data-target="#filterMap" 
                         href="#filterMap" data-text-swap="- Hide"> + Show </a></span>
                     <div class="collapse" id="filterMap">
+                        {sf:display($hits, $facet-config/descendant::facet:facets/facet:facet-definition[@label="Place Type"])}
+                         {sf:display($hits, $facet-config/descendant::facet:facets/facet:facet-definition[@label="Location Type"])}
+                         <!--
                         {facet:output-html-facets($geojson[descendant::tei:geo], $facet-config/descendant::facet:facets/facet:facet-definition[@name="Place Type"])}
-                        {facet:output-html-facets($geojson[descendant::tei:geo], $facet-config/descendant::facet:facets/facet:facet-definition[@name="Location Type"])}
+                        {facet:output-html-facets($geojson[descendant::tei:geo], $facet-config/descendant::facet:facets/facet:facet-definition[@name="Location Type"])}-->
                     </div>
                 </div>)}
         </div>
@@ -290,7 +296,12 @@ declare function browse:browse-type($collection){
 declare function browse:large-map($node as node(), $model as map(*), $collection, $sort-options as xs:string*, $facets as xs:string?){
 let $hits := if(request:get-parameter('fq', '')!= '') then 
                 util:eval(concat("collection($config:data-root)//tei:TEI[descendant::tei:geo]",facet:facet-filter(global:facet-definition-file($collection))))
-             else doc(xmldb:encode-uri(concat($config:app-root,'/resources/lodHelpers/placeNames.xml')))//tei:place                 
+             else if(request:get-query-string()) then 
+                collection($config:data-root)//tei:body[ft:query(., (),sf:facet-query())][descendant::tei:geo]
+             else doc(xmldb:encode-uri(concat($config:app-root,'/resources/lodHelpers/placeNames.xml')))//tei:place
+let $facets :=  if(request:get-query-string()) then 
+                    $hits
+                else collection($config:data-root)//tei:body[ft:query(., (),sf:facet-query())][descendant::tei:geo]
 let $facet-config := global:facet-definition-file($collection)
 return 
 <div xmlns="http://www.w3.org/1999/xhtml" id="browseMap">
@@ -299,8 +310,8 @@ return
         <span class="filter-label">Filter Map 
             <a class="pull-right small togglelink text-info" data-toggle="collapse" data-target="#filterMap" href="#filterMap" data-text-swap="- Hide"> + Show </a></span>
             <div class="collapse" id="filterMap">
-                {facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition[@name="Place Type"])}
-                {facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition[@name="Location Type"])}
+                {sf:display($facets, $facet-config/descendant::facet:facets/facet:facet-definition[@label="Place Type"])}
+                {sf:display($facets, $facet-config/descendant::facet:facets/facet:facet-definition[@label="Location Type"])}
             </div>
     </div>
 </div>

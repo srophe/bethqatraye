@@ -3,11 +3,11 @@
  :)
 xquery version "3.0";
 
-module namespace ev="http://syriaca.org/srophe/events";
+module namespace ev="http://srophe.org/srophe/events";
 
-import module namespace global="http://syriaca.org/srophe/global" at "global.xqm";
-import module namespace tei2html="http://syriaca.org/srophe/tei2html" at "tei2html.xqm";
-import module namespace timeline="http://syriaca.org/srophe/timeline" at "timeline.xqm";
+import module namespace global="http://srophe.org/srophe/global" at "global.xqm";
+import module namespace tei2html="http://srophe.org/srophe/tei2html" at "tei2html.xqm";
+import module namespace timeline="http://srophe.org/srophe/timeline" at "timeline.xqm";
 
 declare namespace xslt="http://exist-db.org/xquery/transform";
 declare namespace tei="http://www.tei-c.org/ns/1.0";

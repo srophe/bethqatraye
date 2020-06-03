@@ -1,9 +1,9 @@
 xquery version "3.1";
 
-import module namespace config="http://syriaca.org/srophe/config" at "config.xqm";
-import module namespace global="http://syriaca.org/srophe/global" at "lib/global.xqm";
-import module namespace tei2html="http://syriaca.org/srophe/tei2html" at "content-negotiation/tei2html.xqm";
-import module namespace bibl2html="http://syriaca.org/srophe/bibl2html" at "bibl2html.xqm";
+import module namespace config="http://srophe.org/srophe/config" at "config.xqm";
+import module namespace global="http://srophe.org/srophe/global" at "lib/global.xqm";
+import module namespace tei2html="http://srophe.org/srophe/tei2html" at "content-negotiation/tei2html.xqm";
+import module namespace bibl2html="http://srophe.org/srophe/bibl2html" at "bibl2html.xqm";
 
 declare namespace http="http://expath.org/ns/http-client";
 declare namespace tei="http://www.tei-c.org/ns/1.0";

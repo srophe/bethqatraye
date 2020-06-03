@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:t="http://www.tei-c.org/ns/1.0" xmlns:x="http://www.w3.org/1999/xhtml" xmlns:saxon="http://saxon.sf.net/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:local="http://syriaca.org/ns" exclude-result-prefixes="xs t x saxon local" version="2.0">
 
     <!-- ================================================================== 
@@ -267,7 +268,8 @@
                             <xsl:call-template name="persons"/>
                             <xsl:text> </xsl:text>
                                 <xsl:for-each select="t:title">
-                                    <xsl:if test="@level='a'">"</xsl:if><xsl:apply-templates select="self::*" mode="footnote"/>
+                                    <xsl:if test="@level='a'">"</xsl:if>
+                                <xsl:apply-templates select="self::*" mode="footnote"/>
                                     <xsl:if test="@level='a'">,"</xsl:if>
                                     <xsl:if test="following-sibling::t:title[@level = 'j']">
                                         <xsl:text> In</xsl:text>
@@ -278,8 +280,12 @@
                                 </xsl:for-each>                                
                             <xsl:if test="not(empty(t:citedRange))">
                                 <xsl:choose>
-                                    <xsl:when test="not(empty(t:citedRange)) and t:title[last()][not(@level='a')]"><xsl:text>, </xsl:text></xsl:when>
-                                    <xsl:otherwise><xsl:text> </xsl:text></xsl:otherwise>
+                                    <xsl:when test="not(empty(t:citedRange)) and t:title[last()][not(@level='a')]">
+                                        <xsl:text>, </xsl:text>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:text> </xsl:text>
+                                    </xsl:otherwise>
                                 </xsl:choose>
                                 <xsl:for-each select="t:citedRange">
                                     <xsl:apply-templates select="." mode="footnote"/>

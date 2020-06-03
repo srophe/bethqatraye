@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:t="http://www.tei-c.org/ns/1.0" xmlns:x="http://www.w3.org/1999/xhtml" xmlns:saxon="http://saxon.sf.net/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:local="http://syriaca.org/ns" exclude-result-prefixes="xs t x saxon local" version="2.0">
 
     <!-- =================================================================== -->
@@ -99,10 +100,14 @@
             <xsl:sequence select="local:attributes(.)"/>
             <xsl:choose>
                 <xsl:when test="@xml:lang = 'ar' or parent::*[1]/@xml:lang = 'ar' or starts-with(@xml:lang,'syr') or starts-with(parent::*[1]/@xml:lang,'syr')">
-                    <xsl:text> ”</xsl:text><xsl:apply-templates/><xsl:text>“</xsl:text>
+                    <xsl:text> ”</xsl:text>
+                    <xsl:apply-templates/>
+                    <xsl:text>“</xsl:text>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:text> “</xsl:text><xsl:apply-templates/><xsl:text>”</xsl:text>        
+                    <xsl:text> “</xsl:text>
+                    <xsl:apply-templates/>
+                    <xsl:text>”</xsl:text>        
                 </xsl:otherwise>
             </xsl:choose>
             <xsl:sequence select="local:add-footnotes(@source,ancestor::t:*[@xml:lang][1])"/>

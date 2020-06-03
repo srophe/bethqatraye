@@ -2,22 +2,22 @@
  : Builds SPEAR pages  
  :)
 xquery version "3.0";
-module namespace spear="http://syriaca.org/srophe/spear";
+module namespace spear="http://srophe.org/srophe/spear";
 
 (: eXistdb modules :)
 import module namespace templates="http://exist-db.org/xquery/templates" ;
 import module namespace functx="http://www.functx.com";
 
 (:Syriaca.org modules. :)
-import module namespace app="http://syriaca.org/srophe/templates" at "app.xql";
-import module namespace config="http://syriaca.org/srophe/config" at "config.xqm";
+import module namespace app="http://srophe.org/srophe/templates" at "app.xql";
+import module namespace config="http://srophe.org/srophe/config" at "config.xqm";
 import module namespace cts="http://syriaca.org/cts" at "../CTS/cts-resolver.xqm";
-import module namespace ev="http://syriaca.org/srophe/events" at "lib/events.xqm";
-import module namespace global="http://syriaca.org/srophe/global" at "lib/global.xqm";
-import module namespace maps="http://syriaca.org/srophe/maps" at "lib/maps.xqm";
-import module namespace rel="http://syriaca.org/srophe/related" at "lib/get-related.xqm";
-import module namespace tei2html="http://syriaca.org/srophe/tei2html" at "content-negotiation/tei2html.xqm";
-import module namespace timeline="http://syriaca.org/srophe/timeline" at "lib/timeline.xqm";
+import module namespace ev="http://srophe.org/srophe/events" at "lib/events.xqm";
+import module namespace global="http://srophe.org/srophe/global" at "lib/global.xqm";
+import module namespace maps="http://srophe.org/srophe/maps" at "lib/maps.xqm";
+import module namespace rel="http://srophe.org/srophe/related" at "lib/get-related.xqm";
+import module namespace tei2html="http://srophe.org/srophe/tei2html" at "content-negotiation/tei2html.xqm";
+import module namespace timeline="http://srophe.org/srophe/timeline" at "lib/timeline.xqm";
 
 declare namespace http="http://expath.org/ns/http-client";
 declare namespace tei="http://www.tei-c.org/ns/1.0";
@@ -55,7 +55,7 @@ let $id :=
 let $id := if(ends-with($id,'.html')) then substring-before($id,'.html') else $id  
 return 
     if($view = 'aggregate') then
-        map {"data" :=  
+        map {"data" : 
         <aggregate xmlns="http://www.tei-c.org/ns/1.0" id="{$id}">
             {
                 if($spear:item-type = 'source-factoid') then 
@@ -71,7 +71,7 @@ return
                     return $rec  
             }
         </aggregate>}
-    else  map {"data" :=  
+    else  map {"data" :  
                     for $rec in collection($config:data-root)//tei:div[@uri = $id]
                     return 
                         <TEI xmlns="http://www.tei-c.org/ns/1.0">{$rec}</TEI>
@@ -626,7 +626,7 @@ return global:tei2html(<spear-citation xmlns="http://www.tei-c.org/ns/1.0">{($bi
 declare %templates:wrap function spear:get-event-data($node as node(), $model as map(*)){
 let $events :=  collection($config:data-root || "/spear/tei")//tei:event[parent::tei:listEvent]
 return 
-     map {"data" := $events}
+     map {"data" : $events}
 };
    
 declare %templates:wrap function spear:build-event-timeline($node as node(), $model as map(*)){
