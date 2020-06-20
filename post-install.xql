@@ -14,8 +14,10 @@ declare variable $dir external;
 declare variable $target external;
 
 (
+(: Build indexes for data based on search and facet configuration files :)
+   (: sf:update-index(),:)
+(: Set UID for inexing function. Used only if building facets. :)   
+   sm:chmod(xs:anyURI($target || '/modules/index.xql'), "rwsr-xr-x"),
 (: Set UID for git-sync. :)
-sm:chmod(xs:anyURI($target || '/modules/git-sync.xql'), "rwsr-xr-x"),
-(: Set UID for index script. :)
-sm:chmod(xs:anyURI($target || '/modules/index.xql'), "rwsr-xr-x")
+   sm:chmod(xs:anyURI($target || '/modules/git-sync.xql'), "rwsr-xr-x")
 )

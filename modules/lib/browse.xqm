@@ -42,7 +42,7 @@ declare function browse:get-all($node as node(), $model as map(*), $collection a
                     data:get-records($collection, 'tei:place/tei:placeName')
                  else data:get-records($collection, $element)
     return 
-        map{"hits" : $data[descendant::tei:body[ft:query(., (),sf:facet-query())]]}
+        map{"hits" : $data}
 };
 
 (:
@@ -91,11 +91,10 @@ declare function browse:show-hits($node as node(), $model as map(*), $collection
     else 
         <div class="col-md-12 map-lg" xmlns="http://www.w3.org/1999/xhtml" id="browseMap">
             {let $geojson :=  if(request:get-parameter('fq', '') != '') then $hits[descendant::tei:geo]
-                              else if(request:get-query-string()) then 
-                                $hits[descendant::tei:geo]  
+                              else if(contains(request:get-query-string(), 'facet-')) then $hits[descendant::tei:geo]  
                              else doc(xmldb:encode-uri(concat($config:app-root,'/resources/lodHelpers/placeNames.xml')))//tei:place
              return                              
-                (maps:build-map($hits,count($hits)),
+               (maps:build-map($geojson,count($hits)),
                 <div id="map-filters" class="map-overlay">
                     <span class="filter-label">Filter Map 
                         <a class="pull-right small togglelink text-info" 
@@ -296,6 +295,8 @@ declare function browse:browse-type($collection){
 declare function browse:large-map($node as node(), $model as map(*), $collection, $sort-options as xs:string*, $facets as xs:string?){
 let $hits := if(request:get-parameter('fq', '')!= '') then 
                 util:eval(concat("collection($config:data-root)//tei:TEI[descendant::tei:geo]",facet:facet-filter(global:facet-definition-file($collection))))
+             else if(contains(request:get-query-string(), 'facet-')) then 
+                collection($config:data-root)//tei:body[ft:query(., (),sf:facet-query())][descendant::tei:geo] 
              else if(request:get-query-string()) then 
                 collection($config:data-root)//tei:body[ft:query(., (),sf:facet-query())][descendant::tei:geo]
              else doc(xmldb:encode-uri(concat($config:app-root,'/resources/lodHelpers/placeNames.xml')))//tei:place
