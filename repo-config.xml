@@ -23,7 +23,7 @@
         <url>https://bqgazetteer.bethmardutho.org/</url>
         <!-- Root of app for building dynamic links. Default is eXist app root -->
 <!--        <nav-base>https://bqgazetteer.bethmardutho.org</nav-base>-->
-        <nav-base>/exist/apps/bethqatraye</nav-base>
+        <nav-base>/</nav-base>
         <!-- eXist app root for app deployment-->
         <app-root>bethqatraye</app-root>
         <!-- eXist data app root for gazetteer data -->

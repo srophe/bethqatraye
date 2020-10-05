@@ -13,6 +13,9 @@ declare variable $sf:QUERY_OPTIONS := map {
     "filter-rewrite": "yes"
 };
 
+(: Add sort fields to browse and search options. Used for sorting, add sort fields and functions, add sort function:)
+declare variable $sf:sortFields := map { "fields": ("title","titleSyriac","titleArabic", "author") };
+
 (: ~ 
  : Build indexes for fields and facets as specified in facet-def.xml and search-config.xml files
  : Note: Investigate boost? 
@@ -46,6 +49,11 @@ declare function sf:build-index(){
         return 
             ($facets(:,$fields :))
         }
+                        <!-- Predetermined sort fields -->               
+                <field name="title" expression="sf:field(descendant-or-self::tei:body, '/db/apps/srophe/search-config.xml', 'title')"/>
+                <field name="titleArabic" expression="sf:field(descendant-or-self::tei:body, '/db/apps/srophe/search-config.xml', 'titleArabic')"/>
+                <field name="titleSyriac" expression="sf:field(descendant-or-self::tei:body, '/db/apps/srophe/search-config.xml', 'titleSyriac')"/>
+                <field name="author" expression="sf:field(descendant-or-self::tei:body, '/db/apps/srophe/search-config.xml', 'author')"/>
         </text>
         <text qname="tei:fileDesc"/>
         <text qname="tei:biblStruct"/>
@@ -178,7 +186,9 @@ declare function sf:facet-range($element as item()*, $facet-definition as item()
     
 };
 
-(: Title field :)
+(:~
+ : TEI Title field, specific to Srophe applications 
+ :)
 declare function sf:field-title($element as item()*, $facet-definition as item(), $name as xs:string){
     if($element/descendant-or-self::*[contains(@syriaca-tags,'#syriaca-headword')][@xml:lang='en']) then 
         let $en := $element/descendant-or-self::*[contains(@syriaca-tags,'#syriaca-headword')][@xml:lang='en'][1]
@@ -188,9 +198,46 @@ declare function sf:field-title($element as item()*, $facet-definition as item()
         let $en := $element/descendant-or-self::*[contains(@srophe:tags,'#headword')][@xml:lang='en'][1]
         let $syr := string-join($element/descendant::*[contains(@srophe:tags,'#headword')][matches(@xml:lang,'^syr')][1]//text(),' ')
         return sf:build-sort-string(concat($en, if($syr != '') then  concat(' - ', $syr) else ()))
+    else if($element/descendant-or-self::*[contains(@srophe:tags,'#syriaca-headword')][@xml:lang='en']) then
+        let $en := $element/descendant-or-self::*[contains(@srophe:tags,'#syriaca-headword')][@xml:lang='en'][1]
+        let $syr := string-join($element/descendant::*[contains(@srophe:tags,'#syriaca-headword')][matches(@xml:lang,'^syr')][1]//text(),' ')
+        return sf:build-sort-string(concat($en, if($syr != '') then  concat(' - ', $syr) else ()))        
     else if($element/ancestor-or-self::tei:TEI/descendant::tei:biblStruct) then 
         sf:build-sort-string($element/ancestor-or-self::tei:TEI/descendant::tei:biblStruct/descendant::tei:title)
     else sf:build-sort-string($element/ancestor-or-self::tei:TEI/descendant::tei:titleStmt/tei:title)
+};
+
+(:~
+ : TEI Title field - Syriac, specific to Srophe applications 
+ :)
+declare function sf:field-titleSyriac($element as item()*, $facet-definition as item(), $name as xs:string){
+    if($element/descendant-or-self::*[contains(@syriaca-tags,'#syriaca-headword')][matches(@xml:lang,'^syr')]) then 
+        let $syr := string-join($element/descendant::*[contains(@syriaca-tags,'#syriaca-headword')][matches(@xml:lang,'^syr')][1]//text(),' ')
+        return $syr
+    else if($element/descendant-or-self::*[contains(@srophe:tags,'#headword')][matches(@xml:lang,'^syr')]) then
+        let $syr := string-join($element/descendant::*[contains(@srophe:tags,'#headword')][matches(@xml:lang,'^syr')][1]//text(),' ')
+        return $syr
+    else if($element/descendant-or-self::*[contains(@srophe:tags,'#syriaca-headword')][matches(@xml:lang,'^syr')]) then
+        let $syr := string-join($element/descendant::*[contains(@srophe:tags,'#syriaca-headword')][matches(@xml:lang,'^syr')][1]//text(),' ')
+        return $syr    
+    else ()
+};
+
+(:~
+ : TEI Title field - Arabic, specific to Srophe applications 
+ :)
+declare function sf:field-titleArabic($element as item()*, $facet-definition as item(), $name as xs:string){
+    if($element/descendant-or-self::*[contains(@syriaca-tags,'#syriaca-headword')][@xml:lang = 'ar']) then 
+        let $ar := string-join($element/descendant::*[contains(@syriaca-tags,'#syriaca-headword')][@xml:lang = 'ar']//text(),' ')
+        return sf:build-sort-string-arabic($ar)
+    else if($element/descendant-or-self::*[contains(@srophe:tags,'#headword')][@xml:lang = 'ar']) then
+        let $ar := string-join($element/descendant::*[contains(@srophe:tags,'#headword')][@xml:lang = 'ar']//text(),' ')
+        return sf:build-sort-string-arabic($ar)
+    else if($element/tei:listPerson/tei:person/tei:persName[@xml:lang = 'ar']) then 
+        sf:build-sort-string-arabic($element/tei:listPerson/tei:person/tei:persName[@xml:lang = 'ar'])
+    else if($element/tei:listPlace/tei:place/tei:placeName[@xml:lang = 'ar']) then 
+        sf:build-sort-string-arabic($element/tei:listPlace/tei:place/tei:placeName[@xml:lang = 'ar'])
+    else ()
 };
 
 (: Title field :)
@@ -362,6 +409,7 @@ declare function sf:sort($facets as map(*)?) {
 declare function sf:facet-query() {
     map:merge((
         $sf:QUERY_OPTIONS,
+        $sf:sortFields,
         map {
             "facets":
                 map:merge((
@@ -411,6 +459,21 @@ declare function sf:type($value as item()*, $type as xs:string?) as item()*{
 (: Syriaca.org strip non sort characters :)
 declare function sf:build-sort-string($titlestring as xs:string?) as xs:string* {
     replace(normalize-space($titlestring),'^\s+|^[‘|ʻ|ʿ|ʾ]|^[tT]he\s+[^\p{L}]+|^[dD]e\s+|^[dD]e-|^[oO]n\s+[aA]\s+|^[oO]n\s+|^[aA]l-|^[aA]n\s|^[aA]\s+|^\d*\W|^[^\p{L}]','')
+};
+
+(:~ 
+ : Syriaca.org strip non sort characters for sorting 
+ :)
+declare function sf:build-sort-string-arabic($titlestring as xs:string?) as xs:string* {
+    replace(
+    replace(
+      replace(
+        replace(
+          replace($titlestring,'^\s+',''), (:remove leading spaces. :)
+            '[ً-ٖ]',''), (:remove vowels and diacritics :)
+                '(^|\s)(ال|أل|ٱل)',''), (: remove all definite articles :)
+                    'آ|إ|أ|ٱ','ا'), (: normalize letter alif :)
+                        '^(ابن|إبن|بن)','') (:remove all forms of (ابن) with leading space :)
 };
 
 (: BQ functions bqRegion :)
