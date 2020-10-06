@@ -14,7 +14,7 @@ declare variable $sf:QUERY_OPTIONS := map {
 };
 
 (: Add sort fields to browse and search options. Used for sorting, add sort fields and functions, add sort function:)
-declare variable $sf:sortFields := map { "fields": ("title","titleSyriac","titleArabic", "author") };
+declare variable $sf:sortFields := map { "fields": ("title", "author","titleSyriac","titleArabic") };
 
 (: ~ 
  : Build indexes for fields and facets as specified in facet-def.xml and search-config.xml files
@@ -50,10 +50,10 @@ declare function sf:build-index(){
             ($facets(:,$fields :))
         }
                         <!-- Predetermined sort fields -->               
-                <field name="title" expression="sf:field(descendant-or-self::tei:body, '/db/apps/srophe/search-config.xml', 'title')"/>
-                <field name="titleArabic" expression="sf:field(descendant-or-self::tei:body, '/db/apps/srophe/search-config.xml', 'titleArabic')"/>
-                <field name="titleSyriac" expression="sf:field(descendant-or-self::tei:body, '/db/apps/srophe/search-config.xml', 'titleSyriac')"/>
-                <field name="author" expression="sf:field(descendant-or-self::tei:body, '/db/apps/srophe/search-config.xml', 'author')"/>
+                <field name="titleSyriac" expression="sf:field(descendant-or-self::tei:body, 'titleSyriac')"/>
+                <field name="title" expression="sf:field(descendant-or-self::tei:body, 'title')"/>
+                <field name="titleArabic" expression="sf:field(descendant-or-self::tei:body, 'titleArabic')"/>
+                <field name="author" expression="sf:field(descendant-or-self::tei:body, 'author')"/>
         </text>
         <text qname="tei:fileDesc"/>
         <text qname="tei:biblStruct"/>
@@ -132,6 +132,13 @@ declare function sf:facet($element as item()*, $path as xs:string, $name as xs:s
         else ()
 };
 
+(: For sort fields, or fields not defined in search-config.xml :)
+declare function sf:field($element as item()*, $name as xs:string){
+    try { 
+        util:eval(concat('sf:field-',$name,'($element, $name)'))
+    } catch * {concat($err:code, ": ", $err:description)}
+};
+
 declare function sf:field($element as item()*, $path as xs:string, $name as xs:string){
     let $field-definition :=  
         if(doc-available($path)) then
@@ -185,32 +192,32 @@ declare function sf:facet-range($element as item()*, $facet-definition as item()
     return if($f) then $r/@name else()
     
 };
-
 (:~
  : TEI Title field, specific to Srophe applications 
  :)
-declare function sf:field-title($element as item()*, $facet-definition as item(), $name as xs:string){
-    if($element/descendant-or-self::*[contains(@syriaca-tags,'#syriaca-headword')][@xml:lang='en']) then 
-        let $en := $element/descendant-or-self::*[contains(@syriaca-tags,'#syriaca-headword')][@xml:lang='en'][1]
+declare function sf:field-title($element as item()*, $name as xs:string){
+    if($element/descendant-or-self::*[contains(@syriaca-tags,'#syriaca-headword')][contains(@xml:lang,'en')][//text() != '']) then 
+        let $en := $element/descendant-or-self::*[contains(@syriaca-tags,'#syriaca-headword')][contains(@xml:lang,'en')][//text() != ''][1]
         let $syr := string-join($element/descendant::*[contains(@syriaca-tags,'#syriaca-headword')][matches(@xml:lang,'^syr')][1]//text(),' ')
         return sf:build-sort-string(concat($en, if($syr != '') then  concat(' - ', $syr) else ()))
-    else if($element/descendant-or-self::*[contains(@srophe:tags,'#headword')][@xml:lang='en']) then
-        let $en := $element/descendant-or-self::*[contains(@srophe:tags,'#headword')][@xml:lang='en'][1]
+    else if($element/descendant-or-self::*[contains(@srophe:tags,'#headword')][contains(@xml:lang,'en')][//text() != '']) then
+        let $en := $element/descendant-or-self::*[contains(@srophe:tags,'#headword')][contains(@xml:lang,'en')][//text() != ''][1]
         let $syr := string-join($element/descendant::*[contains(@srophe:tags,'#headword')][matches(@xml:lang,'^syr')][1]//text(),' ')
         return sf:build-sort-string(concat($en, if($syr != '') then  concat(' - ', $syr) else ()))
-    else if($element/descendant-or-self::*[contains(@srophe:tags,'#syriaca-headword')][@xml:lang='en']) then
-        let $en := $element/descendant-or-self::*[contains(@srophe:tags,'#syriaca-headword')][@xml:lang='en'][1]
+    else if($element/descendant-or-self::*[contains(@srophe:tags,'#syriaca-headword')][contains(@xml:lang,'en')][//text() != '']) then
+        let $en := $element/descendant-or-self::*[contains(@srophe:tags,'#syriaca-headword')][contains(@xml:lang,'en')][//text() != ''][1]
         let $syr := string-join($element/descendant::*[contains(@srophe:tags,'#syriaca-headword')][matches(@xml:lang,'^syr')][1]//text(),' ')
         return sf:build-sort-string(concat($en, if($syr != '') then  concat(' - ', $syr) else ()))        
     else if($element/ancestor-or-self::tei:TEI/descendant::tei:biblStruct) then 
-        sf:build-sort-string($element/ancestor-or-self::tei:TEI/descendant::tei:biblStruct/descendant::tei:title)
-    else sf:build-sort-string($element/ancestor-or-self::tei:TEI/descendant::tei:titleStmt/tei:title)
+        for $title in $element/ancestor-or-self::tei:TEI/descendant::tei:biblStruct/descendant::tei:title
+        return sf:build-sort-string($title)
+    else sf:build-sort-string($element/ancestor-or-self::tei:TEI/descendant::tei:titleStmt/tei:title[1])
 };
 
 (:~
  : TEI Title field - Syriac, specific to Srophe applications 
  :)
-declare function sf:field-titleSyriac($element as item()*, $facet-definition as item(), $name as xs:string){
+declare function sf:field-titleSyriac($element as item()*, $name as xs:string){
     if($element/descendant-or-self::*[contains(@syriaca-tags,'#syriaca-headword')][matches(@xml:lang,'^syr')]) then 
         let $syr := string-join($element/descendant::*[contains(@syriaca-tags,'#syriaca-headword')][matches(@xml:lang,'^syr')][1]//text(),' ')
         return $syr
@@ -226,17 +233,20 @@ declare function sf:field-titleSyriac($element as item()*, $facet-definition as 
 (:~
  : TEI Title field - Arabic, specific to Srophe applications 
  :)
-declare function sf:field-titleArabic($element as item()*, $facet-definition as item(), $name as xs:string){
+declare function sf:field-titleArabic($element as item()*, $name as xs:string){
     if($element/descendant-or-self::*[contains(@syriaca-tags,'#syriaca-headword')][@xml:lang = 'ar']) then 
-        let $ar := string-join($element/descendant::*[contains(@syriaca-tags,'#syriaca-headword')][@xml:lang = 'ar']//text(),' ')
+        for $title in $element/descendant::*[contains(@syriaca-tags,'#syriaca-headword')][@xml:lang = 'ar']
+        let $ar := string-join($title/descendant::*[contains(@syriaca-tags,'#syriaca-headword')][@xml:lang = 'ar']//text(),' ')
         return sf:build-sort-string-arabic($ar)
     else if($element/descendant-or-self::*[contains(@srophe:tags,'#headword')][@xml:lang = 'ar']) then
+        for $title in $element/descendant::*[contains(@syriaca-tags,'#syriaca-headword')][@xml:lang = 'ar']
         let $ar := string-join($element/descendant::*[contains(@srophe:tags,'#headword')][@xml:lang = 'ar']//text(),' ')
         return sf:build-sort-string-arabic($ar)
     else if($element/tei:listPerson/tei:person/tei:persName[@xml:lang = 'ar']) then 
-        sf:build-sort-string-arabic($element/tei:listPerson/tei:person/tei:persName[@xml:lang = 'ar'])
+         $element/tei:listPerson/tei:person/tei:persName[@xml:lang = 'ar']
     else if($element/tei:listPlace/tei:place/tei:placeName[@xml:lang = 'ar']) then 
-        sf:build-sort-string-arabic($element/tei:listPlace/tei:place/tei:placeName[@xml:lang = 'ar'])
+        for $title in $element/tei:listPlace/tei:place/tei:placeName[@xml:lang = 'ar']
+        return sf:build-sort-string-arabic($title)
     else ()
 };
 
