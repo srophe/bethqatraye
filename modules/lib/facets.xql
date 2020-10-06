@@ -50,10 +50,10 @@ declare function sf:build-index(){
             ($facets(:,$fields :))
         }
                         <!-- Predetermined sort fields -->               
-                <field name="titleSyriac" expression="sf:field(descendant-or-self::tei:body, 'titleSyriac')"/>
-                <field name="title" expression="sf:field(descendant-or-self::tei:body, 'title')"/>
-                <field name="titleArabic" expression="sf:field(descendant-or-self::tei:body, 'titleArabic')"/>
-                <field name="author" expression="sf:field(descendant-or-self::tei:body, 'author')"/>
+                <field name="title" expression="sf:field(descendant-or-self::tei:body,(), 'title')"/>
+                <field name="titleSyriac" expression="sf:field(descendant-or-self::tei:body, (), 'titleSyriac')"/>
+                <field name="titleArabic" expression="sf:field(descendant-or-self::tei:body,(), 'titleArabic')"/>
+                <field name="author" expression="sf:field(descendant-or-self::tei:body, (),'author')"/>
         </text>
         <text qname="tei:fileDesc"/>
         <text qname="tei:biblStruct"/>
@@ -195,7 +195,7 @@ declare function sf:facet-range($element as item()*, $facet-definition as item()
 (:~
  : TEI Title field, specific to Srophe applications 
  :)
-declare function sf:field-title($element as item()*, $name as xs:string){
+declare function sf:field-title($element as item()*, $facet-definition as item()*, $name as xs:string){
     if($element/descendant-or-self::*[contains(@syriaca-tags,'#syriaca-headword')][contains(@xml:lang,'en')][//text() != '']) then 
         let $en := $element/descendant-or-self::*[contains(@syriaca-tags,'#syriaca-headword')][contains(@xml:lang,'en')][//text() != ''][1]
         let $syr := string-join($element/descendant::*[contains(@syriaca-tags,'#syriaca-headword')][matches(@xml:lang,'^syr')][1]//text(),' ')
@@ -217,7 +217,7 @@ declare function sf:field-title($element as item()*, $name as xs:string){
 (:~
  : TEI Title field - Syriac, specific to Srophe applications 
  :)
-declare function sf:field-titleSyriac($element as item()*, $name as xs:string){
+declare function sf:field-titleSyriac($element as item()*, $facet-definition as item()*, $name as xs:string){
     if($element/descendant-or-self::*[contains(@syriaca-tags,'#syriaca-headword')][matches(@xml:lang,'^syr')]) then 
         let $syr := string-join($element/descendant::*[contains(@syriaca-tags,'#syriaca-headword')][matches(@xml:lang,'^syr')][1]//text(),' ')
         return $syr
@@ -233,7 +233,7 @@ declare function sf:field-titleSyriac($element as item()*, $name as xs:string){
 (:~
  : TEI Title field - Arabic, specific to Srophe applications 
  :)
-declare function sf:field-titleArabic($element as item()*, $name as xs:string){
+declare function sf:field-titleArabic($element as item()*, $facet-definition as item()*, $name as xs:string){
     if($element/descendant-or-self::*[contains(@syriaca-tags,'#syriaca-headword')][@xml:lang = 'ar']) then 
         for $title in $element/descendant::*[contains(@syriaca-tags,'#syriaca-headword')][@xml:lang = 'ar']
         let $ar := string-join($title/descendant::*[contains(@syriaca-tags,'#syriaca-headword')][@xml:lang = 'ar']//text(),' ')
