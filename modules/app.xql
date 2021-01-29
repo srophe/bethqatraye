@@ -52,9 +52,7 @@ declare function app:get-work($node as node(), $model as map(*)) {
         let $rec := data:get-document()
         return 
             if(empty($rec)) then 
-                ('No record found. ',xmldb:encode-uri($config:data-root || "/" || request:get-parameter('doc', '') || '.xml'))
-                (: Debugging ('No record found. ',xmldb:encode-uri($config:data-root || "/" || request:get-parameter('doc', '') || '.xml')):)
-               (:response:redirect-to(xs:anyURI(concat($config:nav-base, '/404.html'))):)
+               response:redirect-to(xs:anyURI(concat($config:nav-base, '/404.html')))
             else map {"hits" : $rec }
     else map {"hits" : 'Output plain HTML page'}
 };
@@ -683,18 +681,6 @@ declare %templates:wrap function app:build-editor-list($node as node(), $model a
             <li>{normalize-space($name)}</li>
             else ''
         else ''  
-};
-
-(:~ 
- : Adds google analytics from config.xml
- : @param $node
- : @param $model
- : @param $path path to html content file, relative to app root. 
-:)
-declare  
-    %templates:wrap 
-function app:google-analytics($node as node(), $model as map(*)){
-   $config:get-config//google_analytics/text() 
 };
 
 (: Syriaca.org specific functions :)

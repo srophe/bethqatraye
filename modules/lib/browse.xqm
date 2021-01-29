@@ -118,7 +118,10 @@ declare function browse:display-hits($hits){
     for $hit in subsequence($hits, $browse:start,$browse:perpage)
     let $sort-title := 
         if($browse:lang != 'en' and $browse:lang != 'syr' and $browse:lang != '') then 
-            <span class="sort-title" lang="{$browse:lang}" xml:lang="{$browse:lang}">{(if($browse:lang='ar') then attribute dir { "rtl" } else (), string($hit/@sort))}</span> 
+            <span class="sort-title" lang="{$browse:lang}" xml:lang="{$browse:lang}">{
+            (if($browse:lang='ar') then attribute dir { "rtl" } else (),
+            $hit/descendant::tei:placeName[@xml:lang = $browse:lang][matches(global:build-sort-string(., $browse:lang),global:get-alpha-filter())]/descendant::text()
+            )}</span> 
         else () 
     let $uri := replace($hit/descendant::tei:publicationStmt/tei:idno[1],'/tei','')
     return 
