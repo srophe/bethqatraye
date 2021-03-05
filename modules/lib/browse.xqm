@@ -27,8 +27,8 @@ declare namespace html="http://www.w3.org/1999/xhtml";
 declare variable $browse:alpha-filter {request:get-parameter('alpha-filter', '')};
 declare variable $browse:lang {request:get-parameter('lang', '')};
 declare variable $browse:view {request:get-parameter('view', '')};
-declare variable $browse:start {request:get-parameter('start', 1) cast as xs:integer};
-declare variable $browse:perpage {request:get-parameter('perpage', 25) cast as xs:integer};
+declare variable $browse:start {request:get-parameter('start', 1)[1] cast as xs:integer};
+declare variable $browse:perpage {request:get-parameter('perpage', 25)[1] cast as xs:integer};
 
 (:~
  : Build initial browse results based on parameters
@@ -118,8 +118,14 @@ declare function browse:display-hits($hits){
     for $hit in subsequence($hits, $browse:start,$browse:perpage)
     let $sort-title := 
         if($browse:lang != 'en' and $browse:lang != 'syr' and $browse:lang != '') then 
-            <span class="sort-title" lang="{$browse:lang}" xml:lang="{$browse:lang}">{(if($browse:lang='ar') then attribute dir { "rtl" } else (), string($hit/@sort))}</span> 
-        else () 
+            <span class="sort-title" lang="{$browse:lang}" xml:lang="{$browse:lang}">
+            {(if($browse:lang='ar') then attribute dir { "rtl" } else (), 
+                if($browse:lang='ar') then ft:field($hit, "titleArabic")[matches(global:build-sort-string(., $browse:lang),global:get-alpha-filter())]
+                else if($browse:lang != 'en') then 
+                    tei2html:tei2html($hit/descendant::tei:placeName[@xml:lang = $browse:lang][matches(global:build-sort-string(., $browse:lang),global:get-alpha-filter())][1])
+                else())}
+            </span> 
+        else ()
     let $uri := replace($hit/descendant::tei:publicationStmt/tei:idno[1],'/tei','')
     return 
         <div xmlns="http://www.w3.org/1999/xhtml" class="result">
