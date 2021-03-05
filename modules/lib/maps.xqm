@@ -41,9 +41,9 @@ declare function maps:build-leaflet-map($nodes as node()*, $total-count as xs:in
             }
         <script type="text/javascript">
             <![CDATA[
-            var terrain = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'}); ;
-
-            //L.tileLayer('http://api.tiles.mapbox.com/v3/sgillies.map-ac5eaoks/{z}/{x}/{y}.png', {attribution: "ISAW, 2012"});            
+            var terrain = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'});
+            
+            /* Not added by default, only through user control action */
             var streets = L.tileLayer(
                 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
                 {attribution: "OpenStreetMap"});
@@ -53,7 +53,6 @@ declare function maps:build-leaflet-map($nodes as node()*, $total-count as xs:in
                         maxZoom: 10,
                         attribution: 'Powered by <a href="http://leafletjs.com/">Leaflet</a>. Map base: <a href="https://dh.gu.se/dare/" title="Digital Atlas of the Roman Empire, Department of Archaeology and Ancient History, Lund University, Sweden">DARE</a>, 2015 (cc-by-sa).'
                     }); 
-            
             var placesgeo = ]]>{geojson:geojson($nodes)}
             <![CDATA[                                
             var redIcon = L.icon({
