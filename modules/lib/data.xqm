@@ -197,27 +197,23 @@ declare function data:search($collection as xs:string*, $queryString as xs:strin
     let $eval-string := if($queryString != '') then $queryString 
                         else concat(data:build-collection-path($collection), data:create-query($collection),facet:facet-filter(global:facet-definition-file($collection)))
     let $hits := util:eval($eval-string)
-    let $sort := if($sort-element != '') then 
-                    $sort-element
-                 else if(request:get-parameter('sort-element', '') != '') then
-                    request:get-parameter('sort-element', '')
-                 else ()
     return 
-       if((request:get-parameter('sort-element', '') != '' and request:get-parameter('sort-element', '') != 'relevance') or ($sort-element != '' and $sort-element != 'relevance')) then 
-            for $hit in $hits/ancestor-or-self::tei:TEI
-            let $s := 
-                    if(contains($sort, 'author')) then ft:field($hit, "author")[1]
-                    else if($sort = 'title') then ft:field($hit, "title")
-                    else if($sort != '' and $sort != 'title' and not(contains($sort, 'author'))) then
-                        if($collection = 'bibl') then
-                            data:add-sort-options-bibl($hit, $sort)
-                        else data:add-sort-options($hit, $sort)                    
-                    else ft:field($hit, "title")                
-            order by $s collation 'http://www.w3.org/2013/collation/UCA'
-            return $hit          
+        if(request:get-parameter('sort-element', '') != '' and request:get-parameter('sort-element', '') != 'relevance' or request:get-parameter('view', '') = 'all') then 
+            for $hit in $hits
+            let $root := $hit/ancestor-or-self::tei:TEI
+            let $sort := 
+                if($collection = 'bibl') then
+                    global:build-sort-string(data:add-sort-options-bibl($root, request:get-parameter('sort-element', '')),'')
+                else global:build-sort-string(data:add-sort-options($root, request:get-parameter('sort-element', '')),'')
+            order by $sort collation 'http://www.w3.org/2013/collation/UCA'
+            return $root
+        else if($sort-element != '' and $sort-element != 'relevance') then  
+            for $hit in util:eval($eval-string)
+            order by global:build-sort-string(data:add-sort-options($hit, $sort-element),'')
+            return $hit/ancestor::tei:TEI
         else if(request:get-parameter('relId', '') != '' and (request:get-parameter('sort-element', '') = '' or not(exists(request:get-parameter('sort-element', ''))))) then
             for $h in $hits
-            let $part := 
+                let $part := 
                       if ($h/child::*/tei:listRelation/tei:relation[@passive[matches(.,request:get-parameter('relId', ''))]]/tei:desc[1]/tei:label[@type='order'][1]/@n castable as  xs:integer)
                       then xs:integer($h/child::*/tei:listRelation/tei:relation[@passive[matches(.,request:get-parameter('relId', ''))]]/tei:desc[1]/tei:label[@type='order'][1]/@n)
                       else 0
