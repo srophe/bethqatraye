@@ -101,4 +101,13 @@ clipboard.on('error', function(e) {
     console.error('Action:', e.action);
     console.error('Trigger:', e.trigger);
 });
+//Detect browser
+                <![CDATA[
+                if (navigator.userAgent.search("MSIE") >= 0){
+                  alert('This website has been optimized for Chrome and Firefox browsers. If you are using Safari, Internet Explorer or other unsupported browsers some Syriac and Arabic text may not display correctly.');
+                }
+                if ((navigator.userAgent.search("Safari") >= 0 && navigator.userAgent.search("Chrome") < 0)){
+                  alert('This website has been optimized for Chrome and Firefox browsers. If you are using Safari, Internet Explorer or other unsupported browsers some Syriac and Arabic text may not display correctly.');
+                }
+                ]]>
 });
