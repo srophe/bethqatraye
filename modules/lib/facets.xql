@@ -469,7 +469,7 @@ declare function sf:facet-range($element as item()*, $facet-definition as item()
                     concat('$element/',$facet-definition/descendant::facet:sub-path/text(),'[. >= "', sf:type($r/@gt, $range/@type),'"]')
                  else if($r/@eq) then
                     concat('$element/',$facet-definition/descendant::facet:sub-path/text(),'[', $r/@eq ,']')
-                 else ()
+                 else string($range/@path)
     let $f := util:eval($path)
     return if($f) then $r/@name else()
 };
