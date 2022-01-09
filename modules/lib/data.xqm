@@ -532,32 +532,6 @@ declare function data:mentioned() as xs:string?{
     else ()  
 };
 
-(:~ 
- : Adds sort filter based on sort prameter
- : Currently supports sort on title, author, publication date and person dates
- : @param $sort-option
-:)
-declare function data:add-sort-options-bibl($hit, $sort-option as xs:string*){
-    if($sort-option != '') then
-        if($sort-option = 'title') then 
-            $hit/descendant::tei:body/tei:biblStruct/tei:title[1]
-        else if($sort-option = 'author') then 
-            if($hit/descendant::tei:body/tei:biblStruct/descendant-or-self::tei:author[1]) then 
-                if($hit/descendant::tei:body/tei:biblStruct/descendant-or-self::tei:author[1]/descendant-or-self::tei:surname) then 
-                    $hit/descendant::tei:body/tei:biblStruct/descendant-or-self::tei:author[1]/descendant-or-self::tei:surname[1]
-                else $hit/descendant::tei:body/tei:biblStruct/descendant-or-self::tei:author[1]
-            else 
-                if($hit/descendant::tei:body/tei:biblStruct/descendant-or-self::tei:editor[1]/descendant-or-self::tei:surname) then 
-                    $hit/descendant::tei:body/tei:biblStruct/descendant-or-self::tei:editor[1]/descendant-or-self::tei:surname[1]
-                else $hit/descendant::tei:body/tei:biblStruct/descendant-or-self::tei:editor[1]
-        else if($sort-option = 'pubDate') then 
-            $hit/descendant::tei:body/tei:biblStruct/descendant-or-self::tei:imprint[1]/descendant-or-self::tei:date[1]
-        else if($sort-option = 'pubPlace') then 
-            $hit/descendant::tei:body/tei:biblStruct/descendant-or-self::tei:imprint[1]/descendant-or-self::tei:pubPlace[1]
-        else $hit
-    else $hit
-};
-
 (:~
  : Generic id search
  : Searches record idnos

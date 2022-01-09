@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <facets xmlns="http://expath.org/ns/facet">
     <facet-definition name="region" label="Region">
         <group-by function="bqRegion">
@@ -14,12 +13,13 @@
         <max-values show="5">60</max-values>
         <order-by direction="ascending">value</order-by>
     </facet-definition>
+    <!--
     <facet-definition name="locationType" label="Location Type">
         <range type="xs:string">
-            <bucket path="[descendant::tei:location[@type='nested']/tei:region[@ref= 'https://bqgazetteer.bethmardutho.org/place/37']]" name="Beth Qaṭraye Region" order="1"/>
-            <bucket path="[not(descendant::tei:location[@type='nested']/tei:region[@ref= 'https://bqgazetteer.bethmardutho.org/place/37'])]" name="Beyond Beth Qaṭraye Region" order="2"/>
-            <bucket path="[descendant::tei:location[@type='gps'][@subtype='representative']]" name="Representative Coordinates" order="3"/>
-            <bucket path="[descendant::tei:location[@type='gps'][@subtype='preferred' or not(@subtype='representative')]]" name="Specific Coordinates" order="4"/>
+            <bucket path="descendant::*[descendant::tei:location[@type='nested']/tei:region[@ref= 'https://bqgazetteer.bethmardutho.org/place/37']]" name="Beth Qaṭraye Region" order="1"/>
+            <bucket path="descendant::*[not(descendant::tei:location[@type='nested']/tei:region[@ref= 'https://bqgazetteer.bethmardutho.org/place/37'])]" name="Beyond Beth Qaṭraye Region" order="2"/>
+            <bucket path="descendant::*[descendant::tei:location[@type='gps'][@subtype='representative']]" name="Representative Coordinates" order="3"/>
+            <bucket path="descendant::*[descendant::tei:location[@type='gps'][@subtype='preferred' or not(@subtype='representative')]]" name="Specific Coordinates" order="4"/>
         </range>
         <group-by>
             <sub-path>descendant::tei:place</sub-path>
@@ -27,4 +27,5 @@
         <max-values show="5">40</max-values>
         <order-by direction="descending">order</order-by>
     </facet-definition>
+    -->
 </facets>

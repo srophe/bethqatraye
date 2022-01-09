@@ -114,17 +114,6 @@ declare function app:metadata($node as node(), $model as map(*)) {
     else ()
 };
 
-(:~ 
- : Adds google analytics from repo-config.xml
- : @param $node
- : @param $model 
-:)
-declare  
-    %templates:wrap 
-function app:google-analytics($node as node(), $model as map(*)){
-  $config:get-config//google_analytics/text()
-};
-
 (:~  
  : Display any TEI nodes passed to the function via the paths parameter
  : Used by templating module, defaults to tei:body if no nodes are passed. 
@@ -571,29 +560,6 @@ declare function app:wiki-links($nodes as node()*, $wiki) {
                     $node/@*, app:wiki-links($node/node(), $wiki)
                 }
             default return $node               
-};
-
-(:~
- : Typeswitch to processes wiki menu links for use with Syriaca.org documentation pages. 
- : @param $wiki pulls content from specified wiki or wiki page. 
-:)
-declare function app:wiki-links($nodes as node()*, $wiki) {
-    for $node in $nodes
-    return 
-        typeswitch($node)
-            case element(html:a) return
-                let $wiki-path := substring-after($wiki,'https://github.com')
-                let $href := concat($config:nav-base, replace($node/@href, $wiki-path, "/documentation/wiki.html?wiki-page="),'&amp;wiki-uri=', $wiki)
-                return
-                    <a href="{$href}">
-                        {$node/@* except $node/@href, $node/node()}
-                    </a>
-            case element() return
-                element { node-name($node) } {
-                    $node/@*, app:wiki-links($node/node(), $wiki)
-                }
-            default return
-                $node               
 };
 
 (:~ 
