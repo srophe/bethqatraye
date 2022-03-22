@@ -1,6 +1,7 @@
 $(document).ready(function() {
 // Main javascript functions used by place pages
 // validate contact forms
+$('.spinning').hide();
 $.validator.setDefaults({
 	submitHandler: function() {
          	//Ajax submit for contact form
