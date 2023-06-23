@@ -56,7 +56,7 @@ body {background-color:#385978;}
 .main-content-block {padding:2em 2em; background-color:white;}
 
 /* Adds a little extra padding around interior content, useful when for when nav wraps. */
-.interior-content {padding:0; padding-top: 50px;}
+.interior-content {padding:0; padding-top: 8px;}
 .full-page {margin-top:0;}
 
 /* Small Syrica.org icons images for submodules in nav menus */
@@ -509,7 +509,7 @@ label.error {
     line-height:36px;
 
 } 
-.citationinfo {padding:1em; color: #555; border-top:1px solid #666666; background-color:#eee; }
+.citationinfo {padding:1em; color: #555; border-top:1px solid #666666;}
 .preferred-citation {font-size:1.2em;}
 .hint{margin:.5em; color: grey; font-style:italic;}
 .uri {margin:0 0 1em; color: #999999;}

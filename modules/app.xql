@@ -7,38 +7,38 @@ xquery version "3.1";
 module namespace app="http://srophe.org/srophe/templates";
 
 (:eXist templating module:)
-import module namespace templates="http://exist-db.org/xquery/templates" ;
+import module namespace templates="http://exist-db.org/xquery/html-templating";
 
 (: Import Srophe application modules. :)
 import module namespace config="http://srophe.org/srophe/config" at "config.xqm";
 import module namespace data="http://srophe.org/srophe/data" at "lib/data.xqm";
 import module namespace facet="http://expath.org/ns/facet" at "lib/facet.xqm";
+import module namespace sf="http://srophe.org/srophe/facets" at "lib/facets.xql";
 import module namespace global="http://srophe.org/srophe/global" at "lib/global.xqm";
 import module namespace maps="http://srophe.org/srophe/maps" at "lib/maps.xqm";
 import module namespace page="http://srophe.org/srophe/page" at "lib/paging.xqm";
 import module namespace rel="http://srophe.org/srophe/related" at "lib/get-related.xqm";
+import module namespace relations="http://srophe.org/srophe/relationships" at "lib/relationships.xqm";
 import module namespace teiDocs="http://srophe.org/srophe/teiDocs" at "teiDocs/teiDocs.xqm";
 import module namespace tei2html="http://srophe.org/srophe/tei2html" at "content-negotiation/tei2html.xqm";
+
 
 (: Namespaces :)
 declare namespace http="http://expath.org/ns/http-client";
 declare namespace tei="http://www.tei-c.org/ns/1.0";
-declare namespace srophe="https://srophe.app";
 declare namespace html="http://www.w3.org/1999/xhtml";
+declare namespace srophe="https://srophe.app";
 
 (: Global Variables:)
-declare variable $app:perpage { 
-    if(request:get-parameter('perpage', 20)[1]) then 
-        if(request:get-parameter('perpage', 20)[1] castable as xs:integer) then request:get-parameter('perpage', 20)[1] cast as xs:integer
-        else 20
-    else 20
+declare variable $app:start {
+    if(request:get-parameter('start', 1)[1] castable as xs:integer) then 
+        xs:integer(request:get-parameter('start', 1)[1]) 
+    else 1};
+declare variable $app:perpage {
+    if(request:get-parameter('perpage', 25)[1] castable as xs:integer) then 
+        xs:integer(request:get-parameter('perpage', 25)[1]) 
+    else 25
     };
-declare variable $app:start { 
-    if(request:get-parameter('start', 1)[1]) then 
-        if(request:get-parameter('start', 1)[1] castable as xs:integer) then request:get-parameter('start', 1)[1] cast as xs:integer
-        else 1
-    else 1
-    }; 
 (:~
  : Get app logo. Value passed from repo-config.xml  
 :)
@@ -68,27 +68,21 @@ declare function app:get-work($node as node(), $model as map(*)) {
     else map {"hits" : 'Output plain HTML page'}
 };
 
+
 (:~
  : Dynamically build html title based on TEI record and/or sub-module. 
- : @param request:get-parameter('id', '') if id is present find TEI title, otherwise use title of sub-module 
+ : @param request:get-parameter('id', '') if id is present find TEI title, otherwise use title of sub-module
 :)
 declare %templates:wrap function app:record-title($node as node(), $model as map(*), $collection as xs:string?){
-    let $data := $model("hits")
-    return 
-        if(request:get-parameter('id', '')) then
-            string-join(for $n in $data//tei:placeName[@srophe:tags='#headword']
-            let $sort := 
-                if($n/@xml:lang = 'en') then 1                             
-                else if($n/@xml:lang = 'fr') then 2                            
-                else if($n/@xml:lang = 'as') then 3                             
-                else if($n/@xml:lang = 'syr') then 3                             
-                else 4
-            order by $sort
-            return $n/text(),' - ')
-        else if($collection != '') then
-            string(config:collection-vars($collection)/@title)
-        else $config:app-title
+    if(request:get-parameter('id', '')) then
+       if(contains($model("hits")/descendant::tei:titleStmt[1]/tei:title[1]/text(),' — ')) then
+            substring-before($model("hits")/descendant::tei:titleStmt[1]/tei:title[1],' — ')
+       else $model("hits")/descendant::tei:titleStmt[1]/tei:title[1]/text()
+    else if($collection != '') then
+        string(config:collection-vars($collection)/@title)
+    else $config:app-title
 };  
+
 
 (:~ 
  : Add header links for alternative formats.
@@ -114,6 +108,17 @@ declare function app:metadata($node as node(), $model as map(*)) {
     else ()
 };
 
+(:~ 
+ : Adds google analytics from repo-config.xml
+ : @param $node
+ : @param $model 
+:)
+declare  
+    %templates:wrap 
+function app:google-analytics($node as node(), $model as map(*)){
+  $config:get-config//google_analytics/text()
+};
+
 (:~  
  : Display any TEI nodes passed to the function via the paths parameter
  : Used by templating module, defaults to tei:body if no nodes are passed. 
@@ -136,16 +141,12 @@ declare function app:display-nodes($node as node(), $model as map(*), $paths as 
  : Used by templating module, not needed if full record is being displayed 
 :)
 declare function app:h1($node as node(), $model as map(*)){
- global:tei2html(
- <srophe-title xmlns="http://www.tei-c.org/ns/1.0">{(
-    if($model("hits")/descendant::*[@srophe:tags='#headword']) then
-        $model("hits")/descendant::*[@srophe:tags='#headword']
-    else if($model("hits")/descendant::*[@syriaca-tags='#syriaca-headword']) then
-        $model("hits")/descendant::*[@syriaca-tags='#syriaca-headword']
-    else $model("hits")/descendant::tei:titleStmt[1]/tei:title[1], 
-    $model("hits")/descendant::tei:publicationStmt/tei:idno[@type="URI"][1]
-    )}
- </srophe-title>)
+    (<div class="title">
+        <h1><span id="title">{tei2html:tei2html($model("hits")/descendant::tei:titleStmt[1]/tei:title[1])}</span></h1>
+    </div>,
+    if($model("hits")/descendant::tei:publicationStmt/tei:idno[@type='URI']) then
+       tei2html:idno-title-display(replace($model("hits")/descendant::tei:publicationStmt/tei:idno[@type='URI'],'/tei',''))
+    else ())
 }; 
   
 (:~ 
@@ -156,7 +157,7 @@ declare %templates:wrap function app:other-data-formats($node as node(), $model 
 let $id := (:replace($model("hits")/descendant::tei:idno[contains(., $config:base-uri)][1],'/tei',''):)request:get-parameter('id', '')
 return 
     if($formats) then
-        <div class="indent" style="width:100%;clear:both;margin-bottom:1em; text-align:right;">
+        <div class="container" style="width:100%;clear:both;margin-bottom:1em; text-align:right;">
             {
                 for $f in tokenize($formats,',')
                 return 
@@ -196,7 +197,15 @@ return
                         (<a href="{concat(replace($id,$config:base-uri,$config:nav-base),'.ttl')}" class="btn btn-default btn-xs" id="teiBtn" data-toggle="tooltip" title="Click to view the RDF-Turtle data for this record." >
                              <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> RDF/TTL
                         </a>, '&#160;')
-                   else () 
+                   else if($f = 'citations') then
+                        let $zotero-group := $config:get-config//*:zotero/@group
+                        return 
+                            if($zotero-group != '') then 
+                                (<a href="{concat('https://api.zotero.org/groups/',$zotero-group,'/items/',tokenize($id,'/')[last()])}" class="btn btn-default btn-xs" id="citationsBtn" data-toggle="tooltip" title="Click for additional Citation Styles." >
+                                    <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span> Cite
+                                </a>, '&#160;')
+                            else ()
+ else () 
             }
             <br/>
         </div>
@@ -225,9 +234,13 @@ declare %templates:wrap function app:pageination($node as node()*, $model as map
 (:~
  : Builds list of related records based on tei:relation  
 :)                   
-declare function app:internal-relationships($node as node(), $model as map(*), $relationship-type as xs:string?, $display as xs:string?, $map as xs:string?){
+declare function app:internal-relationships($node as node(), $model as map(*), $relationship-type as xs:string?, $display as xs:string?, $map as xs:string?,$label as xs:string?){
     if($model("hits")//tei:relation) then 
-        rel:build-relationships($model("hits")//tei:relation,request:get-parameter('id', ''), $relationship-type, $display, $map)
+        <div id="internalRelationships">
+           <h3>{if($label != '') then $label else 'Internal Relationships' }</h3> 
+           {relations:display-internal-relatiobships($model("hits"), replace($model("hits")//tei:idno[@type='URI'][1],'/tei',''), $relationship-type)}
+           
+        </div>
     else ()
 };
 
@@ -236,13 +249,13 @@ declare function app:internal-relationships($node as node(), $model as map(*), $
  : Used by NHSL for displaying child works
  : @param $relType name/ref of relation to be displayed in HTML page
 :)                   
-declare function app:external-relationships($node as node(), $model as map(*), $relationship-type as xs:string?, $sort as xs:string?, $count as xs:string?){
+declare function app:external-relationships($node as node(), $model as map(*), $relationship-type as xs:string?, $sort as xs:string?, $count as xs:string?, $label as xs:string?){
     let $rec := $model("hits")
     let $recid := replace($rec/descendant::tei:idno[@type='URI'][starts-with(.,$config:base-uri)][1],'/tei','')
     let $title := if(contains($rec/descendant::tei:title[1]/text(),' — ')) then 
                         substring-before($rec/descendant::tei:title[1],' — ') 
                    else $rec/descendant::tei:title[1]/text()
-    return rel:external-relationships($recid, $title, $relationship-type, $sort, $count)
+    return <div class="dynamicContent" data-url="{concat($config:nav-base,'/modules/data.xql?currentID=',$recid,'&amp;relationship=external&amp;relationshipType=',$relationship-type,'&amp;label=',$label)}"></div>
 };
 
 (:~
@@ -268,15 +281,6 @@ declare function app:display-map($node as node(), $model as map(*)){
 };
 
 (:~
- : Display Dates using timelinejs
- :)                 
-declare function app:display-timeline($node as node(), $model as map(*)){
-    if($model("hits")/descendant::tei:body/descendant::*[@when or @notBefore or @notAfter]) then
-        <div>Timeline</div>
-     else ()
-};
-
-(:~
  : Configure dropdown menu for keyboard layouts for input boxes
  : Options are defined in repo-config.xml
  : @param $input-id input id used by javascript to select correct keyboard layout.  
@@ -295,8 +299,30 @@ declare function app:display-facets($node as node(), $model as map(*), $collecti
     let $facet-config := global:facet-definition-file($collection)
     return 
         if(not(empty($facet-config))) then 
-           (facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition))
+            sf:display($model("hits"),$facet-config)
+           (:(facet:output-html-facets($hits, $facet-config/descendant::facet:facets/facet:facet-definition)):)
         else ()
+};
+
+
+(:~
+ : bibl module relationships
+:)                   
+declare function app:cited($node as node(), $model as map(*)){
+    if($model("hits")//tei:relation[@ref='dcterms:references']) then
+        <div class="panel panel-default">
+            <div class="panel-heading"><h3 class="panel-title">Cited Manuscripts</h3></div>
+            <div class="panel-body">
+                {
+                    for $cited in $model("hits")//tei:relation[@ref='dcterms:references']
+                    return 
+                        <span class="related-subject">{$cited/tei:desc/tei:msDesc/string-join(tei:msIdentifier/*, ", ")}&#160;
+                        <a href='../search.html?mss="{$cited/tei:desc/tei:msDesc/string-join(tei:msIdentifier/*, ", ")}"'>
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span></a></span>
+                }
+            </div>
+        </div>
+  else ()
 };
 
 (:~
@@ -349,121 +375,6 @@ declare %templates:wrap function app:contact-form($node as node(), $model as map
    </div>
 };
 
-(:~
- : Dashboard function outputs collection statistics. 
- : $data collection data
- : $collection-title title of sub-module/collection
- : $data-dir 
-:)
-declare %templates:wrap function app:dashboard($node as node(), $model as map(*), $collection-title, $data-dir){
-    let $data := 
-        if($collection-title != '') then 
-            collection($config:data-root || '/' || $data-dir || '/tei')//tei:title[. = $collection-title]
-        else collection($config:data-root || '/' || $data-dir || '/tei')//tei:title[@level='a'][parent::tei:titleStmt] 
-            
-    let $data-type := if($data-dir) then $data-dir else 'data'
-    let $rec-num := count($data)
-    let $contributors := for $contrib in distinct-values(for $contributors in $data/ancestor::tei:TEI/descendant::tei:respStmt/tei:name return $contributors) return <li>{$contrib}</li>
-    let $contrib-num := count($contributors)
-    let $data-points := count($data/ancestor::tei:TEI/descendant::tei:body/descendant::text())
-    return
-    <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-        <div class="panel panel-default">
-            <div class="panel-heading" role="tab" id="dashboardOne">
-                <h4 class="panel-title">
-                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                        <i class="glyphicon glyphicon-dashboard"></i> {concat(' ',$collection-title,' ')} Dashboard
-                    </a>
-                </h4>
-            </div>
-            <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="dashboardOne">
-                <div class="panel-body dashboard">
-                    <div class="row" style="padding:2em;">
-                        <div class="col-md-4">
-                            <div class="panel panel-primary">
-                                <div class="panel-heading">
-                                    <div class="row">
-                                        <div class="col-xs-3"><i class="glyphicon glyphicon-file"></i></div>
-                                        <div class="col-xs-9 text-right">
-                                            <div class="huge">{$rec-num}</div><div>{$data-dir}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="collapse panel-body" id="recCount">
-                                    <p>This number represents the count of {$data-dir} currently described in <i>{$collection-title}</i> as of {current-date()}.</p>
-                                    <span><a href="browse.html"> See records <i class="glyphicon glyphicon-circle-arrow-right"></i></a></span>
-                                </div>
-                                <a role="button" 
-                                    data-toggle="collapse" 
-                                    href="#recCount" 
-                                    aria-expanded="false" 
-                                    aria-controls="recCount">
-                                    <div class="panel-footer">
-                                        <span class="pull-left">View Details</span>
-                                        <span class="pull-right"><i class="glyphicon glyphicon-circle-arrow-right"></i></span>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="panel panel-success">
-                                <div class="panel-heading">
-                                    <div class="row">
-                                        <div class="col-xs-3"><i class="glyphicon glyphicon-user"></i></div>
-                                        <div class="col-xs-9 text-right"><div class="huge">{$contrib-num}</div><div>Contributors</div></div>
-                                    </div>
-                                </div>
-                                <div class="panel-body collapse" id="contribCount">
-                                    {(
-                                    <p>This number represents the count of contributors who have authored or revised an entry in <i>{$collection-title}</i> as of {current-date()}.</p>,
-                                    <ul style="padding-left: 1em;">{$contributors}</ul>)} 
-                                    
-                                </div>
-                                <a role="button" 
-                                    data-toggle="collapse" 
-                                    href="#contribCount" 
-                                    aria-expanded="false" 
-                                    aria-controls="contribCount">
-                                    <div class="panel-footer">
-                                        <span class="pull-left">View Details</span>
-                                        <span class="pull-right"><i class="glyphicon glyphicon-circle-arrow-right"></i></span>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="panel panel-info">
-                                <div class="panel-heading">
-                                    <div class="row">
-                                        <div class="col-xs-3"><i class="glyphicon glyphicon-stats"></i></div>
-                                        <div class="col-xs-9 text-right"><div class="huge"> {$data-points}</div><div>Data points</div></div>
-                                    </div>
-                                </div>
-                                <div id="dataPoints" class="panel-body collapse">
-                                    <p>This number is an approximation of the entire data, based on a count of XML text nodes in the body of each TEI XML document in the <i>{$collection-title}</i> as of {current-date()}.</p>  
-                                </div>
-                                <a role="button" 
-                                data-toggle="collapse" 
-                                href="#dataPoints" 
-                                aria-expanded="false" 
-                                aria-controls="dataPoints">
-                                    <div class="panel-footer">
-                                        <span class="pull-left">View Details</span>
-                                        <span class="pull-right"><i class="glyphicon glyphicon-circle-arrow-right"></i></span>
-                                        <div class="clearfix"></div>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-};
-
 
 (:~
  : Select page view, record or html content
@@ -501,8 +412,7 @@ declare function app:wiki-rest-request($wiki-uri as xs:string?){
  : Pulls github wiki data H1.  
 :)
 declare function app:wiki-page-title($node, $model){
-    let $content := $model("hits")//html:div[@id='wiki-body']
-    return $content/descendant::html:h1[1]
+    $model("hits")//html:h1[contains(@class,'gh-header-title')]
 };
 (:~
  : Pulls github wiki content.  
@@ -536,7 +446,7 @@ declare function app:wiki-data($nodes as node()*) {
 :)
 declare function app:wiki-menu($node, $model, $wiki-uri){
     let $wiki-data := app:wiki-rest-request($wiki-uri)
-    let $menu := app:wiki-links($wiki-data//html:div[@id='wiki-rightbar']/descendant::html:ul, $wiki-uri)
+    let $menu := app:wiki-links($wiki-data//html:div[@class='wiki-rightbar']/descendant::html:ul, $wiki-uri)
     return $menu
 };
 
@@ -658,269 +568,4 @@ declare %templates:wrap function app:build-editor-list($node as node(), $model a
             <li>{normalize-space($name)}</li>
             else ''
         else ''  
-};
-
-(:~ 
- : Adds google analytics from config.xml
- : @param $node
- : @param $model
- : @param $path path to html content file, relative to app root. 
-:)
-declare  
-    %templates:wrap 
-function app:google-analytics($node as node(), $model as map(*)){
-   $config:get-config//google_analytics/text() 
-};
-
-(: Syriaca.org specific functions :)
-(:~
- : Grabs latest news for Syriaca.org home page
- : http://syriaca.org/feed/
- :) 
-declare %templates:wrap function app:get-feed($node as node(), $model as map(*)){
-    try {
-        let $feed := http:send-request(<http:request http-version="1.1" href="{xs:anyURI('http://syriaca.org/blog/feed/')}" method="get"/>)[2]
-        return  if($feed != '') then 
-                for $latest at $n in subsequence($feed//*:item, 1, 3)
-                return 
-                    <li>
-                         <a href="{$latest/link/text()}">{$latest/*:title/text()}</a>
-                    </li>
-                else ()
-       } catch * {
-           <error>Caught error {$err:code}: {$err:description}</error>
-    }     
-};
-
-(:~    
- : Special output for NHSL work records
-:)
-declare %templates:wrap function app:display-work($node as node(), $model as map(*)){
-        <div class="row">
-            <div class="col-md-8 column1">
-                {
-                    let $data := $model("hits")/descendant::tei:body/tei:bibl
-                    let $infobox := 
-                        <body xmlns="http://www.tei-c.org/ns/1.0">
-                        <bibl>
-                        {(
-                            $data/@*,
-                            $data/tei:title[not(@type=('initial-rubric','final-rubric'))],
-                            $data/tei:author,
-                            $data/tei:editor,
-                            $data/tei:desc[@type='abstract' or starts-with(@xml:id, 'abstract-en')],
-                            $data/tei:note[@type='abstract'],
-                            $data/tei:date,
-                            $data/tei:extent,
-                            $data/tei:idno[starts-with(.,'http://syriaca.org')]
-                         )}
-                        </bibl>
-                        </body>
-                     let $allData := 
-                     <body xmlns="http://www.tei-c.org/ns/1.0"><bibl>
-                        {(
-                            $data/@*,
-                            $data/child::*
-                            [not(self::tei:title[not(@type=('initial-rubric','final-rubric'))])]
-                            [not(self::tei:author)]
-                            [not(self::tei:editor)]
-                            [not(self::tei:desc[@type='abstract' or starts-with(@xml:id, 'abstract-en')])]
-                            [not(self::tei:note[@type='abstract'])]
-                            [not(self::tei:date)]
-                            [not(self::tei:extent)]
-                            [not(self::tei:idno)])}
-                        </bibl></body>
-                     return 
-                        (
-                        app:work-toc($data),
-                        global:tei2html($infobox),
-                        app:external-relationships($node, $model,'dcterms:isPartOf','',''),
-                        app:external-relationships($node, $model,'skos:broadMatch','',''),
-                        app:external-relationships($node, $model,'syriaca:sometimesCirculatesWith','',''),
-                        app:external-relationships($node, $model,'syriaca:part-of-tradition','',''),
-                        global:tei2html($allData))  
-                } 
-            </div>
-            <div class="col-md-4 column2">
-                {(
-                app:rec-status($node, $model,''),
-                <div class="info-btns">  
-                    <button class="btn btn-default" data-toggle="modal" data-target="#feedback">Corrections/Additions?</button>&#160;
-                    <a href="#" class="btn btn-default" data-toggle="modal" data-target="#selection" data-ref="../documentation/faq.html" id="showSection">Is this record complete?</a>
-                </div>,                
-                if($model("hits")//tei:body/child::*/tei:listRelation) then 
-                rel:build-relationships($model("hits")//tei:body/child::*/tei:listRelation,request:get-parameter('id', ''), (), 'list-description', 'false')
-                else (),
-                app:link-icons-list($node, $model)
-                )}  
-            </div>
-        </div>
-};
-
-(:~    
- : Works TOC on bibl elements
-:)
-declare function app:work-toc($data){
-let $data := $data/tei:bibl[@type != ('lawd:Citation','lawd:ConceptualWork')]
-return global:tei2html(<work-toc xmlns="http://www.tei-c.org/ns/1.0" >{$data}</work-toc>)
-};
-
-(:~
- : bibl module relationships
-:)                   
-declare function app:subject-headings($node as node(), $model as map(*)){
-    rel:subject-headings($model("hits")//tei:idno[@type='URI'][ends-with(.,'/tei')])
-};
-
-(:~
- : bibl module relationships
-:)                   
-declare function app:cited($node as node(), $model as map(*)){
-    rel:cited($model("hits")//tei:idno[@type='URI'][ends-with(.,'/tei')], request:get-parameter('start', 1),request:get-parameter('perpage', 5))
-};
-
-
-(:~      
- : Return teiHeader info to be used in citation used for Syriaca.org bibl module
-:)
-declare %templates:wrap function app:about($node as node(), $model as map(*)){
-    let $rec := $model("hits")
-    let $header := 
-        <srophe-about xmlns="http://www.tei-c.org/ns/1.0">
-            {$rec//tei:teiHeader}
-        </srophe-about>
-    return global:tei2html($header)
-};
-
-(:~  
- : Display any TEI nodes passed to the function via the paths parameter
- : Used by templating module, defaults to tei:body if no nodes are passed. 
- : @param $paths comma separated list of xpaths for display. Passed from html page  
-:)
-declare function app:link-icons-list($node as node(), $model as map(*)){
-let $data := $model("hits")//tei:body/descendant::tei:idno[not(contains(., $config:base-uri))]  
-return 
-    if(not(empty($data))) then 
-        <div class="panel panel-default">
-            <div class="panel-heading"><h3 class="panel-title">See Also </h3></div>
-            <div class="panel-body">
-                <ul>
-                    {for $l in $data
-                     return <li>{string($l/@type)}: {global:tei2html($l)}</li>
-                    }
-                </ul>
-            </div>
-        </div>
-    else ()
-}; 
-
-
-(:~  
- : Display all names and orgs in the editors.xml file.  
-:)
-declare function app:editors($node as node(), $model as map(*)){
-let $data := doc($config:app-root || '/documentation/editors.xml')
-return
-    <div>
-        <p>{$data/descendant::tei:encodingDesc//text()}</p>
-        <ul>{
-            for $name in $data/descendant::tei:body/tei:listPerson/child::*
-            return 
-                <li>{tei2html:tei2html($name)}</li>
-            }</ul>
-    </div>
-    
-    
-}; 
-
-(: Linked data box for handling sparql queries to syriaca.org :)
-declare %templates:wrap function app:linked-data($node as node(), $model as map(*)){
-let $data := $model("hits")//tei:body
-let $other-resources := distinct-values(($data//@ref[contains(.,'http://syriaca.org/')],
-                                    $data//@target[contains(.,'http://syriaca.org/')], 
-                                    $data//@active[contains(.,'http://syriaca.org/')], 
-                                    $data//@passive[contains(.,'http://syriaca.org/')], 
-                                    $data//@mutual[contains(.,'http://syriaca.org/')], 
-                                    $data//tei:idno[contains(.,'http://syriaca.org/')]))
-let $count := count($other-resources)
-return 
-if($count gt 0) then
-    <div xmlns="http://www.w3.org/1999/xhtml">
-        <script type="text/javascript" src="{$config:nav-base}/resources/js/sparql.js"/>
-        <div class="hidden" id="showOtherResources">
-            <form class="form-inline hidden" action="{$config:nav-base}/modules/sparql-requests.xql" method="post">
-                <input type="hidden" name="format" id="format" value="json"/>
-                <textarea id="query" class="span9" rows="15" cols="150" name="query" type="hidden">
-                                      <![CDATA[
-                                        prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-                                        prefix lawd: <http://lawd.info/ontology/>
-                                        prefix skos: <http://www.w3.org/2004/02/skos/core#>
-                                        prefix dcterms: <http://purl.org/dc/terms/>  
-                                                                                	        
-                                        SELECT ?uri (SAMPLE(?l) AS ?label) (SAMPLE(?uriSubject) AS ?subjects) (SAMPLE(?uriCitations) AS ?citations)
-                                            {
-                                                ?uri rdfs:label ?l
-                                                FILTER (?uri IN (]]>{string-join(for $r in subsequence($other-resources,1,10) return concat('<',$r,'>'),',')}<![CDATA[)).
-                                                FILTER ( langMatches(lang(?l), 'en')).
-                                                OPTIONAL{
-                                                    {SELECT ?uri ( count(?s) as ?uriSubject ) { ?s dcterms:relation ?uri } GROUP BY ?uri }  }
-                                                    OPTIONAL{
-                                                        {SELECT ?uri ( count(?o) as ?uriCitations ) { ?uri lawd:hasCitation ?o 
-                                                                OPTIONAL{ ?uri skos:closeMatch ?o.}
-                                                        } GROUP BY ?uri }
-                                                    }           
-                                            }
-                                        GROUP BY ?uri  
-                                      ]]>  
-                </textarea>
-            </form>            
-        </div>
-        <div class="panel panel-default hidden" id="linkedDataBox" style="margin-top:1em;">
-            <div class="panel-heading">
-                <a href="#" data-toggle="collapse" data-target="#showLinkedData">Linked Data  </a>
-                <span class="glyphicon glyphicon-question-sign text-info moreInfo" aria-hidden="true" data-toggle="tooltip" 
-                    title="This sidebar provides links via Syriaca.org to 
-                    additional resources beyond this record. 
-                    We welcome your additions, please use the e-mail button on the right to contact Syriaca.org about submitting additional links."></span>
-                <button class="btn btn-default btn-xs pull-right" data-toggle="modal" data-target="#submitLinkedData" style="margin-right:1em;"><span class="glyphicon glyphicon-envelope" aria-hidden="true"></span></button>
-            </div>
-            <div class="panel-body collapse in" id="showLinkedData"> 
-                <div id="listOtherResources"></div>
-                {if($count gt 10) then
-                    <div>
-                        <div class="collapse" id="showMoreResources">
-                            <form class="form-inline hidden" action="{$config:nav-base}/modules/sparql-requests.xql" method="post">
-                                <input type="hidden" name="format" id="format" value="json"/>
-                                <textarea id="query" class="span9" rows="15" cols="150" name="query" type="hidden">
-                                                  <![CDATA[
-                                                    prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-                                                    prefix lawd: <http://lawd.info/ontology/>
-                                                    prefix skos: <http://www.w3.org/2004/02/skos/core#>
-                                                    prefix dcterms: <http://purl.org/dc/terms/>  
-                                                                                            	        
-                                                    SELECT ?uri (SAMPLE(?l) AS ?label) (SAMPLE(?uriSubject) AS ?subjects) (SAMPLE(?uriCitations) AS ?citations)
-                                                        {
-                                                            ?uri rdfs:label ?l
-                                                            FILTER (?uri IN (]]>{string-join(for $r in subsequence($other-resources,10,$count) return concat('<',$r,'>'),',')}<![CDATA[)).
-                                                            FILTER ( langMatches(lang(?l), 'en')).
-                                                            OPTIONAL{
-                                                                {SELECT ?uri ( count(?s) as ?uriSubject ) { ?s dcterms:relation ?uri } GROUP BY ?uri }  }
-                                                                OPTIONAL{
-                                                                    {SELECT ?uri ( count(?o) as ?uriCitations ) { ?uri lawd:hasCitation ?o 
-                                                                            OPTIONAL{ ?uri skos:closeMatch ?o.}
-                                                                    } GROUP BY ?uri }
-                                                                }           
-                                                        }
-                                                    GROUP BY ?uri  
-                                                  ]]>
-                                </textarea>
-                            </form>
-                        </div>
-                        <a href="#" class="togglelink" data-toggle="collapse" data-target="#showMoreResources" data-text-swap="Less" id="getMoreLinkedData">See more ...</a>
-                    </div>
-                else ()}
-            </div>
-        </div>
-    </div>
-else ()    
 };

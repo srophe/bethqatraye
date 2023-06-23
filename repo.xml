@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <meta xmlns="http://exist-db.org/xquery/repo">
     <description>The Beth Qaṭraye Gazetteer</description>
     <author>Winona Salesky</author>
@@ -12,5 +11,5 @@
     <finish>post-install.xql</finish> 
     
 
-<deployed>2020-09-17T16:52:56.653-04:00</deployed>
-</meta>
+
+<deployed>2023-06-21T13:51:50.569-04:00</deployed></meta>

@@ -15,7 +15,7 @@ declare namespace html="http://www.w3.org/1999/xhtml";
  : @param $node data passed to transform
 :)
 declare function global:tei2html($nodes as node()*) {
-  transform:transform(($nodes), doc($config:app-root || '/resources/xsl/tei2html.xsl'), 
+  transform:transform($nodes, doc($config:app-root || '/resources/xsl/tei2html.xsl'), 
     <parameters>
         <param name="data-root" value="{$config:data-root}"/>
         <param name="app-root" value="{$config:app-root}"/>
@@ -32,13 +32,13 @@ declare function global:tei2html($nodes as node()*) {
 :)
 declare function global:tei2html($nodes as node()*, $collection as xs:string?) {
 if($config:get-config//repo:collection[@name=$collection]/@xslt != '') then
-  transform:transform(($nodes), doc($config:app-root || string($config:get-config//repo:collection[@name=$collection]/@xslt)), 
+  transform:transform($nodes, doc($config:app-root || string($config:get-config//repo:collection[@name=$collection]/@xslt)), 
     <parameters>
         <param name="data-root" value="{$config:data-root}"/>
         <param name="app-root" value="{$config:app-root}"/>
         <param name="nav-base" value="{$config:nav-base}"/>
         <param name="base-uri" value="{$config:base-uri}"/>
-        <param name="base-uri" value="{$collection}"/>
+        <param name="collection" value="{$collection}"/>
     </parameters>
     )      
 else 
@@ -48,7 +48,7 @@ else
         <param name="app-root" value="{$config:app-root}"/>
         <param name="nav-base" value="{$config:nav-base}"/>
         <param name="base-uri" value="{$config:base-uri}"/>
-        <param name="base-uri" value="{$collection}"/>
+        <param name="collection" value="{$collection}"/>
     </parameters>
     )
 };
@@ -123,7 +123,7 @@ declare function global:odd2text($element as xs:string?, $label as xs:string?) a
  : Strips English title or sort string of non-sort characters as established by Syriaca.org
  : Used for alphabetizing in search/browse and elsewhere
  : @param $titlestring 
- : @param $lang
+ : @param $lang   
  :)
 declare function global:build-sort-string($titlestring as xs:string?, $lang as xs:string?) as xs:string* {
     if($lang = 'ar') then global:ar-sort-string($titlestring)
@@ -153,7 +153,7 @@ replace(
  : @param $data:sort indicates letter for browse
  :)
 declare function global:get-alpha-filter(){
-let $sort := request:get-parameter('alpha-filter', '')[1]
+let $sort := request:get-parameter('alpha-filter', '')
 return 
         if(request:get-parameter('lang', '') = 'ar') then
             global:ar-sort()
@@ -175,7 +175,7 @@ return
  : Matches Arabic letters and their equivalent letters as established by Syriaca.org
  :)
 declare function global:ar-sort(){
-let $sort := request:get-parameter('alpha-filter', '')[1]
+let $sort := request:get-parameter('alpha-filter', '')
 return 
     if($sort = 'ٱ') then '^(ٱ|ا|آ|أ|إ)'
         else if($sort = 'ٮ') then '^(ٮ|ب)'
@@ -228,7 +228,7 @@ if(starts-with($uri,$config:base-uri)) then
       let $doc := collection($config:data-root)//tei:idno[@type='URI'][. = concat($uri,"/tei")]
       return 
           if(exists($doc)) then
-            string-join($doc/ancestor::tei:TEI/descendant::tei:titleStmt[1]/tei:title[1]/text()[1],' ')
+            string-join($doc/ancestor::tei:TEI//tei:titleStmt[1]/tei:title[1]/text()[1],' ')
           else $uri 
 else $uri
 };
