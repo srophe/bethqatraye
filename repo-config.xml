@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <meta xmlns="http://exist-db.org/xquery/repo">
     <description>The Beth Qaṭraye Gazetteer</description>
     <author>Winona Salesky</author>
@@ -34,6 +33,7 @@
         <odd>/documentation/syriaca-tei-main.odd</odd>
         <!-- xpath to unique identifier for record, syriaca.org uses tei:idno[@type='URL'], this is the default value -->
         <id-path/>
+        <html-render type="xslt"/>
         <!-- Map rendering -->
         <maps>
             <!--  <option selected="true" api-key="API_KEY_HERE">google</option> -->

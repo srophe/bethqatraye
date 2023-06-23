@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:t="http://www.tei-c.org/ns/1.0" xmlns:x="http://www.w3.org/1999/xhtml" xmlns:saxon="http://saxon.sf.net/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:local="http://syriaca.org/ns" exclude-result-prefixes="xs t x saxon local" version="2.0">
-
+<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:saxon="http://saxon.sf.net/" xmlns:local="http://syriaca.org/ns" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:t="http://www.tei-c.org/ns/1.0" xmlns:x="http://www.w3.org/1999/xhtml" xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="xs t x saxon local" version="2.0">
+    
     <!-- =================================================================== -->
     <!--  Core TEI to HTML transformations -->
     <!-- =================================================================== -->
@@ -76,7 +75,74 @@
             <xsl:text> </xsl:text>
         </xsl:for-each>
     </xsl:template> 
-    
+    <xsl:template match="t:list">
+        <xsl:if test="t:head">
+            <xsl:apply-templates select="t:head"/>
+        </xsl:if>
+        
+        <xsl:choose>
+            <xsl:when test="@type='catalogue'">
+                <p>
+                    <dl>
+                        <xsl:for-each select="*[not(self::t:head)]">
+                            <p/>
+                            <xsl:apply-templates select="."/>
+                        </xsl:for-each>
+                    </dl>
+                </p>
+            </xsl:when>
+            <xsl:when test="@type='gloss' and contains(@rend,'multicol')">
+                <xsl:variable name="nitems">
+                    <xsl:value-of select="count(t:item) div 2"/>
+                </xsl:variable>
+                <p>
+                    <table>
+                        <tr>
+                            <td style="vertical-align:top;">
+                                <dl>
+                                    <xsl:apply-templates select="t:item[position()&lt;=$nitems ]"/>
+                                </dl>
+                            </td>
+                            <td style="vertical-align:top;">
+                                <dl>
+                                    <xsl:apply-templates select="t:item[position() &gt;$nitems]"/>
+                                </dl>
+                            </td>
+                        </tr>
+                    </table>
+                </p>
+            </xsl:when>
+            <xsl:when test="@type='inline' or @type='runin'">
+                <p>
+                    <xsl:apply-templates select="*[not(self::t:head or self::t:trailer)]" mode="inline"/>
+                </p>
+            </xsl:when>
+            <xsl:when test="@type='bibl'">
+                <xsl:apply-templates select="*[not(self::t:head or self::t:trailer)]" mode="bibl"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:element name="ul">
+                    <xsl:if test="starts-with(@type,'ordered:')">
+                        <xsl:attribute name="start">
+                            <xsl:value-of select="substring-after(@type,':')"/>
+                        </xsl:attribute>
+                    </xsl:if>
+                    <xsl:apply-templates select="*[not(self::t:head or self::t:trailer)]"/>
+                </xsl:element>
+                <xsl:apply-templates select="t:trailer"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <xsl:template match="t:item">
+        <xsl:choose>
+            <xsl:when test="parent::t:list[@type = 'catalogue']">
+                <xsl:apply-templates/>
+            </xsl:when>
+            <xsl:otherwise>
+                <li><xsl:apply-templates/></li>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
     <!-- O -->
     <xsl:template match="t:offset | t:measure | t:source ">
         <xsl:if test="preceding-sibling::*">
@@ -95,22 +161,40 @@
     
     <!-- Q -->
     <xsl:template match="t:quote">
-
-        <span>
-            <xsl:sequence select="local:attributes(.)"/>
+        <span class="tei-quote" dir="ltr" lang="en">
             <xsl:choose>
-                <xsl:when test="@xml:lang = 'ar' or parent::*[1]/@xml:lang = 'ar' or starts-with(@xml:lang,'syr') or starts-with(parent::*[1]/@xml:lang,'syr')">
-                    <xsl:text> ”</xsl:text>
-                    <xsl:apply-templates/>
-                    <xsl:text>“</xsl:text>
+                <xsl:when test="@xml:lang">
+                    <span dir="ltr">
+                        <xsl:text> “</xsl:text>
+                    </span>
+                    <span>
+                        <xsl:sequence select="local:attributes(.)"/>
+                        <xsl:call-template name="rend"/>
+                    </span>
+                    <span dir="ltr">
+                        <xsl:text>”  </xsl:text>
+                    </span>
+                </xsl:when>
+                <xsl:when test="parent::*/@xml:lang">
+                    <!-- Quotes need to be outside langattr for Syriac and arabic characters to render correctly.  -->
+                    <span dir="ltr">
+                        <xsl:text> “</xsl:text>
+                    </span>
+                    <span class="langattr">
+                        <xsl:sequence select="local:attributes(parent::*[@xml:lang])"/>
+                        <xsl:call-template name="rend"/>
+                    </span>
+                    <span dir="ltr">
+                        <xsl:text>”  </xsl:text>
+                    </span>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:text> “</xsl:text>
                     <xsl:apply-templates/>
-                    <xsl:text>”</xsl:text>        
+                    <xsl:text>” </xsl:text>
                 </xsl:otherwise>
             </xsl:choose>
-            <xsl:sequence select="local:add-footnotes(@source,ancestor::t:*[@xml:lang][1])"/>
+            <xsl:sequence select="local:add-footnotes(@source,ancestor::t:*[@xml:lang][1])"/> 
         </span>
     </xsl:template>
     

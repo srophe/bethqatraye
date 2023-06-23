@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:t="http://www.tei-c.org/ns/1.0" xmlns:x="http://www.w3.org/1999/xhtml" xmlns:saxon="http://saxon.sf.net/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:local="http://syriaca.org/ns" exclude-result-prefixes="xs t x saxon local" version="2.0">
+<xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml" xmlns:saxon="http://saxon.sf.net/" xmlns:local="http://syriaca.org/ns" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:t="http://www.tei-c.org/ns/1.0" xmlns:x="http://www.w3.org/1999/xhtml" xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="xs t x saxon local" version="2.0">
     
     <!-- ================================================================== 
        citation.xsl
@@ -29,17 +28,29 @@
     <xsl:template match="t:titleStmt" mode="cite-foot">
         <!-- creator(s) of the entry -->
         <!-- Process editors/authors using local function in helper-functions.xsl local:emit-responsible-persons -->
-        <xsl:sequence select="local:emit-responsible-persons(t:editor[@role='creator'],'footnote',1)"/>
-        <xsl:text>, </xsl:text>
+        <xsl:if test="t:editor[@role='creator']">
+            <xsl:sequence select="local:emit-responsible-persons(t:editor[@role='creator'],'footnote',1)"/>
+            <xsl:text>, </xsl:text>
+        </xsl:if>
         
         <!-- title of the entry -->
         <xsl:text>“</xsl:text>
-            <xsl:apply-templates select="t:title[@level='a'][1]" mode="footnote"/>
+        <xsl:choose>
+            <xsl:when test="t:title[@level='a'][1]">
+                <xsl:apply-templates select="t:title[@level='a'][1]" mode="footnote"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:apply-templates select="t:title[1]" mode="footnote"/>
+            </xsl:otherwise>
+        </xsl:choose>
         <xsl:text>”</xsl:text>
         
         <!-- monographic title -->
-        <xsl:text> in </xsl:text>
-        <xsl:apply-templates select="../descendant::t:title[@level='m'][1]" mode="footnote"/>
+        <xsl:if test="../descendant::t:titleStmt/t:title[@level='m'][1]">
+            <xsl:text> in </xsl:text>
+            <xsl:apply-templates select="../descendant::t:titleStmt/t:title[@level='m'][1]" mode="footnote"/>
+            <xsl:text>, </xsl:text>
+        </xsl:if>
         
         <!-- publication date statement -->
         <xsl:text> last modified </xsl:text>
@@ -68,17 +79,28 @@
     <xsl:template match="t:titleStmt" mode="cite-biblist">
         <!-- creator(s) of the entry -->
         <!-- Process editors/authors using local function in helper-functions.xsl local:emit-responsible-persons -->
-        <xsl:sequence select="local:emit-responsible-persons(t:editor[@role='creator'],'biblist',1)"/>
-        <xsl:text>, </xsl:text>
+        <xsl:if test="t:editor[@role='creator']">
+            <xsl:sequence select="local:emit-responsible-persons(t:editor[@role='creator'],'biblist',1)"/>
+            <xsl:text>, </xsl:text>            
+        </xsl:if>
         
         <!-- title of the entry -->
         <xsl:text>“</xsl:text>
-        <xsl:apply-templates select="t:title[@level='a'][1]" mode="biblist"/>
+        <xsl:choose>
+            <xsl:when test="t:title[@level='a'][1]">
+                <xsl:apply-templates select="t:title[@level='a'][1]" mode="biblist"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:apply-templates select="t:title[1]" mode="biblist"/>
+            </xsl:otherwise>
+        </xsl:choose>
         <xsl:text>.”</xsl:text>
         
         <!-- monographic title -->
-        <xsl:text> In </xsl:text>
-        <xsl:apply-templates select="../descendant::t:title[@level='m'][1]" mode="footnote"/>
+        <xsl:if test="../descendant::t:titleStmt/t:title[@level='m'][1]">
+            <xsl:text> In </xsl:text>
+            <xsl:apply-templates select="../descendant::t:titleStmt/t:title[@level='m'][1]" mode="footnote"/>
+        </xsl:if>
         
         <!-- general editors -->
         <xsl:text>, edited by </xsl:text>
@@ -100,7 +122,18 @@
             <xsl:sequence select="local:emit-responsible-persons(t:editor[@role='general'],'footnote',1)"/>
             <xsl:text>.</xsl:text>
         </xsl:for-each>
-        <xsl:text> Beth Mardutho, 2019-.</xsl:text>
+        <xsl:text> </xsl:text>
+        <xsl:value-of select="../t:publicationStmt/t:authority"/>,
+        <xsl:for-each select="../t:publicationStmt/t:date[1]">
+            <xsl:choose>
+                <xsl:when test=". castable as xs:date">
+                    <xsl:value-of select="format-date(xs:date(.), '[Y]')"/>.
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="."/>.
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:for-each>
         <!-- publication date statement -->
         <xsl:text> Entry published </xsl:text>
         <xsl:for-each select="../t:publicationStmt/t:date[1]">
@@ -165,7 +198,7 @@
                         <xsl:text>, editor</xsl:text>
                         <xsl:if test="count(t:editor[@role='general'])&gt; 1">s</xsl:if>
                         <xsl:text>, </xsl:text>
-                        <xsl:apply-templates select="../descendant::t:title[@level='m'][1]" mode="footnote"/>
+                        <xsl:apply-templates select="../descendant::t:titleStmt/t:title[@level='m'][1]" mode="footnote"/>
                     </li>
                     <li>
                         <!-- Process editors/authors using local function in helper-functions.xsl local:emit-responsible-persons -->

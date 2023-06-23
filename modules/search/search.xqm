@@ -5,7 +5,7 @@ xquery version "3.1";
 module namespace search="http://srophe.org/srophe/search";
 
 (:eXist templating module:)
-import module namespace templates="http://exist-db.org/xquery/templates" ;
+import module namespace templates="http://exist-db.org/xquery/html-templating";
 
 (: Import KWIC module:)
 import module namespace kwic="http://exist-db.org/xquery/kwic";
@@ -16,15 +16,6 @@ import module namespace data="http://srophe.org/srophe/data" at "../lib/data.xqm
 import module namespace global="http://srophe.org/srophe/global" at "../lib/global.xqm";
 import module namespace page="http://srophe.org/srophe/page" at "../lib/paging.xqm";
 import module namespace tei2html="http://srophe.org/srophe/tei2html" at "../content-negotiation/tei2html.xqm";
-
-(: Syriaca.org search modules :)
-import module namespace bhses="http://srophe.org/srophe/bhses" at "bhse-search.xqm";
-import module namespace bibls="http://srophe.org/srophe/bibls" at "bibl-search.xqm";
-import module namespace ms="http://srophe.org/srophe/ms" at "ms-search.xqm";
-import module namespace nhsls="http://srophe.org/srophe/nhsls" at "nhsl-search.xqm";
-import module namespace persons="http://srophe.org/srophe/persons" at "persons-search.xqm";
-import module namespace places="http://srophe.org/srophe/places" at "places-search.xqm";
-import module namespace spears="http://srophe.org/srophe/spears" at "spear-search.xqm";
 
 declare namespace tei="http://www.tei-c.org/ns/1.0";
 
@@ -49,27 +40,13 @@ declare variable $search:start {
  : Search results stored in map for use by other HTML display functions
  data:search($collection)
 :)
-declare %templates:wrap function search:search-data($node as node(), $model as map(*), $collection as xs:string?, $sort-element as xs:string?){
-    let $search-string := 
-        if($collection = ('sbd','q','authors','saints','persons')) then persons:query-string($collection)
-        else if($collection ='spear') then spears:query-string()
-        else if($collection = 'places') then places:query-string()
-        else if($collection = ('bhse','nhsl','bible')) then bhses:query-string($collection)
-        else if($collection = 'bibl') then bibls:query-string()
-        else if($collection = 'manuscripts') then ms:query-string()
-        else ()
-    let $queryExpr :=  
-        if($collection = ('sbd','q','authors','saints','persons')) then persons:query-string($collection)
-        else if($collection ='spear') then spears:query-string()
-        else if($collection = 'places') then places:query-string()
-        else if($collection = ('bhse','nhsl','bible')) then bhses:query-string($collection)
-        else if($collection = 'bibl') then bibls:query-string()
-        else if($collection = 'manuscripts') then ms:query-string()
-        else data:create-query($collection)                    
+declare %templates:wrap function search:search-data($node as node(), $model as map(*), $collection as xs:string?, $sort-element as xs:string*){
+    let $search-string :=  ()
+    let $queryExpr :=  data:create-query($collection)                    
     return
         if(empty($queryExpr) or $queryExpr = "" or empty(request:get-parameter-names())) then ()
         else 
-            let $hits := data:search($collection, $search-string, $sort-element)
+            let $hits := data:search($collection, $search-string, $sort-element[1])
             return
                 map {
                         "hits" : $hits,
@@ -124,12 +101,6 @@ else
     return
         if(doc-available($search-config)) then 
             search:build-form($search-config)
-        else if($collection = ('persons','sbd','authors','q','saints')) then <div>{persons:search-form($collection)}</div>
-        else if($collection ='spear') then <div>{spears:search-form()}</div>
-        else if($collection ='manuscripts') then <div>{ms:search-form()}</div>
-        else if($collection = ('bhse','nhsl')) then <div>{bhses:search-form($collection)}</div>
-        else if($collection ='bibl') then <div>{bibls:search-form()}</div>
-        else if($collection ='places') then <div>{places:search-form()}</div> 
         else search:default-search-form()
 };
 
