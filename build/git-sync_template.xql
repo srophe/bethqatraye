@@ -19,8 +19,8 @@ import module namespace githubxq="http://exist-db.org/lib/githubxq";
 let $data := request:get-data()
 return 
     githubxq:execute-webhook($data, 
-        '/db/apps/caesarea',
-        'https://github.com/srophe/caesarea',
+        '/db/apps/bethqatraye',
+        'https://github.com/srophe/bethqatraye',
         'main',
         '${SECRET_KEY}',
         '')

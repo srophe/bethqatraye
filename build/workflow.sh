@@ -1,5 +1,5 @@
 GITHUB_ORG="srophe"
-GITHUB_REPOSITORY="caesarea-data"
+GITHUB_REPOSITORY="bethqatraye-data"
 
 echo "Fetching the data repository to build a data xar"
 git clone https://github.com/$GITHUB_ORG/$GITHUB_REPOSITORY
