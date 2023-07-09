@@ -1,0 +1,342 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head xmlns="">
+        <title>Peruz Shapur</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        
+        <link href="/exist/apps/bethqatraye/resources/images/fav-icons/bq-favicon.ico" rel="shortcut icon"/>
+        <!-- Bootstrap 3 -->
+        <link href="/exist/apps/bethqatraye/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+        <link href="/exist/apps/bethqatraye/resources/css/sm-core-css.css" rel="stylesheet" type="text/css"/>
+        <!-- Srophe styles -->
+        <link href="/exist/apps/bethqatraye/resources/css/syr-icon-fonts.css" rel="stylesheet" type="text/css"/>
+        <link href="/exist/apps/bethqatraye/resources/css/style.css" rel="stylesheet" type="text/css"/>
+        <link href="/exist/apps/bethqatraye/resources/css/main.css" rel="stylesheet" type="text/css"/>
+        <link href="/exist/apps/bethqatraye/resources/css/bq.css" rel="stylesheet" type="text/css"/>
+        <link href="/exist/apps/bethqatraye/resources/css/print.css" rel="stylesheet" type="text/css" media="print"/>
+        <!-- Leaflet -->
+        <link href="/exist/apps/bethqatraye/resources/leaflet/leaflet.css" rel="stylesheet"/>
+        <link href="/exist/apps/bethqatraye/resources/leaflet/leaflet.awesome-markers.css" rel="stylesheet"/>
+        <link href="/exist/apps/bethqatraye/resources/leaflet/MarkerCluster.css" rel="stylesheet"/>
+        <link href="/exist/apps/bethqatraye/resources/leaflet/MarkerCluster.Default.css" rel="stylesheet"/>
+       <!--
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+        <link href="$nav-base/resources/leaflet/leaflet.icon-material.css" rel="stylesheet"/>
+        <script src="$nav-base/resources/leaflet/leaflet.icon-material.js"></script>
+        -->
+        <!-- JQuery -->
+        <link href="/exist/apps/bethqatraye/resources/jquery-ui/jquery-ui.min.css" rel="stylesheet"/>
+        <script src="https://plausible.io/js/plausible.js" defer="defer" data-domain="bqgazetteer.bethmardutho.org"/>
+        <script src="/exist/apps/bethqatraye/resources/js/jquery.min.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/jquery-ui/jquery-ui.min.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/js/jquery.smartmenus.min.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/js/clipboard.min.js" type="text/javascript"/>
+        <!-- Bootstrap -->
+        <script src="/exist/apps/bethqatraye/resources/bootstrap/js/bootstrap.min.js" type="text/javascript"/>
+        <!-- ReCaptcha -->
+        <script src="https://www.google.com/recaptcha/api.js" type="text/javascript" async="async" defer="defer"/>
+        <!-- keyboard widget css & script -->
+        <link href="/exist/apps/bethqatraye/resources/keyboard/css/keyboard.min.css" rel="stylesheet"/>
+        <link href="/exist/apps/bethqatraye/resources/keyboard/css/keyboard-previewkeyset.min.css" rel="stylesheet"/>
+        <link href="/exist/apps/bethqatraye/resources/keyboard/syr/syr.css" rel="stylesheet"/>
+        <script src="/exist/apps/bethqatraye/resources/keyboard/syr/jquery.keyboard.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/keyboard/js/jquery.keyboard.extension-mobile.min.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/keyboard/js/jquery.keyboard.extension-navigation.min.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/keyboard/syr/jquery.keyboard.extension-autocomplete.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/keyboard/syr/keyboardSupport.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/keyboard/syr/syr.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/keyboard/layouts/ms-Greek.min.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/keyboard/layouts/ms-Russian.min.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/keyboard/layouts/ms-Arabic.min.js" type="text/javascript"/>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $('[data-toggle="tooltip"]').tooltip({ container: 'body' })
+
+                $('.keyboard').keyboard({
+                    openOn: null,
+                    stayOpen: false,
+                    alwaysOpen: false,
+                    autoAccept: true,
+                    usePreview: false,
+                    initialFocus: true,
+                    rtl : true,
+                    layout: 'syriac-phonetic',
+                    hidden: function(event, keyboard, el){
+                       //  keyboard.destroy();
+                     }
+                });
+
+                $('.keyboard-select').click(function () {
+                    var keyboardID = '#' + $(this).data("keyboard-id")
+                    var kb = $(keyboardID).getkeyboard();
+                    //var kb = $('#searchField').getkeyboard();
+                    // change layout based on link ID
+                    kb.options.layout = this.id
+                    // open keyboard if layout is different, or time from it last closing is &gt; 200 ms
+                    if (kb.last.layout !== kb.options.layout || (new Date().getTime() - kb.last.eventTime) &gt; 200) {
+                        kb.reveal();
+                    }
+                });
+                //Change fonts
+                $('.swap-font').on('click', function(){
+                    var selectedFont = $(this).data("font-id")
+                    $('.selectableFont').not('.syr').css('font-family', selectedFont);
+                    $("*:lang(syr)").css('font-family', selectedFont)
+                });
+                
+            })
+        </script>
+    </head>
+    <body xmlns="" id="body">
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"/>
+                    <span class="icon-bar"/>
+                    <span class="icon-bar"/>
+                </button>
+                <a href="/exist/apps/bethqatraye/index.html" class="navbar-brand banner-container">
+                    <span class="banner-icon">
+                        <img src="/exist/apps/bethqatraye/resources/images/bq-icon.png" alt="Beth Qaṭraye Gazetteer logo" width="50px"/>
+                    </span>
+                    <span class="banner-text">Beth Qaṭraye Gazetteer</span>
+                </a>
+                
+            </div>
+            <div class="navbar-collapse collapse pull-right" id="navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="/exist/apps/bethqatraye/browse.html" class="nav-text">Browse</a>
+                    </li>
+                    <li>
+                        <a href="/exist/apps/bethqatraye/about.html" class="nav-text">About</a>
+                    </li>
+                    <li>
+                        <a href="/exist/apps/bethqatraye/search.html" class="nav-text">Advanced Search</a>
+                    </li>
+                    <li>
+                        <div id="search-wrapper">
+                            <form action="/exist/apps/bethqatraye/search.html" class="navbar-form navbar-right search-box" role="search" method="get">
+                                <div class="form-group">
+                                    <input type="text" class="form-control keyboard" placeholder="search" name="keyword" id="keywordNav"/>
+                                    <span><span class="keyboard-menu"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Select Keyboard">
+                 <span class="syriaca-icon syriaca-keyboard">  </span><span class="caret"/></button><ul class="dropdown-menu"><li><a href="#" class="keyboard-select" id="syriac-phonetic" data-keyboard-id="keywordNav">Syriac Phonetic</a></li><li><a href="#" class="keyboard-select" id="syriac-standard" data-keyboard-id="keywordNav">Syriac Standard</a></li><li><a href="#" class="keyboard-select" id="ms-Arabic (101)" data-keyboard-id="keywordNav">Arabic Mod. Standard</a></li><li><a href="#" class="keyboard-select" id="qwerty" data-keyboard-id="keywordNav">English QWERTY</a></li><li><a href="#" class="keyboard-select" id="ms-Greek" data-keyboard-id="keywordNav">Greek Mod. Standard</a></li><li><a href="#" class="keyboard-select" id="ms-Russian" data-keyboard-id="keywordNav">Russian Mod. Standard</a></li></ul></span></span>
+                                    <button class="btn btn-default search-btn" id="searchbtn" type="submit" title="Search">
+                                        <span class="glyphicon glyphicon-search"/>
+                                    </button>                                    
+                                </div>
+                            </form>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="btn-nav navbar-btn">
+                            <span><span class="keyboard-menu"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Select Keyboard">
+                 <span class="syriaca-icon syriaca-keyboard">  </span><span class="caret"/></button><ul class="dropdown-menu"><li><a href="#" class="keyboard-select" id="syriac-phonetic" data-keyboard-id="keywordNav">Syriac Phonetic</a></li><li><a href="#" class="keyboard-select" id="syriac-standard" data-keyboard-id="keywordNav">Syriac Standard</a></li><li><a href="#" class="keyboard-select" id="ms-Arabic (101)" data-keyboard-id="keywordNav">Arabic Mod. Standard</a></li><li><a href="#" class="keyboard-select" id="qwerty" data-keyboard-id="keywordNav">English QWERTY</a></li><li><a href="#" class="keyboard-select" id="ms-Greek" data-keyboard-id="keywordNav">Greek Mod. Standard</a></li><li><a href="#" class="keyboard-select" id="ms-Russian" data-keyboard-id="keywordNav">Russian Mod. Standard</a></li></ul></span></span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div id="content" class="text">
+    <div class="main-content-block">
+            <div><div class="container" style="width:100%;clear:both;margin-bottom:1em; text-align:right;"><a href="javascript:window.print();" type="button" class="btn btn-default btn-xs" id="teiBtn" data-toggle="tooltip" title="Click to send this page to the printer."><span class="glyphicon glyphicon-print" aria-hidden="true"/></a> <a href="/exist/apps/bethqatraye/place/211.tei" class="btn btn-default btn-xs" id="teiBtn" data-toggle="tooltip" title="Click to view the TEI XML data for this record."><span class="glyphicon glyphicon-download-alt" aria-hidden="true"/> TEI/XML
+                        </a> <a href="/exist/apps/bethqatraye/place/211.rdf" class="btn btn-default btn-xs" id="teiBtn" data-toggle="tooltip" title="Click to view the RDF-XML data for this record."><span class="glyphicon glyphicon-download-alt" aria-hidden="true"/> RDF/XML
+                        </a> <a href="/exist/apps/bethqatraye/place/211.txt" class="btn btn-default btn-xs" id="teiBtn" data-toggle="tooltip" title="Click to view the plain text data for this record."><span class="glyphicon glyphicon-download-alt" aria-hidden="true"/> Text
+                        </a> <br/></div></div>
+            <div class="row">
+                <div class="col-md-7 col-lg-8">
+                    <div class="title"><h1><span id="title"><span xml:lang="en" lang="en" dir="ltr">Peruz Shapur — <span class="tei-foreign" xml:lang="syr" lang="syr" dir="rtl">ܐܢܒܐܪ</span>
+                </span></span></h1></div><div class="idno seriesStmt" style="margin:0; margin-top:.25em; margin-bottom: 1em; padding:1em; color: #999999;"><small><span class="uri"><a href="/exist/apps/bethqatraye/place/210"><span class="glyphicon glyphicon-backward" aria-hidden="true"/></a> <button type="button" class="btn btn-default btn-xs" id="idnoBtn" data-clipboard-action="copy" data-clipboard-target="#syriaca-id"><span class="srp-label">URI</span></button> <span id="syriaca-id">https://bqgazetteer.bethmardutho.org/place/211</span><script>
+                        var clipboard = new Clipboard('#idnoBtn');
+                        clipboard.on('success', function(e) {
+                        console.log(e);
+                        });
+                        
+                        clipboard.on('error', function(e) {
+                        console.log(e);
+                        });
+                    </script> <a href="/exist/apps/bethqatraye/place/212"><span class="glyphicon glyphicon-forward" aria-hidden="true"/></a></span></small></div><span class="tei-body">
+            <span class="tei-listPlace">
+                <div class="tei-desc text abstract"><span class="tei-desc" xml:lang="en" lang="en" dir="ltr" id="abstract211-1">A <span class="tei-quote" dir="ltr" lang="en"><span dir="ltr"> “</span><span class="langattr" xml:lang="en" lang="en" dir="ltr" id="abstract211-1">town on the left
+                        bank of the <span class="tei-placeName">Euphrates</span>, 43° 43’ E, 33° 22.5’ N.</span><span dir="ltr">”  </span></span><span class="tei-footnote-refs" dir="ltr" lang="en" xml:lang="en"><span class="tei-footnote-ref"><a href="#bib211-11">11</a></span> </span></span></div><div id="placenames" class="content-block"><h3>Names</h3><ul><li dir="ltr"><span class="tei-placeName" xml:lang="syr" lang="syr" dir="rtl" id="name211-3">ܐܢܒܐܪ</span></li><li dir="ltr"><span class="tei-placeName" xml:lang="syr-Syrj" lang="syr-Syrj" dir="rtl" id="name211-4">ܐܰܢܒܰܐܪ</span><span class="tei-footnote-refs" dir="ltr" lang="en" xml:lang="en"><span class="tei-footnote-ref"><a href="#bib211-3">3</a></span> </span></li><li dir="ltr"><span class="tei-placeName" xml:lang="ar" lang="ar" dir="rtl" id="name211-12">الأنبار</span><span class="tei-footnote-refs" dir="ltr" lang="en" xml:lang="en"><span class="tei-footnote-ref"><a href="#bib211-9">9</a></span> </span></li><li dir="ltr"><span class="tei-placeName" xml:lang="ar" lang="ar" dir="rtl" id="name211-9">الأَنبار</span><span class="tei-footnote-refs" dir="ltr" lang="en" xml:lang="en"><span class="tei-footnote-ref"><a href="#bib211-8">8</a>, </span><span class="tei-footnote-ref"><a href="#bib211-15">15</a></span> </span></li><li dir="ltr"><span class="tei-placeName" xml:lang="ar" lang="ar" dir="rtl" id="name211-5">الانبار</span><span class="tei-footnote-refs" dir="ltr" lang="en" xml:lang="en"><span class="tei-footnote-ref"><a href="#bib211-4">4</a>, </span><span class="tei-footnote-ref"><a href="#bib211-10">10</a></span> </span></li><li dir="ltr"><span class="tei-placeName" xml:lang="ar" lang="ar" dir="rtl" id="name211-8">فيروزسابور</span><span class="tei-footnote-refs" dir="ltr" lang="en" xml:lang="en"><span class="tei-footnote-ref"><a href="#bib211-8">8</a>, </span><span class="tei-footnote-ref"><a href="#bib211-15">15</a></span> </span></li><li dir="ltr"><span class="tei-placeName" xml:lang="en" lang="en" dir="ltr" id="name211-13">Al Anbar</span></li><li dir="ltr"><span class="tei-placeName" xml:lang="en" lang="en" dir="ltr" id="name211-2">al-Anbār</span><span class="tei-footnote-refs" dir="ltr" lang="en" xml:lang="en"><span class="tei-footnote-ref"><a href="#bib211-2">2</a></span> </span></li><li dir="ltr"><span class="tei-placeName" xml:lang="en" lang="en" dir="ltr" id="name211-6">al-ʾAnbar</span><span class="tei-footnote-refs" dir="ltr" lang="en" xml:lang="en"><span class="tei-footnote-ref"><a href="#bib211-5">5</a></span> </span></li><li dir="ltr"><span class="tei-placeName" xml:lang="en-x-srp1" lang="en-x-srp1" id="name211-10">al-ʾAnbar</span></li><li dir="ltr"><span class="tei-placeName" xml:lang="en" lang="en" dir="ltr" id="name211-7">Anbar</span><span class="tei-footnote-refs" dir="ltr" lang="en" xml:lang="en"><span class="tei-footnote-ref"><a href="#bib211-6">6</a></span> </span></li><li dir="ltr"><span class="tei-placeName" xml:lang="en" lang="en" dir="ltr" id="name211-1">Peruz Shapur</span><span class="tei-footnote-refs" dir="ltr" lang="en" xml:lang="en"><span class="tei-footnote-ref"><a href="#bib211-2">2</a></span> </span></li></ul></div><div class="content-block"><h3>Place Type</h3><p class="text-block">settlement</p></div><div id="placenames" class="content-block"><h3>Location</h3><ul><li>Coordinates 
+                     (alternate): 
+                    <ul class="unstyled offset1"><li>Lat. 33.375° Long. 43.71667°<span class="tei-footnote-refs" dir="ltr" lang="en" xml:lang="en"><span class="tei-footnote-ref"><a href="#bib211-12">12</a></span> </span></li></ul></li><li>Coordinates 
+                     (preferred): 
+                    <ul class="unstyled offset1"><li>Lat. 33.4000693333° Long. 43.640686°<span class="tei-footnote-refs" dir="ltr" lang="en" xml:lang="en"><span class="tei-footnote-ref"><a href="#bib211-7">7</a></span> </span></li></ul></li></ul></div><h3>Descriptions</h3><div class="tei-desc text"><span class="tei-desc" xml:lang="ar" lang="ar" dir="rtl">
+                        <span class="tei-quote" dir="ltr" lang="en"><span dir="ltr"> “</span><span class="langattr" xml:lang="ar" lang="ar" dir="rtl">ثم رحلت من بغداد فوصلت الى مدينة الأنبار.</span><span dir="ltr">”  </span><span class="tei-footnote-refs" dir="ltr" lang="en" xml:lang="en"><span class="tei-footnote-ref"><a href="#bib211-14">14</a></span> </span></span></span></div><div class="tei-desc text"><span class="tei-desc" xml:lang="ar" lang="ar" dir="rtl">
+                        <span class="tei-quote" dir="ltr" lang="en"><span dir="ltr"> “</span><span class="langattr" xml:lang="ar" lang="ar" dir="rtl">ثم يمتد الفرات على ديار العرب حتى ينتهي الى الرقة
+                            وقرقيسيا والرحبة والدالية وعانة والحديثة وهيت والانبارالى الكوفة</span><span dir="ltr">”  </span><span class="tei-footnote-refs" dir="ltr" lang="en" xml:lang="en"><span class="tei-footnote-ref"><a href="#bib211-10">10</a></span> </span></span>
+                    </span></div><div class="tei-desc text"><span class="tei-desc" xml:lang="ar" lang="ar" dir="rtl">
+                        <span class="tei-quote" dir="ltr" lang="en"><span dir="ltr"> “</span><span class="langattr" xml:lang="ar" lang="ar" dir="rtl">ولم أر في الدنيا مثلها، غير مسيرة أربعة أيام من الأنبار الى عانة.</span><span dir="ltr">”  </span><span class="tei-footnote-refs" dir="ltr" lang="en" xml:lang="en"><span class="tei-footnote-ref"><a href="#bib211-13">13</a></span> </span></span></span></div><div id="attestation"><h3>Attestation</h3><div class="text-block"><span class="text-block"><span class="tei-event" id="attestation211-1">
+                        <p xml:lang="en" lang="en" dir="ltr">Attestation of names <span class="tei-foreign" xml:lang="ar" lang="ar" dir="rtl">فيروزسابور</span> and <span class="tei-foreign" xml:lang="ar" lang="ar" dir="rtl">الأَنبار</span>
+                            in the <span xml:lang="en" lang="en" dir="ltr">Muʿjam al-buldān</span> of
+                                <span class="tei-persName">Yāqūt al-Ḥamawī</span>.</p>
+                        <span class="tei-placeName" xml:lang="ar" lang="ar" dir="rtl" id="name211-8">فيروزسابور<span class="tei-footnote-refs" dir="ltr" lang="en" xml:lang="en"><span class="tei-footnote-ref"><a href="#bib211-8">8</a>, </span><span class="tei-footnote-ref"><a href="#bib211-15">15</a></span> </span></span> 
+                        <span class="tei-placeName" xml:lang="ar" lang="ar" dir="rtl" id="name211-9">الأَنبار<span class="tei-footnote-refs" dir="ltr" lang="en" xml:lang="en"><span class="tei-footnote-ref"><a href="#bib211-8">8</a>, </span><span class="tei-footnote-ref"><a href="#bib211-15">15</a></span> </span></span> 
+                    <span class="tei-footnote-refs" dir="ltr" lang="en" xml:lang="en"><span class="tei-footnote-ref"><a href="#bib211-8">8</a>, </span><span class="tei-footnote-ref"><a href="#bib211-15">15</a></span> </span></span></span></div></div><div class="info-btns"><button class="btn btn-info" data-toggle="modal" data-target="#feedback">Corrections/Additions?</button> 
+            <a href="#" class="btn btn-info" data-toggle="modal" data-target="#selection" data-ref="../documentation/faq.html" id="showSection">
+                Is this record complete?
+            </a></div><div id="see-also" class="see-also content-block"><h3>See Also</h3><ul><li><a href="http://pleiades.stoa.org/places/894043"><img src="/exist/apps/bethqatraye/resources/images/circle-pi-25.png" alt="Image of the Greek letter pi in blue; small icon of the Pleiades project" title="click to view Peruz Shapur — ܐܢܒܐܪ&#xA;                 in Pleiades"/> View in Pleiades</a></li><li><a href="https://maps.google.com/maps?q=33.375, 43.71667+(name)&amp;z=10&amp;ll=33.375, 43.71667"><img src="/exist/apps/bethqatraye/resources/images/gmaps-25.png" alt="The Google Maps icon" title="click to view Peruz Shapur — ܐܢܒܐܪ&#xA;                 on Google Maps"/> View in Google Maps
+                            </a></li><li><a href="https://maps.google.com/maps?q=33.4000693333, 43.640686+(name)&amp;z=10&amp;ll=33.4000693333, 43.640686"><img src="/exist/apps/bethqatraye/resources/images/gmaps-25.png" alt="The Google Maps icon" title="click to view Peruz Shapur — ܐܢܒܐܪ&#xA;                 on Google Maps"/> View in Google Maps
+                            </a></li><li><a href="http://en.wikipedia.org/wiki/Anbar_(town)"><img src="/exist/apps/bethqatraye/resources/images/Wikipedia-25.png" alt="The Wikipedia icon" title="click to view Anbar (town) in Wikipedia"/> "Anbar (town)" in Wikipedia</a></li></ul></div><div class="content-block"><div id="sources"><h3>Works Cited</h3><p><small>Any information without attribution has been created following the Syriaca.org <a href="http://syriaca.org/documentation/">editorial guidelines</a>.</small></p><ul><li class="tei-bibl footnote"><span class="anchor" id="bib211-1"/><span class="tei-footnote-tgt">1</span> <span class="tei-footnote-content"><span class="footnote-content">A. Juckel,  "<span class="title-analytic" xml:lang="en" lang="en" dir="ltr">35. al-Anbār</span>," <span class="title-monographic" xml:lang="en" lang="en" dir="ltr">The Gorgias Encyclopedic Dictionary of the
+                            Syriac Heritage</span>, pp: 21.<span class="footnote-links"><span class="footnote-icon"><a title="External link to bibliographic record" data-toggle="tooltip" data-placement="top" class="bibl-links"><span class="glyphicon glyphicon-book"/></a></span></span></span></span></li><li class="tei-bibl footnote"><span class="anchor" id="bib211-2"/><span class="tei-footnote-tgt">2</span> <span class="tei-footnote-content"><span class="footnote-content"> <span class="title" xml:lang="en" lang="en" dir="ltr">The Gorgias Encyclopedic Dictionary of the Syriac
+                            Heritage</span>, pp: 21, 70, 142, 217, map: Map I C2, II C2.<span class="footnote-links"><span class="footnote-icon"><a title="External link to bibliographic record" data-toggle="tooltip" data-placement="top" class="bibl-links"><span class="glyphicon glyphicon-book"/></a></span></span></span></span></li><li class="tei-bibl footnote"><span class="anchor" id="bib211-3"/><span class="tei-footnote-tgt">3</span> <span class="tei-footnote-content"><span class="footnote-content"> <span class="title" xml:lang="syr" lang="syr" dir="rtl">ܒܪ̈ܘܠܐ ܒܕܝܪ̈ܐ ܕܥܠ ܡܪܕܘܬ ܝܘܠܦܢ̈ܐ ܣܘܪ̈ܝܝܐ ܗܕܝܪ̈ܐ</span>, pp: 273.<span class="footnote-links"><span class="footnote-icon"><a title="External link to bibliographic record" data-toggle="tooltip" data-placement="top" class="bibl-links"><span class="glyphicon glyphicon-book"/></a></span></span></span></span></li><li class="tei-bibl footnote"><span class="anchor" id="bib211-4"/><span class="tei-footnote-tgt">4</span> <span class="tei-footnote-content"><span class="footnote-content"> <span class="title" xml:lang="ar" lang="ar" dir="rtl">كتاب اللؤلؤ المنثور في تاريخ العلوم والأداب
+                            السريانية</span>, pp: 248.<span class="footnote-links"><span class="footnote-icon"><a title="External link to bibliographic record" data-toggle="tooltip" data-placement="top" class="bibl-links"><span class="glyphicon glyphicon-book"/></a></span></span></span></span></li><li class="tei-bibl footnote"><span class="anchor" id="bib211-5"/><span class="tei-footnote-tgt">5</span> <span class="tei-footnote-content"><span class="footnote-content"> <span class="title" xml:lang="en" lang="en" dir="ltr">The Scattered Pearls: A History of Syriac Literature
+                            and Sciences</span>, pp: 287.<span class="footnote-links"><span class="footnote-icon"><a title="External link to bibliographic record" data-toggle="tooltip" data-placement="top" class="bibl-links"><span class="glyphicon glyphicon-book"/></a></span></span></span></span></li><li class="tei-bibl footnote"><span class="anchor" id="bib211-6"/><span class="tei-footnote-tgt">6</span> <span class="tei-footnote-content"><span class="footnote-content">David Wilmshurst,  <span class="title" xml:lang="en" lang="en" dir="ltr">The Ecclesiastical Organisation of the Church of the
+                            East, 1318-1913</span>, pp: 343.<span class="footnote-links"><span class="footnote-icon"><a title="External link to bibliographic record" data-toggle="tooltip" data-placement="top" class="bibl-links"><span class="glyphicon glyphicon-book"/></a></span></span></span></span></li><li class="tei-bibl footnote"><span class="anchor" id="bib211-7"/><span class="tei-footnote-tgt">7</span> <span class="tei-footnote-content"><span class="footnote-content">Roger Bagnall et al. (eds.),  "<span class="title-analytic">http://pleiades.stoa.org/places/894043</span>," <span class="title-monographic">Pleiades: A Gazetteer of Past Places</span><span class="footnote-links"><span class="footnote-icon"><a title="External link to bibliographic record" data-toggle="tooltip" data-placement="top" class="bibl-links"><span class="glyphicon glyphicon-book"/></a></span></span></span></span></li><li class="tei-bibl footnote"><span class="anchor" id="bib211-8"/><span class="tei-footnote-tgt">8</span> <span class="tei-footnote-content"><span class="footnote-content">Yāqūt al-Ḥamawī,  <span class="title-monographic" xml:lang="en" lang="en" dir="ltr">Muʿjam al-buldān</span>, vol: I, pp: 305.<span class="footnote-links"><span class="footnote-icon"><a title="External link to bibliographic record" data-toggle="tooltip" data-placement="top" class="bibl-links"><span class="glyphicon glyphicon-book"/></a></span></span></span></span></li><li class="tei-bibl footnote"><span class="anchor" id="bib211-9"/><span class="tei-footnote-tgt">9</span> <span class="tei-footnote-content"><span class="footnote-content">Ibn Baṭṭūta,  <span class="title-monographic" xml:lang="en" lang="en" dir="ltr">Riḥlat Ibn Baṭṭūta. Tuḥfat al-nuẓẓār fī
+                            gharāʾib al-amṣār wa-ʿajāʾib al-asfār</span>, pp: 655, 663.<span class="footnote-links"><span class="footnote-icon"><a title="External link to bibliographic record" data-toggle="tooltip" data-placement="top" class="bibl-links"><span class="glyphicon glyphicon-book"/></a></span></span></span></span></li><li class="tei-bibl footnote"><span class="anchor" id="bib211-10"/><span class="tei-footnote-tgt">10</span> <span class="tei-footnote-content"><span class="footnote-content">Abū al-Qāsim Muḥammad Ibn Ḥawqal,  <span class="title-monographic" xml:lang="en" lang="en" dir="ltr">Kitāb al-masālik wa
+                            al-mamālik</span>, pp: 17.<span class="footnote-links"><span class="footnote-icon"><a title="External link to bibliographic record" data-toggle="tooltip" data-placement="top" class="bibl-links"><span class="glyphicon glyphicon-book"/></a></span></span></span></span></li><li class="tei-bibl footnote"><span class="anchor" id="bib211-11"/><span class="tei-footnote-tgt">11</span> <span class="tei-footnote-content"><span class="footnote-content">P. Bearman (ed.),  <span class="title-monographic" xml:lang="en" lang="en" dir="ltr">Encyclopaedia of Islam, Second Edition</span><span class="footnote-links"><span class="footnote-icon"><a title="External link to bibliographic record" data-toggle="tooltip" data-placement="top" class="bibl-links"><span class="glyphicon glyphicon-book"/></a></span></span></span></span></li><li class="tei-bibl footnote"><span class="anchor" id="bib211-12"/><span class="tei-footnote-tgt">12</span> <span class="tei-footnote-content"><span class="footnote-content">GeoHack,  "<span class="title-analytic">https://tools.wmflabs.org/geohack/geohack.php?pagename=Anbar_(town)&amp;params=33_22.5_N_43_43_E_region:IQ_type:city</span>,"<span class="footnote-links"><span class="footnote-icon"><a title="External link to bibliographic record" data-toggle="tooltip" data-placement="top" class="bibl-links"><span class="glyphicon glyphicon-book"/></a></span></span></span></span></li><li class="tei-bibl footnote"><span class="anchor" id="bib211-13"/><span class="tei-footnote-tgt">13</span> <span class="tei-footnote-content"><span class="footnote-content">Ibn Baṭṭūta,  <span class="title-monographic" xml:lang="en" lang="en" dir="ltr">Riḥlat Ibn Baṭṭūta. Tuḥfat al-nuẓẓār fī
+                            gharāʾib al-amṣār wa-ʿajāʾib al-asfār</span>, pp: 655.<span class="footnote-links"><span class="footnote-icon"><a title="External link to bibliographic record" data-toggle="tooltip" data-placement="top" class="bibl-links"><span class="glyphicon glyphicon-book"/></a></span></span></span></span></li><li class="tei-bibl footnote"><span class="anchor" id="bib211-14"/><span class="tei-footnote-tgt">14</span> <span class="tei-footnote-content"><span class="footnote-content">Ibn Baṭṭūta,  <span class="title-monographic" xml:lang="en" lang="en" dir="ltr">Riḥlat Ibn Baṭṭūta. Tuḥfat al-nuẓẓār fī
+                            gharāʾib al-amṣār wa-ʿajāʾib al-asfār</span>, pp: 663.<span class="footnote-links"><span class="footnote-icon"><a title="External link to bibliographic record" data-toggle="tooltip" data-placement="top" class="bibl-links"><span class="glyphicon glyphicon-book"/></a></span></span></span></span></li><li class="tei-bibl footnote"><span class="anchor" id="bib211-15"/><span class="tei-footnote-tgt">15</span> <span class="tei-footnote-content"><span class="footnote-content">Yāqūt al-Ḥamawī,  <span class="title-monographic" xml:lang="en" lang="en" dir="ltr">Muʿjam al-buldān</span>, vol: IV, pp: 321.<span class="footnote-links"><span class="footnote-icon"><a title="External link to bibliographic record" data-toggle="tooltip" data-placement="top" class="bibl-links"><span class="glyphicon glyphicon-book"/></a></span></span></span></span></li></ul></div></div>
+            </span>
+        </span><div class="citationinfo"><h3>How to Cite This Entry</h3><div id="citation-note" class="content-block indent"><span> <span> Thomas A. Carlson</span></span> et al., “<span class="title-analytic" xml:lang="en" lang="en" dir="ltr">Peruz Shapur — <span class="tei-foreign" xml:lang="syr" lang="syr" dir="rtl">ܐܢܒܐܪ</span>
+                </span>” in <span class="title-monographic" xml:lang="en" lang="en" dir="ltr">The Beth Qaṭraye Gazetteer</span>,  last modified January 10, 2020, <a href="https://bqgazetteer.bethmardutho.org/place/211">https://bqgazetteer.bethmardutho.org/place/211</a>.<div class="collapse" id="showcit"><div id="citation-bibliography"><h4>Bibliography:</h4><span> <span> Thomas A. Carlson</span></span> et al., “<span class="title-analytic" xml:lang="en" lang="en" dir="ltr">Peruz Shapur — <span class="tei-foreign" xml:lang="syr" lang="syr" dir="rtl">ܐܢܒܐܪ</span>
+                </span>.” In <span class="title-monographic" xml:lang="en" lang="en" dir="ltr">The Beth Qaṭraye Gazetteer</span>, edited by Haya Al Thani, Saif al-Murikhi, Abdulrahim Abu-Husayn, Abdul Rahman Chamseddine and Mario Kozah. Beth Mardutho: The Syriac Institute,
+        2020.
+                 Entry published January 10, 2020. <a href="https://bqgazetteer.bethmardutho.org/place/211">https://bqgazetteer.bethmardutho.org/place/211</a>.</div><div id="about"><h3>About this Entry</h3><p><span class="heading-inline">Entry Title:</span> <span class="title-analytic" xml:lang="en" lang="en" dir="ltr">Peruz Shapur — <span class="tei-foreign" xml:lang="syr" lang="syr" dir="rtl">ܐܢܒܐܪ</span>
+                </span></p><div><h4>Authorial and Editorial Responsibility:</h4><ul><li><span> Haya Al Thani</span>, general editor, Beth Mardutho: The Syriac Institute</li><li>Haya Al Thani, Saif al-Murikhi, Abdulrahim Abu-Husayn, Abdul Rahman Chamseddine, and Mario Kozah, editors, <span class="title-monographic" xml:lang="en" lang="en" dir="ltr">The Beth Qaṭraye Gazetteer</span></li><li><span> <span> Thomas A. Carlson</span></span> and <span> <span> David A. Michelson</span></span>, entry contributors, “<span class="title-analytic" xml:lang="en" lang="en" dir="ltr">Peruz Shapur — <span class="tei-foreign" xml:lang="syr" lang="syr" dir="rtl">ܐܢܒܐܪ</span>
+                </span>”</li></ul></div><div><h4>Additional Credit:</h4><ul><li>Additional research from Encyclopedia of Islam and the Gorgias Encyclopedic Dictionary of the Syriac Heritage by <span> Tobias Scheunchen</span></li><li>Data correction and integration from Ibn Battuta, al-Bakri, al-Tabari, Nasir Khusraw, Ibn Jubayr, Isho’yahb III, Al-Muqaddasī, Ibn Ḥawqal, Al-Masūdī, Yāqūt b. ʿAbdallāh al-Ḥamawī by <span> Tobias Scheunchen</span></li><li>Ibn Ḥawqal data collection by <span> <span> Abdulrahim Abu-Husayn</span></span></li><li>Ibn Ḥawqal data collection by <span> Abdul Rahman Chamseddine</span></li><li>Data merging and XML by <span> William L. Potter</span></li><li>Data merging and XML by <span> <span> David A. Michelson</span></span></li><li>Ibn Battuta data collection by <span> <span> Abdulrahim Abu-Husayn</span></span></li><li>Ibn Battuta data collection by <span> Abdul Rahman Chamseddine</span></li><li>Initial Barsoum entry creation by <span> <span> David A. Michelson</span></span></li><li>Data merging, Pleiades and Wikipedia linking, and XML by <span> <span> Thomas A. Carlson</span></span></li><li>Wilmshurst index information entry by <span> <span> Anthony Davis</span></span></li></ul></div></div><div id="license"><h3>Copyright and License for Reuse</h3><div>Except otherwise noted, this page is © 2020.
+                                </div><span class="tei-licence">
+                        <p>Distributed under a Creative Commons Attribution 3.0 Unported
+                            License.</p>
+                        <p>This entry incorporates copyrighted material from the following work(s): <span class="tei-listBibl">
+                                
+                                
+                                
+                            </span>
+                            <div class="tei-note"><span>used under a Creative Commons Attribution license <a href="http://creativecommons.org/licenses/by/3.0/"/>
+                            </span></div>
+                        </p>
+                    </span></div></div><a class="btn-sm btn-info togglelink pull-right" data-toggle="collapse" data-target="#showcit" data-text-swap="Hide citation">Show full citation information...</a></div></div>
+                </div>
+                <div class="col-md-5 col-lg-4 right-menu">
+                    <!-- Make dynamic -->
+                    <div id="map-data" style="margin-bottom:3em;"><script type="text/javascript" src="/exist/apps/bethqatraye/resources/leaflet/leaflet.js"/><script type="text/javascript" src="/exist/apps/bethqatraye/resources/leaflet/leaflet.awesome-markers.min.js"/><script type="text/javascript" src="/exist/apps/bethqatraye/resources/leaflet/leaflet.markercluster-src.js"/><div id="map"/><div class="hint map pull-right small">
+                * This map displays 1 records. Only places with coordinates are displayed. 
+                     <button class="btn btn-default btn-sm" data-toggle="modal" data-target="#map-selection" id="mapFAQ">See why?</button></div><script type="text/javascript"><![CDATA[
+            var terrain = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'});
+            
+            /* Not added by default, only through user control action */
+            var streets = L.tileLayer(
+                'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
+                {attribution: "OpenStreetMap"});
+                                
+            var imperium = L.tileLayer(
+                    'https://dh.gu.se/tiles/imperium/{z}/{x}/{y}.png', {
+                        maxZoom: 10,
+                        attribution: 'Powered by <a href="http://leafletjs.com/">Leaflet</a>. Map base: <a href="https://dh.gu.se/dare/" title="Digital Atlas of the Roman Empire, Department of Archaeology and Ancient History, Lund University, Sweden">DARE</a>, 2015 (cc-by-sa).'
+                    }); 
+            var placesgeo = {"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[43.640686,33.4000693333]},"properties":{"uri":"/exist/apps/bethqatraye/place/211","name":"Peruz Shapur","desc":"\"town on the left\n                        bank of the Euphrates, 43° 43’ E, 33° 22.5’ N.\"","type":null}}]}                                
+            var redIcon = L.icon({
+                            iconUrl: '$nav-base/resources/leaflet/images/marker-icon-red.png',
+                            iconSize: [25, 41], // size of the icon
+                            iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
+                            popupAnchor: [0, -41],
+                            shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
+                            }),
+                lightRedIcon = L.icon({
+                            iconUrl: '$nav-base/resources/leaflet/images/marker-icon-light-red.png',
+                            iconSize: [25, 41], // size of the icon
+                            iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
+                            popupAnchor: [0, -41],
+                            shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
+                            }),
+                blueIcon = L.icon({
+                            iconUrl: '$nav-base/resources/leaflet/images/marker-icon.png',
+                            iconSize: [25, 41], // size of the icon
+                            iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
+                            popupAnchor: [0, -41],
+                            shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
+                            }),
+               lightBlueIcon = L.icon({
+                            iconUrl: '$nav-base/resources/leaflet/images/marker-icon-light-blue.png',
+                            iconSize: [25, 41], // size of the icon
+                            iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
+                            popupAnchor: [0, -41],
+                            shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',                                            
+                            }),
+                bqIcon = L.icon({
+                            iconUrl: '$nav-base/resources/leaflet/images/marker-icon-bq.png',
+                            iconSize: [25, 41], // size of the icon
+                            iconAnchor: [15, 41], // point of the icon which will correspond to marker's location
+                            popupAnchor: [0, -41],
+                            shadowUrl: '$nav-base/resources/leaflet/images/marker-shadow.png',   
+                            });
+            var markers = L.markerClusterGroup({
+                        maxClusterRadius: function (zoom) {
+                            return 1; // radius in pixels
+                        }
+                    });
+            var geojson = L.geoJson(placesgeo, {onEachFeature: function (feature, layer){
+                            var typeText = feature.properties.type
+                            var popupContent = 
+                                "<a href='" + feature.properties.uri + "' class='map-pop-title'>" +
+                                feature.properties.name + "</a>"  +
+                                (feature.properties.desc ? "<span class='map-pop-desc'>"+ feature.properties.desc +"</span>" : "");
+                                layer.bindPopup(popupContent);
+                                
+                                //return layer.setIcon(redIcon);
+                                //switch icon based on feature property, 
+                                switch (feature.properties.type) {
+                                    case 'bqRegion': return layer.setIcon(redIcon);
+                                    case 'bqRepresentative': return layer.setIcon(lightRedIcon);
+                                    case 'representative': return layer.setIcon(lightBlueIcon);
+                                    case 'representative': return layer.setIcon(blueIcon);
+                                    case 'bq': return layer.setIcon(bqIcon);
+                                    default : return layer.setIcon(blueIcon);
+                                 }
+                                }
+                            })
+        var map = L.map('map',{scrollWheelZoom:false}).fitBounds(geojson.getBounds(),{maxZoom: 5}).setZoom(5);     
+        terrain.addTo(map);
+                                        
+        L.control.layers({
+                        "Terrain (default)": terrain,
+                        "Streets": streets,
+                        "Imperium": imperium }).addTo(map);
+        
+        markers.addLayer(geojson);
+        map.addLayer(markers);
+        //map.fitBounds(markers.getBounds(), {padding: [50,50]});
+          		
+        //geojson.addTo(map);     
+        ]]></script><div><div class="modal fade" id="map-selection" tabindex="-1" role="dialog" aria-labelledby="map-selectionLabel" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal"><span aria-hidden="true"> x </span><span class="sr-only">Close</span></button></div><div class="modal-body"><div id="popup" style="border:none; margin:0;padding:0;margin-top:-2em;"/></div><div class="modal-footer"><a class="btn" href="/documentation/faq.html" aria-hidden="true">See all FAQs</a><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div></div></div></div><script type="text/javascript"><![CDATA[
+            $('#mapFAQ').click(function(){
+                $('#popup').load( '../documentation/faq.html #map-selection',function(result){
+                    $('#map-selection').modal({show:true});
+                });
+             });]]></script></div>
+                    <br/>
+                    <!-- Relationsips listed in the TEI record  display: list/sentence -->
+                    
+                    <!-- Relationships referencing this TEI record -->
+                    <!--                    <div data-template="app:external-relationships" data-template-label="External Relationships"/>    -->
+                </div>
+            </div>
+        
+    </div>
+    <!-- Modal email form-->
+    <div><div class="modal fade" id="feedback" tabindex="-1" role="dialog" aria-labelledby="feedbackLabel" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">x</span><span class="sr-only">Close</span></button><h2 class="modal-title" id="feedbackLabel">Corrections/Additions?</h2></div><form action="/exist/apps/bethqatraye/modules/email.xql" method="post" id="email" role="form"><div class="modal-body" id="modal-body"><!-- More information about submitting data from howtoadd.html --><p><strong>Notify the editors of a mistake:</strong><a class="btn btn-link togglelink" data-toggle="collapse" data-target="#viewdetails" data-text-swap="hide information">more information...</a></p><div class="collapse" id="viewdetails"><p>Using the following form, please inform us which page URI the mistake is on, where on the page the mistake occurs,
+                       the content of the correction, and a citation for the correct information (except in the case of obvious corrections, such as misspelled words). 
+                       Please also include your email address, so that we can follow up with you regarding 
+                       anything which is unclear. We will publish your name, but not your contact information as the author of the  correction.</p></div><input type="text" name="name" placeholder="Name" class="form-control" style="max-width:300px"/><br/><input type="text" name="email" placeholder="email" class="form-control" style="max-width:300px"/><br/><input type="text" name="subject" placeholder="subject" class="form-control" style="max-width:300px"/><br/><textarea name="comments" id="comments" rows="3" class="form-control" placeholder="Comments" style="max-width:500px"/><input type="hidden" name="id"/><input type="hidden" name="collection" value="places"/><input class="input url" id="url" placeholder="url" required="required" style="display:none;"/><!-- start reCaptcha API--></div><div class="modal-footer"><button class="btn btn-default" data-dismiss="modal">Close</button><input id="email-submit" type="submit" value="Send e-mail" class="btn"/></div></form></div></div></div></div>
+</div>
+        <!-- Footer -->
+        <footer>
+    <!-- Footer with Syriaca.org $nav-baseing -->
+    <div class="container">
+        <a href="http://creativecommons.org/licenses/by/3.0/deed.en_US" rel="license">
+            <img src="/exist/apps/bethqatraye/resources/images/cc.png" alt="Creative Commons License" style="border-width:0" height="18px"/>
+        </a> This work is licensed under a <a href="http://creativecommons.org/licenses/by/3.0/deed.en_US" rel="license">Creative Commons Attribution 3.0 Unported License</a>.
+            <br/>Copyright Beth Mardutho: The Syriac Institute and the Contributor(s), 2019.
+        </div>
+</footer>
+        <!-- Additional Javascript -->
+        <div>
+            <script src="/exist/apps/bethqatraye/resources/js/jquery.validate.min.js" type="text/javascript"/>
+            <script src="/exist/apps/bethqatraye/resources/js/require.min.js" type="text/javascript"/>
+            <script src="/exist/apps/bethqatraye/resources/js/srophe.js" type="text/javascript"/>
+            <script/>    
+        </div> 
+    </body>
+</html>
