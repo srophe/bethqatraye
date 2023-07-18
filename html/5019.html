@@ -1,0 +1,213 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head xmlns="">
+        <title>al-Baydāʾ - 
+        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        
+        <link href="/exist/apps/bethqatraye/resources/images/fav-icons/bq-favicon.ico" rel="shortcut icon"/>
+        <!-- Bootstrap 3 -->
+        <link href="/exist/apps/bethqatraye/resources/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+        <link href="/exist/apps/bethqatraye/resources/css/sm-core-css.css" rel="stylesheet" type="text/css"/>
+        <!-- Srophe styles -->
+        <link href="/exist/apps/bethqatraye/resources/css/syr-icon-fonts.css" rel="stylesheet" type="text/css"/>
+        <link href="/exist/apps/bethqatraye/resources/css/style.css" rel="stylesheet" type="text/css"/>
+        <link href="/exist/apps/bethqatraye/resources/css/main.css" rel="stylesheet" type="text/css"/>
+        <link href="/exist/apps/bethqatraye/resources/css/bq.css" rel="stylesheet" type="text/css"/>
+        <link href="/exist/apps/bethqatraye/resources/css/print.css" rel="stylesheet" type="text/css" media="print"/>
+        <!-- Leaflet -->
+        <link href="/exist/apps/bethqatraye/resources/leaflet/leaflet.css" rel="stylesheet"/>
+        <link href="/exist/apps/bethqatraye/resources/leaflet/leaflet.awesome-markers.css" rel="stylesheet"/>
+        <link href="/exist/apps/bethqatraye/resources/leaflet/MarkerCluster.css" rel="stylesheet"/>
+        <link href="/exist/apps/bethqatraye/resources/leaflet/MarkerCluster.Default.css" rel="stylesheet"/>
+       <!--
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+        <link href="$nav-base/resources/leaflet/leaflet.icon-material.css" rel="stylesheet"/>
+        <script src="$nav-base/resources/leaflet/leaflet.icon-material.js"></script>
+        -->
+        <!-- JQuery -->
+        <link href="/exist/apps/bethqatraye/resources/jquery-ui/jquery-ui.min.css" rel="stylesheet"/>
+        <script src="https://plausible.io/js/plausible.js" defer="defer" data-domain="bqgazetteer.bethmardutho.org"/>
+        <script src="/exist/apps/bethqatraye/resources/js/jquery.min.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/jquery-ui/jquery-ui.min.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/js/jquery.smartmenus.min.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/js/clipboard.min.js" type="text/javascript"/>
+        <!-- Bootstrap -->
+        <script src="/exist/apps/bethqatraye/resources/bootstrap/js/bootstrap.min.js" type="text/javascript"/>
+        <!-- ReCaptcha -->
+        <script src="https://www.google.com/recaptcha/api.js" type="text/javascript" async="async" defer="defer"/>
+        <!-- keyboard widget css & script -->
+        <link href="/exist/apps/bethqatraye/resources/keyboard/css/keyboard.min.css" rel="stylesheet"/>
+        <link href="/exist/apps/bethqatraye/resources/keyboard/css/keyboard-previewkeyset.min.css" rel="stylesheet"/>
+        <link href="/exist/apps/bethqatraye/resources/keyboard/syr/syr.css" rel="stylesheet"/>
+        <script src="/exist/apps/bethqatraye/resources/keyboard/syr/jquery.keyboard.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/keyboard/js/jquery.keyboard.extension-mobile.min.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/keyboard/js/jquery.keyboard.extension-navigation.min.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/keyboard/syr/jquery.keyboard.extension-autocomplete.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/keyboard/syr/keyboardSupport.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/keyboard/syr/syr.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/keyboard/layouts/ms-Greek.min.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/keyboard/layouts/ms-Russian.min.js" type="text/javascript"/>
+        <script src="/exist/apps/bethqatraye/resources/keyboard/layouts/ms-Arabic.min.js" type="text/javascript"/>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $('[data-toggle="tooltip"]').tooltip({ container: 'body' })
+
+                $('.keyboard').keyboard({
+                    openOn: null,
+                    stayOpen: false,
+                    alwaysOpen: false,
+                    autoAccept: true,
+                    usePreview: false,
+                    initialFocus: true,
+                    rtl : true,
+                    layout: 'syriac-phonetic',
+                    hidden: function(event, keyboard, el){
+                       //  keyboard.destroy();
+                     }
+                });
+
+                $('.keyboard-select').click(function () {
+                    var keyboardID = '#' + $(this).data("keyboard-id")
+                    var kb = $(keyboardID).getkeyboard();
+                    //var kb = $('#searchField').getkeyboard();
+                    // change layout based on link ID
+                    kb.options.layout = this.id
+                    // open keyboard if layout is different, or time from it last closing is &gt; 200 ms
+                    if (kb.last.layout !== kb.options.layout || (new Date().getTime() - kb.last.eventTime) &gt; 200) {
+                        kb.reveal();
+                    }
+                });
+                //Change fonts
+                $('.swap-font').on('click', function(){
+                    var selectedFont = $(this).data("font-id")
+                    $('.selectableFont').not('.syr').css('font-family', selectedFont);
+                    $("*:lang(syr)").css('font-family', selectedFont)
+                });
+                
+            })
+        </script>
+    </head>
+    <body xmlns="" id="body">
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"/>
+                    <span class="icon-bar"/>
+                    <span class="icon-bar"/>
+                </button>
+                <a href="/exist/apps/bethqatraye/index.html" class="navbar-brand banner-container">
+                    <span class="banner-icon">
+                        <img src="/exist/apps/bethqatraye/resources/images/bq-icon.png" alt="Beth Qaṭraye Gazetteer logo" width="50px"/>
+                    </span>
+                    <span class="banner-text">Beth Qaṭraye Gazetteer</span>
+                </a>
+                
+            </div>
+            <div class="navbar-collapse collapse pull-right" id="navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="/exist/apps/bethqatraye/browse.html" class="nav-text">Browse</a>
+                    </li>
+                    <li>
+                        <a href="/exist/apps/bethqatraye/about.html" class="nav-text">About</a>
+                    </li>
+                    <li>
+                        <a href="/exist/apps/bethqatraye/search.html" class="nav-text">Advanced Search</a>
+                    </li>
+                    <li>
+                        <div id="search-wrapper">
+                            <form action="/exist/apps/bethqatraye/search.html" class="navbar-form navbar-right search-box" role="search" method="get">
+                                <div class="form-group">
+                                    <input type="text" class="form-control keyboard" placeholder="search" name="keyword" id="keywordNav"/>
+                                    <span><span class="keyboard-menu"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Select Keyboard">
+                 <span class="syriaca-icon syriaca-keyboard">  </span><span class="caret"/></button><ul class="dropdown-menu"><li><a href="#" class="keyboard-select" id="syriac-phonetic" data-keyboard-id="keywordNav">Syriac Phonetic</a></li><li><a href="#" class="keyboard-select" id="syriac-standard" data-keyboard-id="keywordNav">Syriac Standard</a></li><li><a href="#" class="keyboard-select" id="ms-Arabic (101)" data-keyboard-id="keywordNav">Arabic Mod. Standard</a></li><li><a href="#" class="keyboard-select" id="qwerty" data-keyboard-id="keywordNav">English QWERTY</a></li><li><a href="#" class="keyboard-select" id="ms-Greek" data-keyboard-id="keywordNav">Greek Mod. Standard</a></li><li><a href="#" class="keyboard-select" id="ms-Russian" data-keyboard-id="keywordNav">Russian Mod. Standard</a></li></ul></span></span>
+                                    <button class="btn btn-default search-btn" id="searchbtn" type="submit" title="Search">
+                                        <span class="glyphicon glyphicon-search"/>
+                                    </button>                                    
+                                </div>
+                            </form>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="btn-nav navbar-btn">
+                            <span><span class="keyboard-menu"><button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Select Keyboard">
+                 <span class="syriaca-icon syriaca-keyboard">  </span><span class="caret"/></button><ul class="dropdown-menu"><li><a href="#" class="keyboard-select" id="syriac-phonetic" data-keyboard-id="keywordNav">Syriac Phonetic</a></li><li><a href="#" class="keyboard-select" id="syriac-standard" data-keyboard-id="keywordNav">Syriac Standard</a></li><li><a href="#" class="keyboard-select" id="ms-Arabic (101)" data-keyboard-id="keywordNav">Arabic Mod. Standard</a></li><li><a href="#" class="keyboard-select" id="qwerty" data-keyboard-id="keywordNav">English QWERTY</a></li><li><a href="#" class="keyboard-select" id="ms-Greek" data-keyboard-id="keywordNav">Greek Mod. Standard</a></li><li><a href="#" class="keyboard-select" id="ms-Russian" data-keyboard-id="keywordNav">Russian Mod. Standard</a></li></ul></span></span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div id="content" class="text">
+    <div class="main-content-block">
+            <div><div class="container" style="width:100%;clear:both;margin-bottom:1em; text-align:right;"><a href="javascript:window.print();" type="button" class="btn btn-default btn-xs" id="teiBtn" data-toggle="tooltip" title="Click to send this page to the printer."><span class="glyphicon glyphicon-print" aria-hidden="true"/></a> <a href="/exist/apps/bethqatraye/place/5019.tei" class="btn btn-default btn-xs" id="teiBtn" data-toggle="tooltip" title="Click to view the TEI XML data for this record."><span class="glyphicon glyphicon-download-alt" aria-hidden="true"/> TEI/XML
+                        </a> <a href="/exist/apps/bethqatraye/place/5019.rdf" class="btn btn-default btn-xs" id="teiBtn" data-toggle="tooltip" title="Click to view the RDF-XML data for this record."><span class="glyphicon glyphicon-download-alt" aria-hidden="true"/> RDF/XML
+                        </a> <a href="/exist/apps/bethqatraye/place/5019.txt" class="btn btn-default btn-xs" id="teiBtn" data-toggle="tooltip" title="Click to view the plain text data for this record."><span class="glyphicon glyphicon-download-alt" aria-hidden="true"/> Text
+                        </a> <br/></div></div>
+            <div class="row">
+                <div class="col-md-7 col-lg-8">
+                    <div class="title"><h1><span id="title"><span xml:lang="en" lang="en" dir="ltr">al-Baydāʾ - <span class="tei-foreign" xml:lang="ar" lang="ar" dir="rtl">البيداء</span>
+        </span></span></h1></div><div class="idno seriesStmt" style="margin:0; margin-top:.25em; margin-bottom: 1em; padding:1em; color: #999999;"><small><span class="uri"><a href="/exist/apps/bethqatraye/place/5018"><span class="glyphicon glyphicon-backward" aria-hidden="true"/></a> <button type="button" class="btn btn-default btn-xs" id="idnoBtn" data-clipboard-action="copy" data-clipboard-target="#syriaca-id"><span class="srp-label">URI</span></button> <span id="syriaca-id">https://bqgazetteer.bethmardutho.org/place/5019</span><script>
+                        var clipboard = new Clipboard('#idnoBtn');
+                        clipboard.on('success', function(e) {
+                        console.log(e);
+                        });
+                        
+                        clipboard.on('error', function(e) {
+                        console.log(e);
+                        });
+                    </script> <a href="/exist/apps/bethqatraye/place/5020"><span class="glyphicon glyphicon-forward" aria-hidden="true"/></a></span></small></div><span class="tei-body">
+      <span class="tei-listPlace">
+        <div class="tei-desc text abstract"><span class="tei-desc" xml:lang="en" lang="en" dir="ltr" id="abstract5019-1">A wādī near Medina.</span></div><div id="placenames" class="content-block"><h3>Names</h3><ul><li dir="ltr"><span class="tei-placeName" xml:lang="ar" lang="ar" dir="rtl" id="name5019-2">البيداء</span><span class="tei-footnote-refs" dir="ltr" lang="en" xml:lang="en"><span class="tei-footnote-ref"><a href="#bib5019-1">1</a></span> </span></li><li dir="ltr"><span class="tei-placeName" xml:lang="en" lang="en" dir="ltr" id="name5019-1">al-Baydāʾ</span></li></ul></div><div class="content-block"><h3>Place Type</h3><p class="text-block">valley</p></div><div class="info-btns"><button class="btn btn-info" data-toggle="modal" data-target="#feedback">Corrections/Additions?</button> 
+            <a href="#" class="btn btn-info" data-toggle="modal" data-target="#selection" data-ref="../documentation/faq.html" id="showSection">
+                Is this record complete?
+            </a></div><div id="see-also" class="see-also content-block"><h3>See Also</h3><ul/></div><div class="content-block"><div id="sources"><h3>Works Cited</h3><p><small>Any information without attribution has been created following the Syriaca.org <a href="http://syriaca.org/documentation/">editorial guidelines</a>.</small></p><ul><li class="tei-bibl footnote"><span class="anchor" id="bib5019-1"/><span class="tei-footnote-tgt">1</span> <span class="tei-footnote-content"><span class="footnote-content">Ibn Jubayr,  <span class="title-monographic" xml:lang="en" lang="en" dir="ltr">Riḥlat Ibn Jubayr</span>, pp: 189.<span class="footnote-links"><span class="footnote-icon"><a title="External link to bibliographic record" data-toggle="tooltip" data-placement="top" class="bibl-links"><span class="glyphicon glyphicon-book"/></a></span></span></span></span></li></ul></div></div>
+      </span>
+    </span><div class="citationinfo"><h3>How to Cite This Entry</h3><div id="citation-note" class="content-block indent"><span> Tobias Scheunchen</span>, “<span class="title-analytic" xml:lang="en" lang="en" dir="ltr">al-Baydāʾ - <span class="tei-foreign" xml:lang="ar" lang="ar" dir="rtl">البيداء</span>
+        </span>” in <span class="title-monographic" xml:lang="en" lang="en" dir="ltr">The Beth Qaṭraye Gazetteer</span>,  last modified January 10, 2020, <a href="https://bqgazetteer.bethmardutho.org/place/5019">https://bqgazetteer.bethmardutho.org/place/5019</a>.<div class="collapse" id="showcit"><div id="citation-bibliography"><h4>Bibliography:</h4><span class="editor">Tobias Scheunchen</span>, “<span class="title-analytic" xml:lang="en" lang="en" dir="ltr">al-Baydāʾ - <span class="tei-foreign" xml:lang="ar" lang="ar" dir="rtl">البيداء</span>
+        </span>.” In <span class="title-monographic" xml:lang="en" lang="en" dir="ltr">The Beth Qaṭraye Gazetteer</span>, edited by Haya Al Thani, Saif al-Murikhi, Abdulrahim Abu-Husayn, Abdul Rahman Chamseddine and Mario Kozah. Beth Mardutho: The Syriac Institute,
+        2020.
+                 Entry published January 10, 2020. <a href="https://bqgazetteer.bethmardutho.org/place/5019">https://bqgazetteer.bethmardutho.org/place/5019</a>.</div><div id="about"><h3>About this Entry</h3><p><span class="heading-inline">Entry Title:</span> <span class="title-analytic" xml:lang="en" lang="en" dir="ltr">al-Baydāʾ - <span class="tei-foreign" xml:lang="ar" lang="ar" dir="rtl">البيداء</span>
+        </span></p><div><h4>Authorial and Editorial Responsibility:</h4><ul><li><span> Haya Al Thani</span>, general editor, Beth Mardutho: The Syriac Institute</li><li>Haya Al Thani, Saif al-Murikhi, Abdulrahim Abu-Husayn, Abdul Rahman Chamseddine, and Mario Kozah, editors, <span class="title-monographic" xml:lang="en" lang="en" dir="ltr">The Beth Qaṭraye Gazetteer</span></li><li><span class="editor">Tobias Scheunchen</span>, entry contributor, “<span class="title-analytic" xml:lang="en" lang="en" dir="ltr">al-Baydāʾ - <span class="tei-foreign" xml:lang="ar" lang="ar" dir="rtl">البيداء</span>
+        </span>”</li></ul></div><div><h4>Additional Credit:</h4><ul><li>Data correction and integration from Ibn Battuta, al-Bakri, al-Tabari, Nasir Khusraw, Ibn Jubayr, Isho’yahb III, Al-Muqaddasī, Ibn Ḥawqal, Al-Masūdī, Yāqūt b. ʿAbdallāh al-Ḥamawī by <span> Tobias Scheunchen</span></li><li>Ibn Jubayr data collection by <span> <span> Abdulrahim Abu-Husayn</span></span></li><li>Ibn Jubayr data collection by <span> Abdul Rahman Chamseddine</span></li><li>Data merging and XML by <span> William L. Potter</span></li><li>Data merging and XML by <span> <span> David A. Michelson</span></span></li></ul></div></div><div id="license"><h3>Copyright and License for Reuse</h3><div>Except otherwise noted, this page is © 2020.
+                                </div><span class="tei-licence">
+            <p>Distributed under a Creative Commons Attribution 3.0 Unported License.</p>
+          </span></div></div><a class="btn-sm btn-info togglelink pull-right" data-toggle="collapse" data-target="#showcit" data-text-swap="Hide citation">Show full citation information...</a></div></div>
+                </div>
+                <div class="col-md-5 col-lg-4 right-menu">
+                    <!-- Make dynamic -->
+                    
+                    <br/>
+                    <!-- Relationsips listed in the TEI record  display: list/sentence -->
+                    
+                    <!-- Relationships referencing this TEI record -->
+                    <!--                    <div data-template="app:external-relationships" data-template-label="External Relationships"/>    -->
+                </div>
+            </div>
+        
+    </div>
+    <!-- Modal email form-->
+    <div><div class="modal fade" id="feedback" tabindex="-1" role="dialog" aria-labelledby="feedbackLabel" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">x</span><span class="sr-only">Close</span></button><h2 class="modal-title" id="feedbackLabel">Corrections/Additions?</h2></div><form action="/exist/apps/bethqatraye/modules/email.xql" method="post" id="email" role="form"><div class="modal-body" id="modal-body"><!-- More information about submitting data from howtoadd.html --><p><strong>Notify the editors of a mistake:</strong><a class="btn btn-link togglelink" data-toggle="collapse" data-target="#viewdetails" data-text-swap="hide information">more information...</a></p><div class="collapse" id="viewdetails"><p>Using the following form, please inform us which page URI the mistake is on, where on the page the mistake occurs,
+                       the content of the correction, and a citation for the correct information (except in the case of obvious corrections, such as misspelled words). 
+                       Please also include your email address, so that we can follow up with you regarding 
+                       anything which is unclear. We will publish your name, but not your contact information as the author of the  correction.</p></div><input type="text" name="name" placeholder="Name" class="form-control" style="max-width:300px"/><br/><input type="text" name="email" placeholder="email" class="form-control" style="max-width:300px"/><br/><input type="text" name="subject" placeholder="subject" class="form-control" style="max-width:300px"/><br/><textarea name="comments" id="comments" rows="3" class="form-control" placeholder="Comments" style="max-width:500px"/><input type="hidden" name="id"/><input type="hidden" name="collection" value="places"/><input class="input url" id="url" placeholder="url" required="required" style="display:none;"/><!-- start reCaptcha API--></div><div class="modal-footer"><button class="btn btn-default" data-dismiss="modal">Close</button><input id="email-submit" type="submit" value="Send e-mail" class="btn"/></div></form></div></div></div></div>
+</div>
+        <!-- Footer -->
+        <footer>
+    <!-- Footer with Syriaca.org $nav-baseing -->
+    <div class="container">
+        <a href="http://creativecommons.org/licenses/by/3.0/deed.en_US" rel="license">
+            <img src="/exist/apps/bethqatraye/resources/images/cc.png" alt="Creative Commons License" style="border-width:0" height="18px"/>
+        </a> This work is licensed under a <a href="http://creativecommons.org/licenses/by/3.0/deed.en_US" rel="license">Creative Commons Attribution 3.0 Unported License</a>.
+            <br/>Copyright Beth Mardutho: The Syriac Institute and the Contributor(s), 2019.
+        </div>
+</footer>
+        <!-- Additional Javascript -->
+        <div>
+            <script src="/exist/apps/bethqatraye/resources/js/jquery.validate.min.js" type="text/javascript"/>
+            <script src="/exist/apps/bethqatraye/resources/js/require.min.js" type="text/javascript"/>
+            <script src="/exist/apps/bethqatraye/resources/js/srophe.js" type="text/javascript"/>
+            <script/>    
+        </div> 
+    </body>
+</html>
