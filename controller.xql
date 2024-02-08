@@ -68,7 +68,12 @@ else if ($exist:path eq "/") then
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
         <redirect url="index.html"/>
     </dispatch>
-    
+  
+else if(contains($exist:path,'/html/')) then 
+    (: everything else is passed through :)
+    <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
+        <cache-control cache="yes"/>
+    </dispatch>
 else if($exist:resource = 'editors.xml') then
     (: forward editors.xml to editors.html :)
     <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
@@ -137,6 +142,10 @@ else if(replace($exist:path, $exist:resource,'') =  $exist:record-uris) then
                      <redirect url="https://spear-prosop.org/index.html"/>
                  </dispatch>  
             else if(doc-available(xs:anyURI($document-uri))) then
+                 <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
+                    <cache-control cache="yes"/>
+                 </dispatch>
+            (:
                 <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
                     <forward url="{$exist:controller}{$path2html}"></forward>
                     <view>
@@ -149,6 +158,7 @@ else if(replace($exist:path, $exist:resource,'') =  $exist:record-uris) then
                         <forward url="{$exist:controller}/modules/view.xql"/>
                     </error-handler>
                 </dispatch>
+                :)
             else 
         (:<div>HTML page for id: {$id} root: {$record-uri-root} HTML: {$html-path}</div>:)
             <dispatch xmlns="http://exist.sourceforge.net/NS/exist">
