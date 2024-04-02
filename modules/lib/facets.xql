@@ -556,7 +556,9 @@ declare function sf:field-author($element as item()*, $name as xs:string){
                concat($element/ancestor-or-self::tei:TEI/descendant::tei:body/tei:biblStruct/descendant-or-self::tei:author[1]/descendant-or-self::tei:surname, ',',  
                 $element/ancestor-or-self::tei:TEI/descendant::tei:body/tei:biblStruct/descendant-or-self::tei:author[1]/descendant-or-self::tei:forename)
         else  $element/ancestor-or-self::tei:TEI/descendant::tei:biblStruct/descendant::tei:author
-    else $element/ancestor-or-self::tei:TEI/descendant::tei:titleStmt/descendant::tei:author
+    else if($element/ancestor-or-self::tei:TEI/descendant::tei:titleStmt/descendant::tei:author) then 
+            $element/ancestor-or-self::tei:TEI/descendant::tei:titleStmt/descendant::tei:author
+    else ()            
 };
 
 (:~
