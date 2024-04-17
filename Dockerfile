@@ -1,4 +1,4 @@
-FROM wsalesky/srophe-base:1.0.1
+FROM --platform=linux/amd64 pkoiralap/existdb:1.0.0
 
 ARG ADMIN_PASSWORD
 
