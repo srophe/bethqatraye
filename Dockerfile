@@ -1,15 +1,13 @@
-# Start from the existing working base image
-#FROM existdb/existdb:6.0.1
-FROM --platform=linux/amd64 wsalesky/srophe-base:1.0.1
+FROM --platform=linux/amd64 pkoiralap/existdb:1.0.0
 
-# Copy over all the files you need 
+ARG ADMIN_PASSWORD
+
 COPY autodeploy/*.xar /exist/autodeploy/
-COPY conf/*.xml /exist/etc/webapp/WEB-INF/
 COPY conf/controller-config.xml /exist/etc/webapp/WEB-INF/
 COPY conf/collection.xconf.init /exist/etc/
 COPY conf/exist-webapp-context.xml /exist/etc/jetty/webapps/
 COPY conf/conf.xml /exist/etc/conf.xml
-#COPY build/entrypoint.sh /entrypoint.sh
+COPY build/entrypoint.sh /entrypoint.sh
 
 EXPOSE 8080 8443
 
@@ -30,8 +28,7 @@ ENV JAVA_TOOL_OPTIONS \
 -XX:MaxRAMPercentage=${JVM_MAX_RAM_PERCENTAGE:-75.0} \
 -XX:+ExitOnOutOfMemoryError \
 -XX:-HeapDumpOnOutOfMemoryError \
--XX:HeapDumpPath=/exist/heapDump/exist-memory-dump.hprof \
--XX:InitiatingHeapOccupancyPercent=70
+-XX:HeapDumpPath=/exist/heapDump/exist-memory-dump.hprof
 
 HEALTHCHECK CMD [ "java", \
 "org.exist.start.Main", "client", \
@@ -39,7 +36,8 @@ HEALTHCHECK CMD [ "java", \
 "--user", "guest", "--password", "guest", \
 "--xpath", "system:get-version()" ]
 
-ENV ADMIN_PASSWORD $ADMIN_PASSWORD
 
-#RUN [ "java", "org.exist.start.Main", "client", "--no-gui",  "-l", "-u", "admin", "-P", "", "-x", "sm:passwd('admin','ADMIN_PASSWORD')" ]
-ENTRYPOINT [ "java", "org.exist.start.Main", "client", "--no-gui",  "-l", "-u", "admin", "-P", "", "-x", "sm:passwd('admin','ADMIN_PASSWORD')"]
+ENV ADMIN_PASSWORD=$ADMIN_PASSWORD
+
+ENTRYPOINT [ "/busybox/sh", "/entrypoint.sh"]
+
